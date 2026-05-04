@@ -26,6 +26,17 @@ mat-form-field {
   width: 100%;
 }
 
+.nueva-cata-form-error {
+  margin: 0 0 1rem;
+  padding: 12px 14px;
+  border-radius: 6px;
+  background-color: #fdecea;
+  color: #611a15;
+  border: 1px solid #f5c6cb;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
 .actions {
   display: flex;
   justify-content: center;

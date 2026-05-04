@@ -1,5 +1,5 @@
 import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, formatDate } from '@angular/common';
 import { MatSliderModule } from '@angular/material/slider';
 import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -15,6 +15,7 @@ import {
   type CuppingSensoryScores,
   type CuppingSessionEntry,
 } from '../../../../cupping-session/domain/model/cupping-session-entry.entity';
+import { getUserFacingApiMessage } from '../../../../shared/infrastructure/api-error-message';
 import { TranslateService } from '@ngx-translate/core';
 import { CuppingSensoryRadarComponent } from '../cupping-sensory-radar/cupping-sensory-radar.component';
 
@@ -48,12 +49,25 @@ export class DetallesCataComponent implements OnChanges {
     origin: '',
     variety: '',
     processing: 'washed',
-    sessionDate: '',
     roastStyleNotes: '',
   };
 
   processingCodes = ['washed', 'natural', 'honey', 'experimental'] as const;
   saving = false;
+
+  /** Fecha de sesión solo lectura (misma lógica de presentación que el listado). */
+  get sessionDateDisplay(): string {
+    const raw = (this.sesion?.sessionDate ?? '').toString().slice(0, 10);
+    if (raw.length !== 10) {
+      return '—';
+    }
+    try {
+      const lang = this.translate.getCurrentLang() || 'es';
+      return formatDate(`${raw}T12:00:00`, 'mediumDate', lang);
+    } catch {
+      return raw;
+    }
+  }
 
   
   hexagonoAnimar = false;
@@ -79,7 +93,6 @@ export class DetallesCataComponent implements OnChanges {
       origin: s.origin ?? '',
       variety: s.variety ?? '',
       processing: s.processing || 'washed',
-      sessionDate: (s.sessionDate ?? '').slice(0, 10),
       roastStyleNotes: s.roastStyleNotes ?? '',
     };
   }
@@ -116,13 +129,14 @@ export class DetallesCataComponent implements OnChanges {
       amargor: this.evaluacion.amargor,
       aftertaste: this.evaluacion.aftertaste,
     });
+    const sessionDateIso = (this.sesion.sessionDate ?? '').slice(0, 10);
     const updated: CuppingSessionEntry = {
       ...this.sesion,
       name: this.configDraft.name.trim(),
       origin: this.configDraft.origin.trim(),
       variety: this.configDraft.variety.trim(),
       processing: this.configDraft.processing.trim(),
-      sessionDate: this.configDraft.sessionDate.slice(0, 10),
+      sessionDate: sessionDateIso,
       roastStyleNotes: this.configDraft.roastStyleNotes.trim() || null,
       resultsJson,
     };
@@ -132,9 +146,10 @@ export class DetallesCataComponent implements OnChanges {
         this.snackBar.open(this.translate.instant('CUPPING_DETAILS.SAVE_SUCCESS'), undefined, { duration: 3000 });
         this.saved.emit(entity);
       },
-      error: () => {
+      error: (err: unknown) => {
         this.saving = false;
-        this.snackBar.open(this.translate.instant('CUPPING_DETAILS.SAVE_ERROR'), undefined, { duration: 4000 });
+        const msg = getUserFacingApiMessage(err, this.translate.instant('CUPPING_DETAILS.SAVE_ERROR'));
+        this.snackBar.open(msg, undefined, { duration: 5000 });
       },
     });
   }

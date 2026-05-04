@@ -40,6 +40,18 @@
   gap: 20px;
 }
 
+.logup-submit-error {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 6px;
+  background-color: #fdecea;
+  color: #611a15;
+  border: 1px solid #f5c6cb;
+  font-size: 14px;
+  line-height: 1.4;
+  text-align: left;
+}
+
 .logup-form mat-form-field {
   width: 100%;
 }

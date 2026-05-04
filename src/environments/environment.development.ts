@@ -1,6 +1,6 @@
 export const environment = {
   production: false,
-  serverBaseUrl: 'http://localhost:8023',
+  serverBaseUrl: 'http://localhost:8080',
   coffeeLotsEndpointPath: '/api/v1/coffee-lots',
   suppliersEndpointPath: '/api/v1/suppliers',
   roastProfileEndpointPath: '/api/v1/roast-profile',

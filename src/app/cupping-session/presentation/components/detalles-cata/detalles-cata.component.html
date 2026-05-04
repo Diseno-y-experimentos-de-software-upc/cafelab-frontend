@@ -93,9 +93,10 @@
         </mat-option>
       </mat-select>
     </mat-form-field>
-    <mat-form-field appearance="outline" class="full-width">
+    <mat-form-field appearance="outline" class="full-width session-date-readonly">
       <mat-label>{{ 'CUPPING_DETAILS.DATE' | translate }}</mat-label>
-      <input matInput type="date" [(ngModel)]="configDraft.sessionDate" />
+      <input matInput readonly tabindex="-1" class="session-date-readonly-input" [value]="sessionDateDisplay" />
+      <mat-hint>{{ 'CUPPING_DETAILS.DATE_NOT_EDITABLE_HINT' | translate }}</mat-hint>
     </mat-form-field>
     <mat-form-field appearance="outline" class="full-width">
       <mat-label>{{ 'CUPPING_DETAILS.ROAST_STYLE_NOTES' | translate }}</mat-label>

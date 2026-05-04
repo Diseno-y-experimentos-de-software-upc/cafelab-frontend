@@ -1,6 +1,7 @@
+// Mismo origen que ng serve; proxy.local.conf.js reenvía al backend local (p. ej. :8080).
 export const environment = {
   production: false,
-  serverBaseUrl: 'http://localhost:8023',
+  serverBaseUrl: '',
   coffeeLotsEndpointPath: '/api/v1/coffee-lots',
   suppliersEndpointPath: '/api/v1/suppliers',
   roastProfileEndpointPath: '/api/v1/roast-profile',

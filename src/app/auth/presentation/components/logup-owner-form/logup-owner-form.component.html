@@ -67,6 +67,11 @@
       </mat-error>
     </mat-form-field>
 
+    <div *ngIf="submitError as err" class="logup-submit-error" role="alert">
+      <ng-container *ngIf="err.kind === 'i18n'">{{ err.key | translate }}</ng-container>
+      <ng-container *ngIf="err.kind === 'plain'">{{ err.text }}</ng-container>
+    </div>
+
     <button mat-raised-button color="primary" type="submit">
       {{ 'LOGUP.SUBMIT' | translate }}
     </button>

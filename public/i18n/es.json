@@ -95,7 +95,9 @@
     "EXPERIENCEY": "Años de experiencia",
     "EXPERIENCE_0_3": "0 - 3 años",
     "EXPERIENCE_4_7": "4 - 7 años",
-    "EXPERIENCE_8_PLUS": "8 o màs años"
+    "EXPERIENCE_8_PLUS": "8 o màs años",
+    "ERROR_EMAIL_EXISTS": "Este correo electrónico ya está registrado en la plataforma. Inicia sesión o usa otro correo.",
+    "ERROR_GENERIC": "No se pudo completar el registro. Revisa los datos e inténtalo de nuevo."
   },
   "LOGUP_BARISTA": {
     "TITLE": "Registro de Barista"
@@ -617,6 +619,10 @@
     }
   },
   "CUPPING_SESSIONS": {
+    "ERROR_INVALID_NAME": "El nombre solo puede contener letras",
+    "ERROR_INVALID_ORIGIN": "El origen solo puede contener letras",
+    "ERROR_INVALID_VARIETY": "La variedad solo puede contener letras",
+    "REQUIRED_FIELDS_ERROR": "Completa todos los campos requeridos",
     "SEARCH_SESSIONS": "Buscar sesiones",
     "NAME": "Nombre",
     "DATE": "Fecha",
@@ -634,9 +640,12 @@
     "SESSION_NAME_PLACEHOLDER": "Ingrese el nombre de la sesión",
     "ORIGIN_PLACEHOLDER": "Ej.: Colombia, Huila",
     "VARIETY_PLACEHOLDER": "Ej.: Caturra",
-    "ROAST_STYLE_NOTES_LABEL": "Notas de tueste / proceso (opcional)",
+    "ROAST_STYLE_NOTES_LABEL": "Notas de tueste / proceso",
     "ROAST_STYLE_NOTES_PLACEHOLDER": "Texto libre, sin vínculo a perfil de tueste",
     "SESSION_DATE_LABEL": "Fecha de la sesión",
+    "SESSION_DATE_MIN_TODAY_HINT": "Solo a partir de hoy (no se permiten fechas pasadas).",
+    "SESSION_DATE_PAST_ERROR": "No puede registrar una sesión de cata con fecha anterior al día de hoy. Elija hoy o una fecha futura.",
+    "SESSION_DATE_INVALID": "La fecha de la sesión no es válida.",
     "SORT_BY": "Ordenar por",
     "SORT_RECENT": "Más recientes",
     "SORT_OLDEST": "Más antiguas",
@@ -685,11 +694,13 @@
     "VARIETY": "Variedad",
     "PROCESSING": "Procesamiento",
     "DATE": "Fecha",
+    "DATE_NOT_EDITABLE_HINT": "La fecha no se puede cambiar tras registrar la sesión.",
     "ROAST_STYLE_NOTES": "Notas de tueste / proceso",
     "SAVE_SESSION_BUTTON": "Guardar sesión",
     "SAVE_SUCCESS": "Sesión guardada",
     "NAME_REQUIRED": "El nombre de la sesión es obligatorio",
     "SAVE_ERROR": "No se pudo guardar la sesión",
+    "SESSION_DATE_PAST_ERROR": "No puede guardar una fecha de sesión anterior al día de hoy. Use hoy o una fecha futura.",
     "BACK": "Volver"
   },
   "CUPPING_CONSUMPTION_DIALOG": {
@@ -894,11 +905,16 @@
       "COFFEE_NAME": "Nombre del café",
       "COFFEE_REGION": "Región",
       "COFFEE_VARIETY": "Variedad",
-      "COFFEE_WEIGHT": "Peso total (opcional)",
+      "COFFEE_WEIGHT": "Peso total del café (opcional)",
+      "COFFEE_WEIGHT_UNIT_HINT": "Escriba el valor y elija si está en gramos (g) o kilogramos (kg). Se guardará en gramos.",
       "DEFECT_DATA": "Datos del defecto",
       "DEFECT_NAME": "Nombre del defecto",
       "DEFECT_TYPE": "Tipo de defecto",
       "DEFECT_WEIGHT": "Peso del defecto",
+      "DEFECT_WEIGHT_UNIT_HINT": "Escriba el valor y elija si está en gramos (g) o kilogramos (kg). Se guardará en gramos.",
+      "MASS_UNIT_LABEL": "Unidad",
+      "MASS_UNIT_G": "g (gramos)",
+      "MASS_UNIT_KG": "kg (kilogramos)",
       "DEFECT_PERCENTAGE": "Porcentaje",
       "DEFECT_CAUSE": "Causa probable",
       "DEFECT_SOLUTION": "Solución sugerida",

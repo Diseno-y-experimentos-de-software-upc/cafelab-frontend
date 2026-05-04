@@ -95,7 +95,9 @@
     "EXPERIENCEY": "Years of experience",
     "EXPERIENCE_0_3": "0 - 3 years",
     "EXPERIENCE_4_7": "4 - 7 years",
-    "EXPERIENCE_8_PLUS": "8 or more years"
+    "EXPERIENCE_8_PLUS": "8 or more years",
+    "ERROR_EMAIL_EXISTS": "This email is already registered. Sign in or use a different email address.",
+    "ERROR_GENERIC": "Registration could not be completed. Check your details and try again."
   },
   "LOGUP_BARISTA": {
     "TITLE": "Barista Registration"
@@ -616,6 +618,10 @@
   },
   "CUPPING_SESSIONS": {
     "SEARCH_SESSIONS": "Search sessions",
+    "ERROR_INVALID_NAME": "The name can only contain letters",
+    "ERROR_INVALID_ORIGIN": "The origin can only contain letters",
+    "ERROR_INVALID_VARIETY": "The variety can only contain letters",
+    "REQUIRED_FIELDS_ERROR": "Complete all required fields",
     "NAME": "Name",
     "DATE": "Date",
     "ORIGIN": "Origin",
@@ -635,6 +641,9 @@
     "ROAST_STYLE_NOTES_LABEL": "Roast / process notes (optional)",
     "ROAST_STYLE_NOTES_PLACEHOLDER": "Free text, not linked to a roast profile",
     "SESSION_DATE_LABEL": "Session date",
+    "SESSION_DATE_MIN_TODAY_HINT": "From today onward only (past dates are not allowed).",
+    "SESSION_DATE_PAST_ERROR": "You cannot register a cupping session dated before today. Choose today or a future date.",
+    "SESSION_DATE_INVALID": "The session date is not valid.",
     "SORT_BY": "Sort by",
     "SORT_RECENT": "Newest first",
     "SORT_OLDEST": "Oldest first",
@@ -683,11 +692,13 @@
     "VARIETY": "Variety",
     "PROCESSING": "Processing",
     "DATE": "Date",
+    "DATE_NOT_EDITABLE_HINT": "The date cannot be changed after the session is registered.",
     "ROAST_STYLE_NOTES": "Roast / process notes",
     "SAVE_SESSION_BUTTON": "Save session",
     "SAVE_SUCCESS": "Session saved",
     "NAME_REQUIRED": "Session name is required",
     "SAVE_ERROR": "Could not save the session",
+    "SESSION_DATE_PAST_ERROR": "You cannot save a session date before today. Use today or a future date.",
     "BACK": "Back"
   },
   "CUPPING_CONSUMPTION_DIALOG": {
@@ -892,11 +903,16 @@
       "COFFEE_NAME": "Coffee name",
       "COFFEE_REGION": "Region",
       "COFFEE_VARIETY": "Variety",
-      "COFFEE_WEIGHT": "Total weight (optional)",
+      "COFFEE_WEIGHT": "Total coffee weight",
+      "COFFEE_WEIGHT_UNIT_HINT": "Enter the amount and choose grams (g) or kilograms (kg). It will be stored in grams.",
       "DEFECT_DATA": "Defect data",
       "DEFECT_NAME": "Defect name",
       "DEFECT_TYPE": "Defect type",
       "DEFECT_WEIGHT": "Defect weight",
+      "DEFECT_WEIGHT_UNIT_HINT": "Enter the amount and choose grams (g) or kilograms (kg). It will be stored in grams.",
+      "MASS_UNIT_LABEL": "Unit",
+      "MASS_UNIT_G": "g (grams)",
+      "MASS_UNIT_KG": "kg (kilograms)",
       "DEFECT_PERCENTAGE": "Percentage",
       "DEFECT_CAUSE": "Probable cause",
       "DEFECT_SOLUTION": "Suggested solution",

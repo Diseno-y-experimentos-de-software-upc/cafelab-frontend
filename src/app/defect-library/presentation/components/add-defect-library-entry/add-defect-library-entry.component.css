@@ -1,20 +1,25 @@
 @import url('https://fonts.googleapis.com/css?family=Nunito:700&display=swap');
 
 .add-defect-container {
+  box-sizing: border-box;
   background: #f7f7f7;
   border-radius: 18px;
   box-shadow: 0 4px 24px #0002;
-  padding: 32px 40px;
-  max-width: 900px;
-  margin: 40px auto;
+  padding: clamp(16px, 4vw, 40px);
+  max-width: min(900px, 100%);
+  width: 100%;
+  margin: clamp(16px, 4vw, 40px) auto;
 }
 
 .form-title {
   color: #414535;
   font-family: 'Nunito', sans-serif;
-  font-size: 28px;
+  font-size: clamp(1.25rem, 4.5vw, 1.75rem);
   font-weight: bold;
-  margin-bottom: 32px;
+  margin-bottom: clamp(16px, 4vw, 32px);
+  line-height: 1.2;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
 }
 
 .api-error-banner {
@@ -41,9 +46,58 @@
 
 .form-row {
   display: flex;
-  gap: 24px;
+  gap: clamp(12px, 3vw, 24px);
   margin-bottom: 16px;
   flex-wrap: wrap;
+}
+
+.form-row > mat-form-field,
+.form-row > .weight-block {
+  min-width: 0;
+}
+
+.weight-block {
+  flex: 1 1 280px;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.weight-field-group {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 16px;
+  width: 100%;
+}
+
+.weight-field-group .weight-value {
+  flex: 1 1 160px;
+  min-width: 0;
+  max-width: 260px;
+}
+
+.weight-field-group .weight-unit {
+  flex: 0 1 140px;
+  min-width: 0;
+  width: 140px;
+  max-width: 100%;
+}
+
+.weight-field-feedback {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 100%;
+  margin: 6px 0 0;
+  padding: 8px 10px;
+  font-size: clamp(0.78rem, 2.4vw, 0.9rem);
+  line-height: 1.45;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+  hyphens: auto;
+  color: #8a1c1c;
+  background: #fff5f5;
+  border-left: 3px solid #c62828;
+  border-radius: 4px;
 }
 
 .textarea-field {
