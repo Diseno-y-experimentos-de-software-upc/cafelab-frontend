@@ -53,9 +53,9 @@ export class SupplierListComponent implements OnInit {
   loading: boolean = false;
   error: string | null = null;
 
-  
+
   registerFieldErrors: Partial<Record<string, string>> = {};
-  
+
   editFieldErrors: Partial<Record<string, string>> = {};
 
   constructor(
@@ -157,7 +157,10 @@ export class SupplierListComponent implements OnInit {
       return;
     }
 
-    if (!this.validateSupplierFields(this.editingSupplier, 'edit')) {
+    const isSupplierValid = this.validateSupplierFields(this.editingSupplier, 'edit');
+    const areSpecialtiesValid = this.validateSpecialties(this.editingSpecialties, 'edit');
+
+    if (!isSupplierValid || !areSpecialtiesValid) {
       this.error = this.translateService.instant('SUPPLIER_BC.VALIDATION.SUMMARY');
       return;
     }
@@ -219,7 +222,10 @@ export class SupplierListComponent implements OnInit {
     this.registerFieldErrors = {};
     this.error = null;
 
-    if (!this.validateSupplierFields(this.newSupplier, 'register')) {
+    const isSupplierValid = this.validateSupplierFields(this.newSupplier, 'register');
+    const areSpecialtiesValid = this.validateSpecialties(this.newSpecialties, 'register');
+
+    if (!isSupplierValid || !areSpecialtiesValid) {
       this.error = this.translateService.instant('SUPPLIER_BC.VALIDATION.SUMMARY');
       return;
     }
@@ -258,18 +264,50 @@ export class SupplierListComponent implements OnInit {
   addNewSpecialty(specialtyInput: HTMLInputElement): void {
     const specialty = specialtyInput.value.trim();
     delete this.registerFieldErrors['specialties'];
-    if (specialty && this.newSpecialties.length < 4 && !this.newSpecialties.includes(specialty)) {
-      this.newSpecialties.push(specialty);
-      specialtyInput.value = '';
-    } else if (this.newSpecialties.length >= 4) {
-      this.registerFieldErrors['specialties'] = this.translateService.instant(
-        'SUPPLIER_BC.VALIDATION.SPECIALTIES_MAX',
-      );
-    } else if (this.newSpecialties.includes(specialty)) {
-      this.registerFieldErrors['specialties'] = this.translateService.instant(
-        'SUPPLIER_BC.VALIDATION.SPECIALTY_DUPLICATE',
-      );
+
+    const t = (k: string) => this.translateService.instant(k);
+
+    if (!specialty) {
+      return;
     }
+
+    if (this.newSpecialties.length >= 4) {
+      this.registerFieldErrors['specialties'] = t('SUPPLIER_BC.VALIDATION.SPECIALTIES_MAX');
+      return;
+    }
+
+    if (this.newSpecialties.some((item) => item.toLowerCase() === specialty.toLowerCase())) {
+      this.registerFieldErrors['specialties'] = t('SUPPLIER_BC.VALIDATION.SPECIALTY_DUPLICATE');
+      return;
+    }
+
+    if (specialty.length < 2) {
+      this.registerFieldErrors['specialties'] = t('SUPPLIER_BC.VALIDATION.SPECIALTY_MIN_LENGTH');
+      return;
+    }
+
+    if (specialty.length > 100) {
+      this.registerFieldErrors['specialties'] = t('SUPPLIER_BC.VALIDATION.SPECIALTY_MAX_LENGTH');
+      return;
+    }
+
+    if (/^\d+$/.test(specialty)) {
+      this.registerFieldErrors['specialties'] = t('SUPPLIER_BC.VALIDATION.SPECIALTY_ONLY_NUMBERS');
+      return;
+    }
+
+    if (/^[,.;]+$/.test(specialty)) {
+      this.registerFieldErrors['specialties'] = t('SUPPLIER_BC.VALIDATION.SPECIALTY_ONLY_PUNCTUATION');
+      return;
+    }
+
+    if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]+$/.test(specialty)) {
+      this.registerFieldErrors['specialties'] = t('SUPPLIER_BC.VALIDATION.SPECIALTY_INVALID_CHARACTERS');
+      return;
+    }
+
+    this.newSpecialties.push(specialty);
+    specialtyInput.value = '';
   }
 
   removeNewSpecialty(index: number): void {
@@ -279,18 +317,50 @@ export class SupplierListComponent implements OnInit {
   addEditSpecialty(specialtyInput: HTMLInputElement): void {
     const specialty = specialtyInput.value.trim();
     delete this.editFieldErrors['specialties'];
-    if (specialty && this.editingSpecialties.length < 4 && !this.editingSpecialties.includes(specialty)) {
-      this.editingSpecialties.push(specialty);
-      specialtyInput.value = '';
-    } else if (this.editingSpecialties.length >= 4) {
-      this.editFieldErrors['specialties'] = this.translateService.instant(
-        'SUPPLIER_BC.VALIDATION.SPECIALTIES_MAX',
-      );
-    } else if (this.editingSpecialties.includes(specialty)) {
-      this.editFieldErrors['specialties'] = this.translateService.instant(
-        'SUPPLIER_BC.VALIDATION.SPECIALTY_DUPLICATE',
-      );
+
+    const t = (k: string) => this.translateService.instant(k);
+
+    if (!specialty) {
+      return;
     }
+
+    if (this.editingSpecialties.length >= 4) {
+      this.editFieldErrors['specialties'] = t('SUPPLIER_BC.VALIDATION.SPECIALTIES_MAX');
+      return;
+    }
+
+    if (this.editingSpecialties.some((item) => item.toLowerCase() === specialty.toLowerCase())) {
+      this.editFieldErrors['specialties'] = t('SUPPLIER_BC.VALIDATION.SPECIALTY_DUPLICATE');
+      return;
+    }
+
+    if (specialty.length < 2) {
+      this.editFieldErrors['specialties'] = t('SUPPLIER_BC.VALIDATION.SPECIALTY_MIN_LENGTH');
+      return;
+    }
+
+    if (specialty.length > 100) {
+      this.editFieldErrors['specialties'] = t('SUPPLIER_BC.VALIDATION.SPECIALTY_MAX_LENGTH');
+      return;
+    }
+
+    if (/^\d+$/.test(specialty)) {
+      this.editFieldErrors['specialties'] = t('SUPPLIER_BC.VALIDATION.SPECIALTY_ONLY_NUMBERS');
+      return;
+    }
+
+    if (/^[,.;]+$/.test(specialty)) {
+      this.editFieldErrors['specialties'] = t('SUPPLIER_BC.VALIDATION.SPECIALTY_ONLY_PUNCTUATION');
+      return;
+    }
+
+    if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]+$/.test(specialty)) {
+      this.editFieldErrors['specialties'] = t('SUPPLIER_BC.VALIDATION.SPECIALTY_INVALID_CHARACTERS');
+      return;
+    }
+
+    this.editingSpecialties.push(specialty);
+    specialtyInput.value = '';
   }
 
   removeEditSpecialty(index: number): void {
@@ -330,20 +400,89 @@ export class SupplierListComponent implements OnInit {
     if (raw === null || raw === undefined) {
       return NaN;
     }
-    if (typeof raw === 'number') {
-      return Number.isFinite(raw) ? raw : NaN;
-    }
-    const s = String(raw).trim();
-    if (!s) {
+
+    const phoneText = String(raw).trim();
+
+    if (!phoneText) {
       return NaN;
     }
-    const digits = s.replace(/\D/g, '');
-    return digits ? Number(digits) : NaN;
+
+    if (!/^\d+$/.test(phoneText)) {
+      return NaN;
+    }
+
+    return Number(phoneText);
   }
 
   private emailLooksValid(email: string): boolean {
-    return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+    return /^(?!-)[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}$/.test(email);
   }
+
+  private validateSpecialties(
+    specialties: string[],
+    mode: 'register' | 'edit',
+  ): boolean {
+    const target = mode === 'register' ? this.registerFieldErrors : this.editFieldErrors;
+    delete target['specialties'];
+
+    const t = (k: string) => this.translateService.instant(k);
+
+    const cleanedSpecialties = specialties
+      .map((specialty) => specialty.trim())
+      .filter((specialty) => specialty.length > 0);
+
+    if (cleanedSpecialties.length > 4) {
+      target['specialties'] = t('SUPPLIER_BC.VALIDATION.SPECIALTIES_MAX');
+      return false;
+    }
+
+    const normalizedSpecialties = cleanedSpecialties.map((specialty) =>
+      specialty.toLowerCase(),
+    );
+
+    const hasDuplicates = new Set(normalizedSpecialties).size !== normalizedSpecialties.length;
+
+    if (hasDuplicates) {
+      target['specialties'] = t('SUPPLIER_BC.VALIDATION.SPECIALTY_DUPLICATE');
+      return false;
+    }
+
+    for (const specialty of cleanedSpecialties) {
+      if (specialty.length < 2) {
+        target['specialties'] = t('SUPPLIER_BC.VALIDATION.SPECIALTY_MIN_LENGTH');
+        return false;
+      }
+
+      if (specialty.length > 100) {
+        target['specialties'] = t('SUPPLIER_BC.VALIDATION.SPECIALTY_MAX_LENGTH');
+        return false;
+      }
+
+      if (/^\d+$/.test(specialty)) {
+        target['specialties'] = t('SUPPLIER_BC.VALIDATION.SPECIALTY_ONLY_NUMBERS');
+        return false;
+      }
+
+      if (/^[,.;]+$/.test(specialty)) {
+        target['specialties'] = t('SUPPLIER_BC.VALIDATION.SPECIALTY_ONLY_PUNCTUATION');
+        return false;
+      }
+
+      if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]+$/.test(specialty)) {
+        target['specialties'] = t('SUPPLIER_BC.VALIDATION.SPECIALTY_INVALID_CHARACTERS');
+        return false;
+      }
+    }
+
+    if (mode === 'register') {
+      this.newSpecialties = cleanedSpecialties;
+    } else {
+      this.editingSpecialties = cleanedSpecialties;
+    }
+
+    return true;
+  }
+
 
   /**
    * Validación en cliente con mensaje por campo.
@@ -364,29 +503,77 @@ export class SupplierListComponent implements OnInit {
     if (!name) {
       target['name'] = t('SUPPLIER_BC.VALIDATION.NAME_REQUIRED');
       ok = false;
+    } else if (name.length < 2) {
+      target['name'] = t('SUPPLIER_BC.VALIDATION.NAME_MIN_LENGTH');
+      ok = false;
+    } else if (name.length > 100) {
+      target['name'] = t('SUPPLIER_BC.VALIDATION.NAME_MAX_LENGTH');
+      ok = false;
+    } else if (/^\d+$/.test(name)) {
+      target['name'] = t('SUPPLIER_BC.VALIDATION.NAME_ONLY_NUMBERS');
+      ok = false;
+    } else if (/^[,.;]+$/.test(name)) {
+      target['name'] = t('SUPPLIER_BC.VALIDATION.NAME_INVALID_CHARACTERS');
+      ok = false;
+    } else if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s]+$/.test(name)) {
+      target['name'] = t('SUPPLIER_BC.VALIDATION.NAME_INVALID_CHARACTERS');
+      ok = false;
     }
 
     const email = (model.email ?? '').trim();
+
     if (!email) {
       target['email'] = t('SUPPLIER_BC.VALIDATION.EMAIL_REQUIRED');
+      ok = false;
+    } else if (email.length > 100) {
+      target['email'] = t('SUPPLIER_BC.VALIDATION.EMAIL_MAX_LENGTH');
+      ok = false;
+    } else if (email.startsWith('-')) {
+      target['email'] = t('SUPPLIER_BC.VALIDATION.EMAIL_STARTS_WITH_HYPHEN');
       ok = false;
     } else if (!this.emailLooksValid(email)) {
       target['email'] = t('SUPPLIER_BC.VALIDATION.EMAIL_INVALID');
       ok = false;
     }
 
-    const phone = this.parsePhone(model.phone);
-    if (!Number.isFinite(phone)) {
+    const phoneText = String(model.phone ?? '').trim();
+
+    if (!phoneText || phoneText === '0') {
       target['phone'] = t('SUPPLIER_BC.VALIDATION.PHONE_REQUIRED');
       ok = false;
-    } else if (phone <= 0) {
-      target['phone'] = t('SUPPLIER_BC.VALIDATION.PHONE_INVALID');
+    } else if (/^-/.test(phoneText)) {
+      target['phone'] = t('SUPPLIER_BC.VALIDATION.PHONE_NEGATIVE');
+      ok = false;
+    } else if (!/^\d+$/.test(phoneText)) {
+      target['phone'] = t('SUPPLIER_BC.VALIDATION.PHONE_ONLY_NUMBERS');
+      ok = false;
+    } else if (phoneText.length < 7) {
+      target['phone'] = t('SUPPLIER_BC.VALIDATION.PHONE_MIN_LENGTH');
+      ok = false;
+    } else if (phoneText.length > 15) {
+      target['phone'] = t('SUPPLIER_BC.VALIDATION.PHONE_MAX_LENGTH');
       ok = false;
     }
 
     const location = (model.location ?? '').trim();
+
     if (!location) {
       target['location'] = t('SUPPLIER_BC.VALIDATION.LOCATION_REQUIRED');
+      ok = false;
+    } else if (location.length < 2) {
+      target['location'] = t('SUPPLIER_BC.VALIDATION.LOCATION_MIN_LENGTH');
+      ok = false;
+    } else if (location.length > 200) {
+      target['location'] = t('SUPPLIER_BC.VALIDATION.LOCATION_MAX_LENGTH');
+      ok = false;
+    } else if (/^\d+$/.test(location)) {
+      target['location'] = t('SUPPLIER_BC.VALIDATION.LOCATION_ONLY_NUMBERS');
+      ok = false;
+    } else if (/^[,.;]+$/.test(location)) {
+      target['location'] = t('SUPPLIER_BC.VALIDATION.LOCATION_ONLY_PUNCTUATION');
+      ok = false;
+    } else if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñÜü0-9\s,.;]+$/.test(location)) {
+      target['location'] = t('SUPPLIER_BC.VALIDATION.LOCATION_INVALID_CHARACTERS');
       ok = false;
     }
 
@@ -473,7 +660,7 @@ export class SupplierListComponent implements OnInit {
     return allowed.has(leaf) ? leaf : null;
   }
 
-  
+
   private supplierErrorMessage(err: unknown, i18nKey: string): string {
     const fallback = this.translateService.instant(i18nKey);
     if (err instanceof HttpErrorResponse) {
