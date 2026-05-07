@@ -1,5 +1,5 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { TranslateModule } from '@ngx-translate/core';
@@ -7,7 +7,8 @@ import { MatToolbar } from '@angular/material/toolbar';
 import { User } from '../../../../auth/domain/model/user.entity';
 import { UserService } from '../../../../auth/infrastructure/user.service';
 import { TranslateService } from '@ngx-translate/core';
-import {ToolbarComponent} from '../../../../public/presentation/components/toolbar/toolbar.component';
+import { ToolbarComponent } from '../../../../public/presentation/components/toolbar/toolbar.component';
+import { cardExpiryNotPastNorTooFarFuture } from '../confirm-plan/confirm-plan.component';
 
 @Component({
   standalone: true,
@@ -60,13 +61,33 @@ export class ConfirmChangePlanComponent implements OnInit {
     });
 
     this.paymentForm = this.fb.group({
+      paymentMethod: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
       cardNumber: ['', [Validators.required, Validators.pattern('^[0-9]{16}$')]],
-      expiry: ['', [Validators.required, Validators.pattern('^(0[1-9]|1[0-2])/\\d{2}$')]],
+      expiry: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern('^(0[1-9]|1[0-2])\/\\d{2}$'),
+          cardExpiryNotPastNorTooFarFuture(),
+        ],
+      ],
       cvc: ['', [Validators.required, Validators.pattern('^[0-9]{3}$')]],
       cardHolder: ['', [Validators.required, Validators.minLength(2)]],
-      country: ['', [Validators.required]]
+      country: ['', [Validators.required]],
     });
+
+    const storedUserRaw = localStorage.getItem('currentUser');
+    if (storedUserRaw) {
+      try {
+        const storedUser = JSON.parse(storedUserRaw) as User;
+        if (storedUser?.paymentMethod) {
+          this.paymentForm.patchValue({ paymentMethod: storedUser.paymentMethod });
+        }
+      } catch {
+        // ignorar localStorage inválido
+      }
+    }
   }
 
   loadTranslatedFeatures(planType: string): void {
@@ -104,8 +125,11 @@ export class ConfirmChangePlanComponent implements OnInit {
 
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}') as User;
 
+    const paymentMethod = (this.paymentForm.get('paymentMethod')?.value as string) || '';
+
     const updatedUser: User = {
       ...currentUser,
+      paymentMethod,
       hasPlan: true,
       plan: this.selectedPlan.type
     };
@@ -154,26 +178,6 @@ export class ConfirmChangePlanComponent implements OnInit {
     return !!(control && control.invalid && (control.touched || this.formSubmitted));
   }
 
-  latinCountries = [
-    { code: 'AR', translationKey: 'COUNTRIES.ARGENTINA' },
-    { code: 'BO', translationKey: 'COUNTRIES.BOLIVIA' },
-    { code: 'BR', translationKey: 'COUNTRIES.BRAZIL' },
-    { code: 'CL', translationKey: 'COUNTRIES.CHILE' },
-    { code: 'CO', translationKey: 'COUNTRIES.COLOMBIA' },
-    { code: 'CR', translationKey: 'COUNTRIES.COSTA_RICA' },
-    { code: 'CU', translationKey: 'COUNTRIES.CUBA' },
-    { code: 'DO', translationKey: 'COUNTRIES.DOMINICAN_REPUBLIC' },
-    { code: 'EC', translationKey: 'COUNTRIES.ECUADOR' },
-    { code: 'GT', translationKey: 'COUNTRIES.GUATEMALA' },
-    { code: 'HN', translationKey: 'COUNTRIES.HONDURAS' },
-    { code: 'MX', translationKey: 'COUNTRIES.MEXICO' },
-    { code: 'NI', translationKey: 'COUNTRIES.NICARAGUA' },
-    { code: 'PA', translationKey: 'COUNTRIES.PANAMA' },
-    { code: 'PY', translationKey: 'COUNTRIES.PARAGUAY' },
-    { code: 'PE', translationKey: 'COUNTRIES.PERU' },
-    { code: 'PR', translationKey: 'COUNTRIES.PUERTO_RICO' },
-    { code: 'SV', translationKey: 'COUNTRIES.EL_SALVADOR' },
-    { code: 'UY', translationKey: 'COUNTRIES.URUGUAY' },
-    { code: 'VE', translationKey: 'COUNTRIES.VENEZUELA' }
-  ];
+  // Solo Perú disponible como país de cobro (alineado con confirm-plan).
+  latinCountries = [{ code: 'PE', translationKey: 'COUNTRIES.PERU' }];
 }

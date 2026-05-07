@@ -3,8 +3,15 @@ import { BaseService } from '../../shared/infrastructure/base.service';
 import { User } from '../domain/model/user.entity';
 import { environment } from '../../../environments/environment';
 import { Observable, catchError, map } from 'rxjs';
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { TokenService } from './token.service';
+
+/** Resultado del endpoint de disponibilidad de campos del perfil. */
+export interface ProfileFieldsAvailability {
+  emailTaken: boolean;
+  nameTaken: boolean;
+  cafeteriaNameTaken: boolean;
+}
 
 const usersResourceEndpointPath = environment.usersEndpointPath;
 
@@ -110,4 +117,50 @@ export class UserService extends BaseService<User> {
     return this.http.get<User>(`${environment.serverBaseUrl}/api/v1/profiles?email=${email}`);
   }
 
+  /**
+   * Pregunta al backend si los valores propuestos (cualquier subconjunto) ya están en uso por
+   * otro perfil distinto al identificado por {@code excludingUserId}. Los valores en blanco /
+   * indefinidos no se envían y se ignoran del lado del backend.
+   */
+  checkProfileAvailability(input: {
+    excludingUserId?: number;
+    email?: string;
+    name?: string;
+    cafeteriaName?: string;
+  }): Observable<ProfileFieldsAvailability> {
+    let params = new HttpParams();
+    if (input.excludingUserId !== undefined && input.excludingUserId !== null) {
+      params = params.set('excludingUserId', String(input.excludingUserId));
+    }
+    if (input.email && input.email.trim()) {
+      params = params.set('email', input.email.trim());
+    }
+    if (input.name && input.name.trim()) {
+      params = params.set('name', input.name.trim());
+    }
+    if (input.cafeteriaName && input.cafeteriaName.trim()) {
+      params = params.set('cafeteriaName', input.cafeteriaName.trim());
+    }
+    return this.http.get<ProfileFieldsAvailability>(
+      `${environment.serverBaseUrl}/api/v1/profiles/availability`,
+      { params },
+    );
+  }
+
+  /**
+   * Cambia la contraseña del usuario autenticado. El backend exige reenviar la contraseña
+   * actual como prueba de identidad y devuelve 400 si no coincide.
+   */
+  changePassword(currentPassword: string, newPassword: string): Observable<void> {
+    const authToken = this.tokenService.getToken();
+    const headers = new HttpHeaders({
+      'Content-Type': 'application/json',
+      'Authorization': `Bearer ${authToken}`,
+    });
+    return this.http.post<void>(
+      `${environment.serverBaseUrl}/api/v1/account/change-password`,
+      { currentPassword, newPassword },
+      { headers },
+    );
+  }
 }

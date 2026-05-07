@@ -1,6 +1,10 @@
 import { Injectable } from '@angular/core';
 import { AuthService } from '../../auth/infrastructure/AuthService';
-import { ProductionCostCalculation } from '../domain/model/production-cost.entity';
+import { ProductionCostCalculation, ProductionCostCurrency } from '../domain/model/production-cost.entity';
+
+export function productionCostCurrencySymbol(code: ProductionCostCurrency): string {
+  return code === 'USD' ? '$' : 'S/.';
+}
 
 @Injectable({
   providedIn: 'root'
@@ -13,6 +17,7 @@ export class ProductionCostService {
     coffeeLotId: number;
     coffeeLotName: string;
     coffeeType: string;
+    currency: ProductionCostCurrency;
     totalKg: number;
     rawMaterialsCost: number;
     laborCost: number;
@@ -36,6 +41,7 @@ export class ProductionCostService {
       coffeeLotId: data.coffeeLotId,
       coffeeLotName: data.coffeeLotName,
       coffeeType: data.coffeeType,
+      currency: data.currency,
       totalKg: data.totalKg,
       rawMaterialsCost: data.rawMaterialsCost,
       laborCost: data.laborCost,
@@ -82,6 +88,7 @@ export class ProductionCostService {
   }
 
   private createHTMLContent(costCalculation: ProductionCostCalculation): string {
+    const sym = productionCostCurrencySymbol(costCalculation.currency ?? 'PEN');
     return `
       <!DOCTYPE html>
       <html>
@@ -184,21 +191,25 @@ export class ProductionCostService {
             <span>Fecha:</span>
             <span>${new Date(costCalculation.calculatedAt).toLocaleDateString()}</span>
           </div>
+          <div class="cost-item">
+            <span>Moneda:</span>
+            <span>${(costCalculation.currency ?? 'PEN') === 'USD' ? 'USD ($)' : 'PEN (S/.)'}</span>
+          </div>
         </div>
         
         <div class="info-section">
           <h2>Costos Directos</h2>
           <div class="cost-item">
             <span>Materia Prima:</span>
-            <span>S/. ${costCalculation.rawMaterialsCost.toFixed(2)}</span>
+            <span>${sym} ${costCalculation.rawMaterialsCost.toFixed(2)}</span>
           </div>
           <div class="cost-item">
             <span>Mano de Obra:</span>
-            <span>S/. ${costCalculation.laborCost.toFixed(2)}</span>
+            <span>${sym} ${costCalculation.laborCost.toFixed(2)}</span>
           </div>
           <div class="cost-total">
             <span>Total Directos:</span>
-            <span>S/. ${costCalculation.totalDirectCost.toFixed(2)}</span>
+            <span>${sym} ${costCalculation.totalDirectCost.toFixed(2)}</span>
           </div>
         </div>
         
@@ -206,23 +217,23 @@ export class ProductionCostService {
           <h2>Costos Indirectos</h2>
           <div class="cost-item">
             <span>Transporte:</span>
-            <span>S/. ${costCalculation.transportCost.toFixed(2)}</span>
+            <span>${sym} ${costCalculation.transportCost.toFixed(2)}</span>
           </div>
           <div class="cost-item">
             <span>Almacenamiento:</span>
-            <span>S/. ${costCalculation.storageCost.toFixed(2)}</span>
+            <span>${sym} ${costCalculation.storageCost.toFixed(2)}</span>
           </div>
           <div class="cost-item">
             <span>Procesamiento:</span>
-            <span>S/. ${costCalculation.processingCost.toFixed(2)}</span>
+            <span>${sym} ${costCalculation.processingCost.toFixed(2)}</span>
           </div>
           <div class="cost-item">
             <span>Otros:</span>
-            <span>S/. ${costCalculation.otherIndirectCosts.toFixed(2)}</span>
+            <span>${sym} ${costCalculation.otherIndirectCosts.toFixed(2)}</span>
           </div>
           <div class="cost-total">
             <span>Total Indirectos:</span>
-            <span>S/. ${costCalculation.totalIndirectCost.toFixed(2)}</span>
+            <span>${sym} ${costCalculation.totalIndirectCost.toFixed(2)}</span>
           </div>
         </div>
         
@@ -230,11 +241,11 @@ export class ProductionCostService {
           <h2>Resumen Final</h2>
           <div class="summary-item">
             <span>Costo Total:</span>
-            <span>S/. ${costCalculation.totalCost.toFixed(2)}</span>
+            <span>${sym} ${costCalculation.totalCost.toFixed(2)}</span>
           </div>
           <div class="summary-item">
             <span>Costo por kg:</span>
-            <span>S/. ${costCalculation.costPerKg.toFixed(2)}</span>
+            <span>${sym} ${costCalculation.costPerKg.toFixed(2)}</span>
           </div>
           <div class="summary-item">
             <span>Margen:</span>
@@ -242,7 +253,7 @@ export class ProductionCostService {
           </div>
           <div class="summary-item">
             <span>Precio sugerido (por kg):</span>
-            <span>S/. ${costCalculation.suggestedPrice.toFixed(2)}</span>
+            <span>${sym} ${costCalculation.suggestedPrice.toFixed(2)}</span>
           </div>
           <div class="summary-item">
             <span>Margen potencial:</span>
@@ -272,6 +283,7 @@ export class ProductionCostService {
   }
 
   private createPDFContent(costCalculation: ProductionCostCalculation): string {
+    const sym = productionCostCurrencySymbol(costCalculation.currency ?? 'PEN');
     return `
       RESUMEN DE COSTOS DE PRODUCCIÓN
       
@@ -279,24 +291,25 @@ export class ProductionCostService {
       Tipo: ${costCalculation.coffeeType}
       Cantidad: ${costCalculation.totalKg} kg
       Fecha: ${new Date(costCalculation.calculatedAt).toLocaleDateString()}
+      Moneda: ${(costCalculation.currency ?? 'PEN') === 'USD' ? 'USD ($)' : 'PEN (S/.)'}
       
       COSTOS DIRECTOS:
-      - Materia Prima: S/. ${costCalculation.rawMaterialsCost.toFixed(2)}
-      - Mano de Obra: S/. ${costCalculation.laborCost.toFixed(2)}
-      Total Directos: S/. ${costCalculation.totalDirectCost.toFixed(2)}
+      - Materia Prima: ${sym} ${costCalculation.rawMaterialsCost.toFixed(2)}
+      - Mano de Obra: ${sym} ${costCalculation.laborCost.toFixed(2)}
+      Total Directos: ${sym} ${costCalculation.totalDirectCost.toFixed(2)}
       
       COSTOS INDIRECTOS:
-      - Transporte: S/. ${costCalculation.transportCost.toFixed(2)}
-      - Almacenamiento: S/. ${costCalculation.storageCost.toFixed(2)}
-      - Procesamiento: S/. ${costCalculation.processingCost.toFixed(2)}
-      - Otros: S/. ${costCalculation.otherIndirectCosts.toFixed(2)}
-      Total Indirectos: S/. ${costCalculation.totalIndirectCost.toFixed(2)}
+      - Transporte: ${sym} ${costCalculation.transportCost.toFixed(2)}
+      - Almacenamiento: ${sym} ${costCalculation.storageCost.toFixed(2)}
+      - Procesamiento: ${sym} ${costCalculation.processingCost.toFixed(2)}
+      - Otros: ${sym} ${costCalculation.otherIndirectCosts.toFixed(2)}
+      Total Indirectos: ${sym} ${costCalculation.totalIndirectCost.toFixed(2)}
       
       RESUMEN:
-      Costo Total: S/. ${costCalculation.totalCost.toFixed(2)}
-      Costo por kg: S/. ${costCalculation.costPerKg.toFixed(2)}
+      Costo Total: ${sym} ${costCalculation.totalCost.toFixed(2)}
+      Costo por kg: ${sym} ${costCalculation.costPerKg.toFixed(2)}
       Margen: ${costCalculation.margin}%
-      Precio sugerido (por kg): S/. ${costCalculation.suggestedPrice.toFixed(2)}
+      Precio sugerido (por kg): ${sym} ${costCalculation.suggestedPrice.toFixed(2)}
       Margen potencial: ${costCalculation.potentialMargin.toFixed(1)}%
     `;
   }

@@ -1,5 +1,5 @@
 import { Component, Input } from '@angular/core';
-import { FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { AbstractControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
@@ -27,6 +27,7 @@ import { TranslateModule } from '@ngx-translate/core';
 })
 export class StepIndirectCostsComponent {
   @Input() formGroup!: FormGroup;
+  @Input() currencySymbol = 'S/.';
   @Input() onCancel!: () => void;
 
   get transportForm(): FormGroup {
@@ -43,6 +44,46 @@ export class StepIndirectCostsComponent {
 
   get othersForm(): FormGroup {
     return this.formGroup.get('others') as FormGroup;
+  }
+
+  get trCostKg(): AbstractControl {
+    return this.transportForm.get('costPerKg')!;
+  }
+  get trQty(): AbstractControl {
+    return this.transportForm.get('quantity')!;
+  }
+  get stDays(): AbstractControl {
+    return this.storageForm.get('daysInStorage')!;
+  }
+  get stDaily(): AbstractControl {
+    return this.storageForm.get('dailyCost')!;
+  }
+  get prElectric(): AbstractControl {
+    return this.processingForm.get('electricity')!;
+  }
+  get prWater(): AbstractControl {
+    return this.processingForm.get('water')!;
+  }
+  get prSupplies(): AbstractControl {
+    return this.processingForm.get('supplies')!;
+  }
+  get prMaint(): AbstractControl {
+    return this.processingForm.get('maintenance')!;
+  }
+  get prDepr(): AbstractControl {
+    return this.processingForm.get('depreciation')!;
+  }
+  get otQc(): AbstractControl {
+    return this.othersForm.get('qualityControl')!;
+  }
+  get otCert(): AbstractControl {
+    return this.othersForm.get('certifications')!;
+  }
+  get otIns(): AbstractControl {
+    return this.othersForm.get('insurance')!;
+  }
+  get otAdm(): AbstractControl {
+    return this.othersForm.get('administrative')!;
   }
 
   get transportTotal(): number {

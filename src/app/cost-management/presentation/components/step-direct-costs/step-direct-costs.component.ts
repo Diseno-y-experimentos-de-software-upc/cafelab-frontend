@@ -1,5 +1,5 @@
 import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
-import { FormGroup, ReactiveFormsModule } from '@angular/forms';
+import { AbstractControl, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { CommonModule, DecimalPipe } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
@@ -23,7 +23,24 @@ import { TranslateModule } from '@ngx-translate/core';
 })
 export class StepDirectCostsComponent implements OnInit {
   @Input() formGroup!: FormGroup;
+  @Input() currencySymbol = 'S/.';
   @Output() totalsCalculated = new EventEmitter<{ materiaPrima: number; manoObra: number }>();
+
+  get rmCostPerKg(): AbstractControl {
+    return this.formGroup.get('rawMaterials')!.get('costPerKg')!;
+  }
+  get rmQty(): AbstractControl {
+    return this.formGroup.get('rawMaterials')!.get('quantity')!;
+  }
+  get lbHours(): AbstractControl {
+    return this.formGroup.get('labor')!.get('hoursWorked')!;
+  }
+  get lbCostH(): AbstractControl {
+    return this.formGroup.get('labor')!.get('costPerHour')!;
+  }
+  get lbWorkers(): AbstractControl {
+    return this.formGroup.get('labor')!.get('numberOfWorkers')!;
+  }
 
   totalMateriaPrima = 0;
   totalManoObra = 0;
