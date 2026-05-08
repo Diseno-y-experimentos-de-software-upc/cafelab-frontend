@@ -155,11 +155,22 @@
   background-color: #3D4B44;
 }
 
+.force-error .mat-mdc-form-field-outline,
+.force-error .mdc-notched-outline__leading,
+.force-error .mdc-notched-outline__notch,
+.force-error .mdc-notched-outline__trailing {
+  border-color: #d32f2f !important;
+}
+
+.force-error input {
+  caret-color: #d32f2f;
+}
+
 @media (max-width: 768px) {
   .coffee-cards {
     grid-template-columns: 1fr;
   }
-  
+
   .inventory-container {
     padding: 10px;
   }

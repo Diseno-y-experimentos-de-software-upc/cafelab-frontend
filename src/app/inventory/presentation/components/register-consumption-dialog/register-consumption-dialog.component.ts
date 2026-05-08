@@ -74,7 +74,13 @@ export class RegisterConsumptionDialogComponent implements OnInit {
     this.form = this.fb.group({
       date: [new Date(), Validators.required],
       lotId: ['', Validators.required],
-      finalProduct: ['', Validators.required],
+      finalProduct: ['',
+        [
+        Validators.required,
+        Validators.maxLength(100),
+        Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9 .,-]+$/)
+        ]
+      ],
       consumptionKg: [
         null,
         [Validators.required, Validators.min(0.001)],

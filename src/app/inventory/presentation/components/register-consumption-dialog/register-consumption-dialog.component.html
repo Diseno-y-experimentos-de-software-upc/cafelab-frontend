@@ -31,9 +31,12 @@
           </mat-select>
         </mat-form-field>
 
-        <mat-form-field appearance="outline" class="full-width">
+        <mat-form-field appearance="outline" class="full-width" [class.force-error]="form.get('finalProduct')?.invalid && form.get('finalProduct')?.dirty">
           <mat-label>{{ 'INVENTORY.CONSUMPTION_DIALOG.FINAL_PRODUCT' | translate }}</mat-label>
           <input matInput formControlName="finalProduct" required>
+          <mat-error *ngIf="form.get('finalProduct')?.hasError('pattern')">
+            Solo se permiten letras, números, espacios y guiones.
+          </mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
@@ -44,7 +47,7 @@
 
       <div class="summary-column">
         <h3 class="summary-title">{{ 'INVENTORY.CONSUMPTION_DIALOG.LOT_SUMMARY' | translate }}</h3>
-        
+
         <div class="summary-box" *ngIf="consumptionSummary">
           <div class="summary-item">
             <span class="summary-label">{{ 'INVENTORY.CONSUMPTION_DIALOG.LOT_NAME' | translate }}:</span>
@@ -73,7 +76,7 @@
         </div>
 
         <h3 class="summary-title">{{ 'INVENTORY.CONSUMPTION_DIALOG.PREVIOUS_MOVEMENTS' | translate }}</h3>
-        
+
         <div class="movements-box" *ngIf="previousConsumptions.length > 0">
           <div class="movement-item" *ngFor="let consumption of previousConsumptions">
             <span class="movement-date">{{ consumption.date }}</span>
