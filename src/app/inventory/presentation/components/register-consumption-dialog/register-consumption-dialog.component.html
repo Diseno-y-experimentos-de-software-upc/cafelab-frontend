@@ -17,9 +17,14 @@
       <div class="form-column">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>{{ 'INVENTORY.CONSUMPTION_DIALOG.DATE' | translate }}</mat-label>
-          <input matInput [matDatepicker]="picker" formControlName="date" required>
+        <input matInput [matDatepicker]="picker" formControlName="date" [min]="minDate" [max]="maxDate" required>
+
           <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-datepicker #picker></mat-datepicker>
+
+          <mat-error *ngIf="form.get('date')?.hasError('invalidDateRange')">
+            Fecha inválida.
+          </mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">

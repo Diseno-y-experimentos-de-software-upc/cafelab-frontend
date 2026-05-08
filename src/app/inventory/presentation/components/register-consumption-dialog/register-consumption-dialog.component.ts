@@ -16,6 +16,8 @@ import { CoffeeLotApi } from '../../../../coffee-lot/application/coffee-lot.api'
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
+import {control} from 'leaflet';
+import { provideNativeDateAdapter } from '@angular/material/core';
 
 interface ConsumptionSummary {
   lotName: string;
@@ -29,6 +31,8 @@ interface PreviousConsumption {
   date: string;
   quantity: number;
 }
+
+
 
 @Component({
   selector: 'app-register-consumption-dialog',
@@ -49,6 +53,9 @@ interface PreviousConsumption {
     MatButtonModule,
     TranslateModule,
   ],
+  providers: [
+    [provideNativeDateAdapter()],
+  ]
 })
 export class RegisterConsumptionDialogComponent implements OnInit {
   form: FormGroup;
@@ -57,6 +64,9 @@ export class RegisterConsumptionDialogComponent implements OnInit {
   previousConsumptions: PreviousConsumption[] = [];
   loading = false;
   error: string | null = null;
+
+  minDate = new Date();
+  maxDate = new Date(new Date().setFullYear(new Date().getFullYear() + 5));
 
   constructor(
     private fb: FormBuilder,
@@ -72,7 +82,12 @@ export class RegisterConsumptionDialogComponent implements OnInit {
     private translate: TranslateService,
   ) {
     this.form = this.fb.group({
-      date: [new Date(), Validators.required],
+      date: [new Date(),
+        [
+        Validators.required,
+        this.dateRangeValidation
+        ]
+      ],
       lotId: ['', Validators.required],
       finalProduct: ['',
         [
@@ -223,4 +238,27 @@ export class RegisterConsumptionDialogComponent implements OnInit {
     const lot = this.availableLots.find((l) => Number(l.id) === Number(lotId));
     return lot ? lot.lot_name : '';
   }
+
+  private dateRangeValidation(control: any) {
+    const value = control.value;
+
+    if (!value) return null;
+
+    const selectedDate = new Date(value);
+    const today = new Date();
+
+    today.setHours(0, 0, 0, 0);
+
+    const maxDate = new Date(today);
+    maxDate.setFullYear(today.getFullYear() + 5);
+
+    selectedDate.setHours(0, 0, 0, 0);
+
+    if (selectedDate < today || selectedDate > maxDate) {
+      return { invalidDateRange: true };
+    }
+
+    return null;
+  }
+
 }

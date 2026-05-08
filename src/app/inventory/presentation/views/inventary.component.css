@@ -155,10 +155,7 @@
   background-color: #3D4B44;
 }
 
-.force-error .mat-mdc-form-field-outline,
-.force-error .mdc-notched-outline__leading,
-.force-error .mdc-notched-outline__notch,
-.force-error .mdc-notched-outline__trailing {
+.force-error .mat-mdc-form-field-outline {
   border-color: #d32f2f !important;
 }
 
