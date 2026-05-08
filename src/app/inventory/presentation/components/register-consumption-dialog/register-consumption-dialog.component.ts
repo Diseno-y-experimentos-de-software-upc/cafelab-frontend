@@ -18,6 +18,7 @@ import { of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import {control} from 'leaflet';
 import { provideNativeDateAdapter } from '@angular/material/core';
+import {MatCheckbox} from '@angular/material/checkbox';
 
 interface ConsumptionSummary {
   lotName: string;
@@ -52,6 +53,7 @@ interface PreviousConsumption {
     MatDialogTitle,
     MatButtonModule,
     TranslateModule,
+    MatCheckbox
   ],
   providers: [
     [provideNativeDateAdapter()],
@@ -100,6 +102,7 @@ export class RegisterConsumptionDialogComponent implements OnInit {
         null,
         [Validators.required, Validators.min(0.001)],
       ],
+      noEdit: [false, Validators.requiredTrue]
     });
 
     this.form.valueChanges.subscribe(() => this.updateSummary());
