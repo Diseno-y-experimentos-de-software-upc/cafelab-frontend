@@ -41,7 +41,7 @@ export class SupplierAssembler
   toCreateResource(entity: Supplier): CreateSupplierResource {
     return {
       name: entity.name.trim(),
-      email: entity.email.trim(),
+      email: entity.email.trim().toLowerCase(),
       phone: Number(entity.phone),
       location: entity.location.trim(),
       specialties: entity.specialties ?? [],
@@ -51,7 +51,7 @@ export class SupplierAssembler
   toUpdateResource(entity: Supplier): UpdateSupplierResource {
     return {
       name: entity.name.trim(),
-      email: entity.email.trim(),
+      email: entity.email.trim().toLowerCase(),
       phone: Number(entity.phone),
       location: entity.location.trim(),
       specialties: entity.specialties ?? [],
