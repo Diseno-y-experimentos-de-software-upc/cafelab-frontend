@@ -210,8 +210,11 @@ export class LotListComponent implements OnInit {
   private collectRegisterFieldErrors(): Record<string, string> {
     const e: Record<string, string> = {};
     const t = (k: string) => this.translateService.instant(k);
+    const namePattern = /^[a-zA-Z0-9áéíóúÁÉÍÓÚüÜñÑ ]+$/;
     if (!this.newLot.lot_name?.trim()) {
       e['lot_name'] = t('COFFEE_LOT_BC.VALIDATION.LOT_NAME');
+    } else if (!namePattern.test(this.newLot.lot_name.trim())) {
+      e['lot_name'] = t('COFFEE_LOT_BC.VALIDATION.LOT_NAME_SPECIAL_CHARS');
     }
     if (!this.newLot.coffee_type?.trim()) {
       e['coffee_type'] = t('COFFEE_LOT_BC.VALIDATION.COFFEE_TYPE');
@@ -220,12 +223,22 @@ export class LotListComponent implements OnInit {
       e['processing_method'] = t('COFFEE_LOT_BC.VALIDATION.PROCESSING_METHOD');
     }
     const alt = Number(this.newLot.altitude);
-    if (!Number.isFinite(alt) || alt <= 0) {
+    if (!Number.isFinite(alt) || alt < 0) {
       e['altitude'] = t('COFFEE_LOT_BC.VALIDATION.ALTITUDE');
+    } else if (!Number.isInteger(alt)) {
+      e['altitude'] = t('COFFEE_LOT_BC.VALIDATION.ALTITUDE_INTEGER');
+    } else if (alt > 2500) {
+      e['altitude'] = t('COFFEE_LOT_BC.VALIDATION.ALTITUDE_MAX');
     }
     const w = Number(this.newLot.weight);
-    if (!Number.isFinite(w) || w <= 0) {
+    const weightStr = String(this.newLot.weight ?? '');
+    const decimalPlaces = weightStr.includes('.') ? weightStr.split('.')[1].length : 0;
+    if (!Number.isFinite(w) || w < 1) {
       e['weight'] = t('COFFEE_LOT_BC.VALIDATION.WEIGHT');
+    } else if (w > 70) {
+      e['weight'] = t('COFFEE_LOT_BC.VALIDATION.WEIGHT_MAX');
+    } else if (decimalPlaces > 2) {
+      e['weight'] = t('COFFEE_LOT_BC.VALIDATION.WEIGHT_DECIMALS');
     }
     if (!this.newLot.origin?.trim()) {
       e['origin'] = t('COFFEE_LOT_BC.VALIDATION.ORIGIN');
@@ -246,8 +259,11 @@ export class LotListComponent implements OnInit {
   private collectEditFieldErrors(): Record<string, string> {
     const e: Record<string, string> = {};
     const t = (k: string) => this.translateService.instant(k);
+    const namePattern = /^[a-zA-Z0-9áéíóúÁÉÍÓÚüÜñÑ ]+$/;
     if (!this.editingLot.lot_name?.trim()) {
       e['lot_name'] = t('COFFEE_LOT_BC.VALIDATION.LOT_NAME');
+    } else if (!namePattern.test(this.editingLot.lot_name.trim())) {
+      e['lot_name'] = t('COFFEE_LOT_BC.VALIDATION.LOT_NAME_SPECIAL_CHARS');
     }
     if (!this.editingLot.coffee_type?.trim()) {
       e['coffee_type'] = t('COFFEE_LOT_BC.VALIDATION.COFFEE_TYPE');
@@ -256,12 +272,22 @@ export class LotListComponent implements OnInit {
       e['processing_method'] = t('COFFEE_LOT_BC.VALIDATION.PROCESSING_METHOD');
     }
     const alt = Number(this.editingLot.altitude);
-    if (!Number.isFinite(alt) || alt <= 0) {
+    if (!Number.isFinite(alt) || alt < 0) {
       e['altitude'] = t('COFFEE_LOT_BC.VALIDATION.ALTITUDE');
+    } else if (!Number.isInteger(alt)) {
+      e['altitude'] = t('COFFEE_LOT_BC.VALIDATION.ALTITUDE_INTEGER');
+    } else if (alt > 2500) {
+      e['altitude'] = t('COFFEE_LOT_BC.VALIDATION.ALTITUDE_MAX');
     }
     const w = Number(this.editingLot.weight);
-    if (!Number.isFinite(w) || w <= 0) {
+    const weightStr = String(this.editingLot.weight ?? '');
+    const decimalPlaces = weightStr.includes('.') ? weightStr.split('.')[1].length : 0;
+    if (!Number.isFinite(w) || w < 1) {
       e['weight'] = t('COFFEE_LOT_BC.VALIDATION.WEIGHT');
+    } else if (w > 70) {
+      e['weight'] = t('COFFEE_LOT_BC.VALIDATION.WEIGHT_MAX');
+    } else if (decimalPlaces > 2) {
+      e['weight'] = t('COFFEE_LOT_BC.VALIDATION.WEIGHT_DECIMALS');
     }
     if (!this.editingLot.origin?.trim()) {
       e['origin'] = t('COFFEE_LOT_BC.VALIDATION.ORIGIN');
