@@ -1,7 +1,10 @@
+export type ProductionCostCurrency = 'PEN' | 'USD';
+
 export interface ProductionCostCalculation {
   coffeeLotId: number;
   coffeeLotName: string;
   coffeeType: string;
+  currency?: ProductionCostCurrency;
   totalKg: number;
   
   rawMaterialsCost: number;

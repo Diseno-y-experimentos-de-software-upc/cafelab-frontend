@@ -21,7 +21,8 @@ export class ContactUsComponent implements OnInit {
     correo: '',
     asunto: '',
     mensaje: '',
-    archivos: null as FileList | null
+    archivos: null as FileList | null,
+    aceptoTerminos: false
   };
 
   errores = {
@@ -78,6 +79,9 @@ export class ContactUsComponent implements OnInit {
   }
 
   onSubmit(): void {
+    if (!this.contactForm.aceptoTerminos) {
+      return;
+    }
     if (this.validarFormulario()) {
       const contactData = {
         nombre: this.contactForm.nombre,
@@ -157,7 +161,8 @@ export class ContactUsComponent implements OnInit {
       correo: '',
       asunto: '',
       mensaje: '',
-      archivos: null
+      archivos: null,
+      aceptoTerminos: false
     };
     this.errores = {
       nombre: '',

@@ -1,0 +1,255 @@
+<div class="cost-records-container">
+  <div *ngIf="error" class="error-message">{{ error }}</div>
+
+  <div class="search-container">
+    <div class="search-box">
+      <input
+        type="text"
+        [(ngModel)]="searchQuery"
+        [placeholder]="'COST_MANAGEMENT.RECORDS.SEARCH_PLACEHOLDER' | translate"
+        (keyup.enter)="search()"
+      />
+      <button class="search-button" (click)="search()">
+        <i class="material-icons">search</i>
+      </button>
+    </div>
+  </div>
+
+  <div class="register-container">
+    <button class="register-button" type="button" (click)="emitNewCalculation()">
+      {{ 'COST_MANAGEMENT.RECORDS.NEW_CALCULATION' | translate }}
+    </button>
+  </div>
+
+  <div class="table-container">
+    <div *ngIf="loading" class="loading-indicator">
+      <div class="spinner"></div>
+      <p>{{ 'COST_MANAGEMENT.RECORDS.LOADING' | translate }}</p>
+    </div>
+
+    <table class="records-table" *ngIf="!loading">
+      <thead>
+        <tr>
+          <th>{{ 'COST_MANAGEMENT.RECORDS.COL_DATE' | translate }}</th>
+          <th>{{ 'COST_MANAGEMENT.RECORDS.COL_LOT' | translate }}</th>
+          <th>{{ 'COST_MANAGEMENT.RECORDS.COL_AMOUNT' | translate }}</th>
+          <th>{{ 'COST_MANAGEMENT.RECORDS.COL_STATUS' | translate }}</th>
+          <th colspan="2">{{ 'COST_MANAGEMENT.RECORDS.COL_ACTIONS' | translate }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngIf="filteredRecords.length === 0">
+          <td colspan="6" class="empty-message">{{ 'COST_MANAGEMENT.RECORDS.EMPTY' | translate }}</td>
+        </tr>
+        <tr *ngFor="let row of filteredRecords" [class.row-annulled]="isAnnulled(row)">
+          <td>{{ row.createdAt | date : 'short' }}</td>
+          <td>{{ row.lotName }}</td>
+          <td>{{ currencySymbol(row.currency) }} {{ row.totalCost | number : '1.2-2' }}</td>
+          <td>
+            <span class="status-badge"
+                  [class.status-registered]="!isAnnulled(row)"
+                  [class.status-annulled]="isAnnulled(row)">
+              {{ statusLabelKey(row.status) | translate }}
+            </span>
+          </td>
+          <td class="action-cell">
+            <button class="action-button" type="button"
+                    (click)="openView(row)"
+                    [title]="'COST_MANAGEMENT.RECORDS.VIEW' | translate">
+              <i class="material-icons">search</i>
+            </button>
+          </td>
+          <td class="action-cell">
+            <button class="action-button delete-button" type="button"
+                    (click)="openAnnul(row)"
+                    [disabled]="isAnnulled(row)"
+                    [title]="(isAnnulled(row)
+                              ? 'COST_MANAGEMENT.RECORDS.ANNUL.DISABLED_HINT'
+                              : 'COST_MANAGEMENT.RECORDS.DELETE') | translate">
+              <i class="material-icons">delete</i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<!-- Modal: Ver detalle (lupa) -->
+<div *ngIf="selectedForView" class="modal-overlay" (click)="closeView()">
+  <div class="modal-content" (click)="$event.stopPropagation()">
+    <h2>{{ 'COST_MANAGEMENT.RECORDS.VIEW_TITLE' | translate }}</h2>
+
+    <div class="readonly-list">
+      <div class="readonly-row">
+        <span class="readonly-label">{{ 'COST_MANAGEMENT.RECORDS.COL_DATE' | translate }}</span>
+        <span class="readonly-value">{{ selectedForView.createdAt | date : 'medium' }}</span>
+      </div>
+      <div class="readonly-row">
+        <span class="readonly-label">{{ 'COST_MANAGEMENT.RECORDS.COL_STATUS' | translate }}</span>
+        <span class="readonly-value">
+          <span class="status-badge"
+                [class.status-registered]="!isAnnulled(selectedForView)"
+                [class.status-annulled]="isAnnulled(selectedForView)">
+            {{ statusLabelKey(selectedForView.status) | translate }}
+          </span>
+        </span>
+      </div>
+      <div class="readonly-row" *ngIf="isAnnulled(selectedForView)">
+        <span class="readonly-label">{{ 'COST_MANAGEMENT.RECORDS.ANNUL_REASON_LABEL' | translate }}</span>
+        <span class="readonly-value">{{ selectedForView.reason }}</span>
+      </div>
+      <div class="readonly-row">
+        <span class="readonly-label">{{ 'COST_MANAGEMENT.LOT_LABEL' | translate }}</span>
+        <span class="readonly-value">{{ selectedForView.lotName }} ({{ selectedForView.coffeeType }})</span>
+      </div>
+      <div class="readonly-row">
+        <span class="readonly-label">{{ 'COST_MANAGEMENT.CURRENCY_LABEL' | translate }}</span>
+        <span class="readonly-value">{{ selectedForView.currency }}</span>
+      </div>
+      <div class="readonly-row">
+        <span class="readonly-label">{{ 'COST_MANAGEMENT.GREEN_COFFEE_QUANTITY_KG' | translate }}</span>
+        <span class="readonly-value">{{ selectedForView.totalKg | number : '1.2-2' }} kg</span>
+      </div>
+      <div class="readonly-row">
+        <span class="readonly-label">{{ 'COST_MANAGEMENT.RECORDS.MARGIN_PERCENT' | translate }}</span>
+        <span class="readonly-value">{{ selectedForView.marginPercent | number : '1.0-2' }}%</span>
+      </div>
+
+      <h3 class="readonly-section">{{ 'COST_MANAGEMENT.STEP_DIRECT_COSTS' | translate }}</h3>
+      <div class="readonly-row">
+        <span class="readonly-label">{{ 'COST_MANAGEMENT.RAW_MATERIAL' | translate }}</span>
+        <span class="readonly-value">{{ currencySymbol(selectedForView.currency) }} {{ selectedForView.rawMaterialsCost | number : '1.2-2' }}</span>
+      </div>
+      <div class="readonly-row">
+        <span class="readonly-label">{{ 'COST_MANAGEMENT.DIRECT_LABOR' | translate }}</span>
+        <span class="readonly-value">{{ currencySymbol(selectedForView.currency) }} {{ selectedForView.laborCost | number : '1.2-2' }}</span>
+      </div>
+      <div class="readonly-row total-row">
+        <span class="readonly-label">{{ 'COST_MANAGEMENT.RECORDS.TOTAL_DIRECT' | translate }}</span>
+        <span class="readonly-value">{{ currencySymbol(selectedForView.currency) }} {{ selectedForView.totalDirectCost | number : '1.2-2' }}</span>
+      </div>
+
+      <h3 class="readonly-section">{{ 'COST_MANAGEMENT.STEP_INDIRECT_COSTS' | translate }}</h3>
+      <div class="readonly-row">
+        <span class="readonly-label">{{ 'COST_MANAGEMENT.CATEGORY_TRANSPORT' | translate }}</span>
+        <span class="readonly-value">{{ currencySymbol(selectedForView.currency) }} {{ selectedForView.transportCost | number : '1.2-2' }}</span>
+      </div>
+      <div class="readonly-row">
+        <span class="readonly-label">{{ 'COST_MANAGEMENT.CATEGORY_STORAGE' | translate }}</span>
+        <span class="readonly-value">{{ currencySymbol(selectedForView.currency) }} {{ selectedForView.storageCost | number : '1.2-2' }}</span>
+      </div>
+      <div class="readonly-row">
+        <span class="readonly-label">{{ 'COST_MANAGEMENT.CATEGORY_PROCESSING' | translate }}</span>
+        <span class="readonly-value">{{ currencySymbol(selectedForView.currency) }} {{ selectedForView.processingCost | number : '1.2-2' }}</span>
+      </div>
+      <div class="readonly-row">
+        <span class="readonly-label">{{ 'COST_MANAGEMENT.CATEGORY_OTHERS' | translate }}</span>
+        <span class="readonly-value">{{ currencySymbol(selectedForView.currency) }} {{ selectedForView.otherIndirectCosts | number : '1.2-2' }}</span>
+      </div>
+      <div class="readonly-row total-row">
+        <span class="readonly-label">{{ 'COST_MANAGEMENT.RECORDS.TOTAL_INDIRECT' | translate }}</span>
+        <span class="readonly-value">{{ currencySymbol(selectedForView.currency) }} {{ selectedForView.totalIndirectCost | number : '1.2-2' }}</span>
+      </div>
+
+      <h3 class="readonly-section">{{ 'COST_MANAGEMENT.SUMMARY_TITLE' | translate }}</h3>
+      <div class="readonly-row total-row">
+        <span class="readonly-label">{{ 'COST_MANAGEMENT.RECORDS.TOTAL_COST' | translate }}</span>
+        <span class="readonly-value">{{ currencySymbol(selectedForView.currency) }} {{ selectedForView.totalCost | number : '1.2-2' }}</span>
+      </div>
+      <div class="readonly-row">
+        <span class="readonly-label">{{ 'COST_MANAGEMENT.METRICS_COST_PER_KG' | translate }}</span>
+        <span class="readonly-value">{{ currencySymbol(selectedForView.currency) }} {{ selectedForView.costPerKg | number : '1.2-2' }}</span>
+      </div>
+      <div class="readonly-row">
+        <span class="readonly-label">{{ 'COST_MANAGEMENT.METRICS_SUGGESTED_PRICE' | translate }}</span>
+        <span class="readonly-value">
+          {{ currencySymbol(selectedForView.currency) }} {{ selectedForView.suggestedPrice | number : '1.2-2' }}{{ 'COST_MANAGEMENT.PER_KG_UNIT' | translate }}
+        </span>
+      </div>
+      <div class="readonly-row">
+        <span class="readonly-label">{{ 'COST_MANAGEMENT.METRICS_POTENTIAL_MARGIN' | translate }}</span>
+        <span class="readonly-value">{{ selectedForView.potentialMargin | number : '1.1-1' }}%</span>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <button class="submit-button" type="button" (click)="downloadPDFFromView()">
+        {{ 'COST_MANAGEMENT.DOWNLOAD_PDF' | translate }}
+      </button>
+      <button class="cancel-button" type="button" (click)="closeView()">
+        {{ 'COST_MANAGEMENT.RECORDS.CLOSE' | translate }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Anular registro -->
+<div *ngIf="selectedForAnnul" class="modal-overlay" (click)="cancelAnnul()">
+  <div class="modal-content annul-modal" (click)="$event.stopPropagation()">
+    <h2>{{ 'COST_MANAGEMENT.RECORDS.ANNUL.TITLE' | translate }}</h2>
+    <p class="annul-question">
+      {{ 'COST_MANAGEMENT.RECORDS.ANNUL.QUESTION' | translate }}
+    </p>
+
+    <p class="annul-target">
+      <strong>{{ 'COST_MANAGEMENT.LOT_LABEL' | translate }}:</strong>
+      {{ selectedForAnnul.lotName }}
+    </p>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="annul-reason">{{ 'COST_MANAGEMENT.RECORDS.ANNUL.REASON_LABEL' | translate }}</label>
+        <select id="annul-reason"
+                [(ngModel)]="annulReasonSelection"
+                name="annulReasonSelection"
+                [disabled]="annulSubmitting">
+          <option value="" disabled>
+            {{ 'COST_MANAGEMENT.RECORDS.ANNUL.REASON_PLACEHOLDER' | translate }}
+          </option>
+          <option *ngFor="let r of predefinedReasons" [value]="r">{{ r }}</option>
+          <option [value]="otherReasonKey">
+            {{ 'COST_MANAGEMENT.RECORDS.ANNUL.REASON_OTHER' | translate }}
+          </option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row" *ngIf="annulReasonSelection === otherReasonKey">
+      <div class="form-group">
+        <label for="annul-reason-custom">
+          {{ 'COST_MANAGEMENT.RECORDS.ANNUL.REASON_CUSTOM_LABEL' | translate }}
+        </label>
+        <input id="annul-reason-custom"
+               type="text"
+               [(ngModel)]="annulReasonCustom"
+               name="annulReasonCustom"
+               [maxlength]="reasonMaxLength"
+               [disabled]="annulSubmitting"
+               [placeholder]="'COST_MANAGEMENT.RECORDS.ANNUL.REASON_CUSTOM_PLACEHOLDER' | translate" />
+        <div class="char-counter">
+          {{ annulReasonCustom.length }}/{{ reasonMaxLength }}
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="annulFormError" class="error-message">{{ annulFormError }}</div>
+
+    <div class="form-actions">
+      <button class="cancel-button"
+              type="button"
+              (click)="cancelAnnul()"
+              [disabled]="annulSubmitting">
+        {{ 'COST_MANAGEMENT.RECORDS.ANNUL.CANCEL' | translate }}
+      </button>
+      <button class="annul-confirm-button"
+              type="button"
+              (click)="confirmAnnul()"
+              [disabled]="annulSubmitting">
+        {{ annulSubmitting
+            ? ('COST_MANAGEMENT.RECORDS.SAVING' | translate)
+            : ('COST_MANAGEMENT.RECORDS.ANNUL.CONFIRM' | translate) }}
+      </button>
+    </div>
+  </div>
+</div>

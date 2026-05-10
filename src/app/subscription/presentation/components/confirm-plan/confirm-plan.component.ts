@@ -1,5 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import {
+  AbstractControl,
+  FormBuilder,
+  FormGroup,
+  ReactiveFormsModule,
+  ValidationErrors,
+  ValidatorFn,
+  Validators,
+} from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { TranslateModule} from '@ngx-translate/core';
@@ -8,6 +16,50 @@ import {MatToolbar} from '@angular/material/toolbar';
 import { User } from '../../../../auth/domain/model/user.entity';
 import { UserService } from '../../../../auth/infrastructure/user.service';
 import { TranslateService} from '@ngx-translate/core';
+
+/** Margen permitido (en años) hacia el futuro respecto al mes/año actual del usuario. */
+const EXPIRY_MAX_FUTURE_YEARS = 5;
+
+/**
+ * Valida un campo MM/YY de tarjeta:
+ * - Acepta el mes/año actuales como mínimo (no permite fechas pasadas).
+ * - Acepta hasta `EXPIRY_MAX_FUTURE_YEARS` años en el futuro (inclusive el mismo mes).
+ *
+ * Errores devueltos:
+ * - {@code expired}: fecha anterior al mes/año actuales.
+ * - {@code tooFarFuture}: fecha más de 5 años en el futuro.
+ *
+ * Si el formato MM/YY es inválido devuelve {@code null} para no pisar al validador
+ * de patrón existente.
+ */
+export function cardExpiryNotPastNorTooFarFuture(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const raw = control.value;
+    if (raw === null || raw === undefined || raw === '') {
+      return null;
+    }
+    const match = /^(0[1-9]|1[0-2])\/(\d{2})$/.exec(String(raw).trim());
+    if (!match) {
+      return null;
+    }
+    const month = Number(match[1]);
+    const fullYear = 2000 + Number(match[2]);
+
+    const now = new Date();
+    const currentYear = now.getFullYear();
+    const currentMonth = now.getMonth() + 1;
+
+    if (fullYear < currentYear || (fullYear === currentYear && month < currentMonth)) {
+      return { expired: true };
+    }
+
+    const maxYear = currentYear + EXPIRY_MAX_FUTURE_YEARS;
+    if (fullYear > maxYear || (fullYear === maxYear && month > currentMonth)) {
+      return { tooFarFuture: { maxYears: EXPIRY_MAX_FUTURE_YEARS } };
+    }
+    return null;
+  };
+}
 
 @Component({
   standalone: true,
@@ -60,13 +112,34 @@ export class ConfirmPlanComponent implements OnInit {
     });
 
     this.paymentForm = this.fb.group({
+      paymentMethod: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
       cardNumber: ['', [Validators.required, Validators.pattern('^[0-9]{16}$')]],
-      expiry: ['', [Validators.required, Validators.pattern('^(0[1-9]|1[0-2])\/\\d{2}$')]],
+      expiry: [
+        '',
+        [
+          Validators.required,
+          Validators.pattern('^(0[1-9]|1[0-2])\/\\d{2}$'),
+          cardExpiryNotPastNorTooFarFuture(),
+        ],
+      ],
       cvc: ['', [Validators.required, Validators.pattern('^[0-9]{3}$')]],
       cardHolder: ['', [Validators.required, Validators.minLength(2)]],
       country: ['', [Validators.required]]
     });
+
+    // Pre-rellena el método de pago si el usuario ya lo eligió previamente.
+    const storedUserRaw = localStorage.getItem('currentUser');
+    if (storedUserRaw) {
+      try {
+        const storedUser = JSON.parse(storedUserRaw) as User;
+        if (storedUser?.paymentMethod) {
+          this.paymentForm.patchValue({ paymentMethod: storedUser.paymentMethod });
+        }
+      } catch {
+        // localStorage corrupto: ignoramos y dejamos el control vacío.
+      }
+    }
   }
 
   loadTranslatedFeatures(planType: string): void {
@@ -104,8 +177,11 @@ export class ConfirmPlanComponent implements OnInit {
 
     const currentUser = JSON.parse(localStorage.getItem('currentUser') || '{}') as User;
 
+    const paymentMethod = (this.paymentForm.get('paymentMethod')?.value as string) || '';
+
     const updatedUser: User = {
       ...currentUser,
+      paymentMethod,
       hasPlan: true
     };
 
@@ -155,27 +231,9 @@ export class ConfirmPlanComponent implements OnInit {
     return !!(control && control.invalid && (control.touched || this.formSubmitted));
   }
 
+  // Por requerimiento de negocio, sólo Perú está disponible como país de cobro.
   latinCountries = [
-    { code: 'AR', translationKey: 'COUNTRIES.ARGENTINA' },
-    { code: 'BO', translationKey: 'COUNTRIES.BOLIVIA' },
-    { code: 'BR', translationKey: 'COUNTRIES.BRAZIL' },
-    { code: 'CL', translationKey: 'COUNTRIES.CHILE' },
-    { code: 'CO', translationKey: 'COUNTRIES.COLOMBIA' },
-    { code: 'CR', translationKey: 'COUNTRIES.COSTA_RICA' },
-    { code: 'CU', translationKey: 'COUNTRIES.CUBA' },
-    { code: 'DO', translationKey: 'COUNTRIES.DOMINICAN_REPUBLIC' },
-    { code: 'EC', translationKey: 'COUNTRIES.ECUADOR' },
-    { code: 'GT', translationKey: 'COUNTRIES.GUATEMALA' },
-    { code: 'HN', translationKey: 'COUNTRIES.HONDURAS' },
-    { code: 'MX', translationKey: 'COUNTRIES.MEXICO' },
-    { code: 'NI', translationKey: 'COUNTRIES.NICARAGUA' },
-    { code: 'PA', translationKey: 'COUNTRIES.PANAMA' },
-    { code: 'PY', translationKey: 'COUNTRIES.PARAGUAY' },
     { code: 'PE', translationKey: 'COUNTRIES.PERU' },
-    { code: 'PR', translationKey: 'COUNTRIES.PUERTO_RICO' },
-    { code: 'SV', translationKey: 'COUNTRIES.EL_SALVADOR' },
-    { code: 'UY', translationKey: 'COUNTRIES.URUGUAY' },
-    { code: 'VE', translationKey: 'COUNTRIES.VENEZUELA' }
   ];
 
 }
