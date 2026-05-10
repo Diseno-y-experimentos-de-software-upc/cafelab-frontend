@@ -289,29 +289,41 @@ export class RoastProfileListComponent implements OnInit {
   private collectRegisterFieldErrors(): Record<string, string> {
     const e: Record<string, string> = {};
     const t = (k: string) => this.translate.instant(k);
+    const namePattern = /^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ ]+$/;
     if (!this.newProfile.name?.trim()) {
       e['name'] = t('ROAST_PROFILE_BC.VALIDATION.NAME');
+    } else if (!namePattern.test(this.newProfile.name.trim())) {
+      e['name'] = t('ROAST_PROFILE_BC.VALIDATION.NAME_SPECIAL_CHARS');
     }
     if (!this.newProfile.type?.trim()) {
       e['type'] = t('ROAST_PROFILE_BC.VALIDATION.TYPE');
     }
     const dur = Number(this.newProfile.duration);
-    if (!Number.isFinite(dur) || dur <= 0) {
+    if (!Number.isFinite(dur) || dur < 1) {
       e['duration'] = t('ROAST_PROFILE_BC.VALIDATION.DURATION');
-    } else if (dur > 1440) {
+    } else if (dur > 15) {
       e['duration'] = t('ROAST_PROFILE_BC.VALIDATION.DURATION_MAX');
+    } else if (!Number.isInteger(dur)) {
+      e['duration'] = t('ROAST_PROFILE_BC.VALIDATION.DURATION_INTEGER');
     }
     const ts = Number(this.newProfile.tempStart);
-    if (!Number.isFinite(ts)) {
+    if (!Number.isFinite(ts) || ts < 1) {
       e['tempStart'] = t('ROAST_PROFILE_BC.VALIDATION.TEMP_START');
-    } else if (ts < 0 || ts > 300) {
-      e['tempStart'] = t('ROAST_PROFILE_BC.VALIDATION.TEMP_RANGE');
+    } else if (ts > 240) {
+      e['tempStart'] = t('ROAST_PROFILE_BC.VALIDATION.TEMP_START_RANGE');
+    } else if (!Number.isInteger(ts)) {
+      e['tempStart'] = t('ROAST_PROFILE_BC.VALIDATION.TEMP_START_INTEGER');
     }
     const te = Number(this.newProfile.tempEnd);
-    if (!Number.isFinite(te)) {
+    if (!Number.isFinite(te) || te < 1) {
       e['tempEnd'] = t('ROAST_PROFILE_BC.VALIDATION.TEMP_END');
-    } else if (te < 0 || te > 300) {
-      e['tempEnd'] = t('ROAST_PROFILE_BC.VALIDATION.TEMP_RANGE');
+    } else if (te > 240) {
+      e['tempEnd'] = t('ROAST_PROFILE_BC.VALIDATION.TEMP_END_RANGE');
+    } else if (!Number.isInteger(te)) {
+      e['tempEnd'] = t('ROAST_PROFILE_BC.VALIDATION.TEMP_END_INTEGER');
+    }
+    if (!e['tempStart'] && !e['tempEnd'] && Number.isFinite(ts) && Number.isFinite(te) && ts >= te) {
+      e['tempStart'] = t('ROAST_PROFILE_BC.VALIDATION.TEMP_ORDER');
     }
     const lot = Number(this.newProfile.lot);
     if (!lot || lot <= 0) {
@@ -328,29 +340,41 @@ export class RoastProfileListComponent implements OnInit {
     const p = this.editingProfile;
     const e: Record<string, string> = {};
     const t = (k: string) => this.translate.instant(k);
+    const namePattern = /^[a-zA-ZáéíóúÁÉÍÓÚüÜñÑ ]+$/;
     if (!p.name?.trim()) {
       e['name'] = t('ROAST_PROFILE_BC.VALIDATION.NAME');
+    } else if (!namePattern.test(p.name.trim())) {
+      e['name'] = t('ROAST_PROFILE_BC.VALIDATION.NAME_SPECIAL_CHARS');
     }
     if (!p.type?.trim()) {
       e['type'] = t('ROAST_PROFILE_BC.VALIDATION.TYPE');
     }
     const dur = Number(p.duration);
-    if (!Number.isFinite(dur) || dur <= 0) {
+    if (!Number.isFinite(dur) || dur < 1) {
       e['duration'] = t('ROAST_PROFILE_BC.VALIDATION.DURATION');
-    } else if (dur > 1440) {
+    } else if (dur > 15) {
       e['duration'] = t('ROAST_PROFILE_BC.VALIDATION.DURATION_MAX');
+    } else if (!Number.isInteger(dur)) {
+      e['duration'] = t('ROAST_PROFILE_BC.VALIDATION.DURATION_INTEGER');
     }
     const ts = Number(p.tempStart);
-    if (!Number.isFinite(ts)) {
+    if (!Number.isFinite(ts) || ts < 1) {
       e['tempStart'] = t('ROAST_PROFILE_BC.VALIDATION.TEMP_START');
-    } else if (ts < 0 || ts > 300) {
-      e['tempStart'] = t('ROAST_PROFILE_BC.VALIDATION.TEMP_RANGE');
+    } else if (ts > 240) {
+      e['tempStart'] = t('ROAST_PROFILE_BC.VALIDATION.TEMP_START_RANGE');
+    } else if (!Number.isInteger(ts)) {
+      e['tempStart'] = t('ROAST_PROFILE_BC.VALIDATION.TEMP_START_INTEGER');
     }
     const te = Number(p.tempEnd);
-    if (!Number.isFinite(te)) {
+    if (!Number.isFinite(te) || te < 1) {
       e['tempEnd'] = t('ROAST_PROFILE_BC.VALIDATION.TEMP_END');
-    } else if (te < 0 || te > 300) {
-      e['tempEnd'] = t('ROAST_PROFILE_BC.VALIDATION.TEMP_RANGE');
+    } else if (te > 240) {
+      e['tempEnd'] = t('ROAST_PROFILE_BC.VALIDATION.TEMP_END_RANGE');
+    } else if (!Number.isInteger(te)) {
+      e['tempEnd'] = t('ROAST_PROFILE_BC.VALIDATION.TEMP_END_INTEGER');
+    }
+    if (!e['tempStart'] && !e['tempEnd'] && Number.isFinite(ts) && Number.isFinite(te) && ts >= te) {
+      e['tempStart'] = t('ROAST_PROFILE_BC.VALIDATION.TEMP_ORDER');
     }
     const lot = Number(p.lot);
     if (!lot || lot <= 0) {

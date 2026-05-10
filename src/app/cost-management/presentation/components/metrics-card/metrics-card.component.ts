@@ -19,4 +19,5 @@ export class MetricsCardComponent {
   @Input() costPerKg!: number;
   @Input() potentialMargin!: number;
   @Input() suggestedPrice!: number;
+  @Input() currencySymbol = 'S/.';
 }

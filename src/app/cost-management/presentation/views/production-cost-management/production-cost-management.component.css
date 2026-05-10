@@ -33,6 +33,96 @@
   width: 100%;
 }
 
+.summary-section-title {
+  color: #414535;
+  font-family: 'Nunito', sans-serif;
+  font-size: 1.15rem;
+  margin: 24px 0 12px 0;
+}
+
+.summary-fields-table {
+  margin-bottom: 8px;
+}
+
+/* Modal de confirmación previo al guardado del registro. */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 16px;
+}
+
+.modal-content {
+  background-color: white;
+  padding: 28px 28px 24px;
+  border-radius: 8px;
+  width: 100%;
+  max-width: 460px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+  box-sizing: border-box;
+}
+
+.save-confirmation-modal h2 {
+  color: #4a5a54;
+  margin: 0 0 16px;
+  font-weight: 600;
+  font-size: 1.15rem;
+  text-align: left;
+}
+
+.save-confirm-warning {
+  margin: 0 0 12px;
+  padding: 12px 14px;
+  background-color: #fff4e5;
+  color: #8a4b00;
+  border-left: 4px solid #f59e0b;
+  border-radius: 4px;
+  line-height: 1.5;
+}
+
+.save-confirm-hint {
+  margin: 0 0 20px;
+  color: #555;
+  line-height: 1.5;
+}
+
+.save-confirmation-modal .form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.save-confirmation-modal .cancel-confirm-button {
+  min-width: 120px;
+}
+
+.save-confirmation-modal .accept-confirm-button {
+  background-color: #4a5a54 !important;
+  color: white !important;
+  min-width: 160px;
+}
+
+.save-confirmation-modal .accept-confirm-button[disabled] {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+/* Tablas del paso "Resumen": llenan el ancho del contenedor `.summary-container`
+   para que la tarjeta de métricas (también 100%) quede alineada con ellas. */
+.summary-table-full {
+  width: 100%;
+}
+
+.summary-card-wrapper {
+  width: 100%;
+  box-sizing: border-box;
+}
+
 h2 {
   color: #414535;
   margin-bottom: 20px;

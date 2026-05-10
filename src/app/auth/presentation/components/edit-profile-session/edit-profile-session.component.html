@@ -2,45 +2,40 @@
   <div class="profile-right" style="width:100%; margin:auto;">
     <form class="profile-form" [formGroup]="editProfileForm" (ngSubmit)="onSubmit()">
 
-      <div class="form-row">
-        <div class="form-group">
-          <label>{{ 'EDIT_PROFILE.NAME' | translate }}</label>
-          <input type="text" formControlName="name" [ngClass]="{'invalid': isInvalidControl(editProfileForm, 'name')}">
-        </div>
-      </div>
+      <section class="profile-section">
+        <h3 class="profile-section-title">
+          {{ 'EDIT_PROFILE.SECTION_PERSONAL' | translate }}
+        </h3>
 
-      <div class="form-row">
-        <div class="form-group">
-          <label>
-            {{ 'EDIT_PROFILE.CAFETERIA_NAME' | translate }}
-            <span *ngIf="isCafeteriaNameRequired" class="required-mark" title="{{ 'EDIT_PROFILE.CAFETERIA_REQUIRED_HINT' | translate }}">*</span>
-          </label>
-          <input type="text" formControlName="cafeteriaName" [ngClass]="{'invalid': isInvalidControl(editProfileForm, 'cafeteriaName')}">
-          <p *ngIf="isCafeteriaNameRequired" class="field-hint">{{ 'EDIT_PROFILE.CAFETERIA_REQUIRED_HINT' | translate }}</p>
+        <div class="form-row">
+          <div class="form-group">
+            <label>{{ 'EDIT_PROFILE.NAME' | translate }}</label>
+            <input type="text" formControlName="name"
+                   [ngClass]="{'invalid': isInvalidControl(editProfileForm, 'name') || !!fieldErrors.name}">
+            <p *ngIf="fieldErrors.name" class="field-error">{{ fieldErrors.name }}</p>
+          </div>
         </div>
 
-        <div class="form-group">
-          <label>{{ 'EDIT_PROFILE.EMAIL' | translate }}</label>
-          <input type="email" formControlName="email" [ngClass]="{'invalid': isInvalidControl(editProfileForm, 'email')}">
-        </div>
-      </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>
+              {{ 'EDIT_PROFILE.CAFETERIA_NAME' | translate }}
+              <span *ngIf="isCafeteriaNameRequired" class="required-mark" title="{{ 'EDIT_PROFILE.CAFETERIA_REQUIRED_HINT' | translate }}">*</span>
+            </label>
+            <input type="text" formControlName="cafeteriaName"
+                   [ngClass]="{'invalid': isInvalidControl(editProfileForm, 'cafeteriaName') || !!fieldErrors.cafeteriaName}">
+            <p *ngIf="isCafeteriaNameRequired" class="field-hint">{{ 'EDIT_PROFILE.CAFETERIA_REQUIRED_HINT' | translate }}</p>
+            <p *ngIf="fieldErrors.cafeteriaName" class="field-error">{{ fieldErrors.cafeteriaName }}</p>
+          </div>
 
-      <div class="payment-section">
-        <label>{{ 'EDIT_PROFILE.PAYMENT_METHOD' | translate }}</label>
-        <div class="payment-options">
-          <label class="payment-radio">
-            <input type="radio" formControlName="paymentMethod" value="visa">
-            <img src="assets/Visa.png" alt="Visa">
-            {{ 'EDIT_PROFILE.VISA' | translate }}
-          </label>
-
-          <label class="payment-radio">
-            <input type="radio" formControlName="paymentMethod" value="mastercard">
-            <img src="assets/MasterCard.png" alt="MasterCard">
-            {{ 'EDIT_PROFILE.MASTERCARD' | translate }}
-          </label>
+          <div class="form-group">
+            <label>{{ 'EDIT_PROFILE.EMAIL' | translate }}</label>
+            <input type="email" formControlName="email"
+                   [ngClass]="{'invalid': isInvalidControl(editProfileForm, 'email') || !!fieldErrors.email}">
+            <p *ngIf="fieldErrors.email" class="field-error">{{ fieldErrors.email }}</p>
+          </div>
         </div>
-      </div>
+      </section>
 
       <div class="form-actions">
         <button type="submit"
@@ -56,5 +51,128 @@
       </div>
 
     </form>
+
+    <form class="profile-form password-form" [formGroup]="passwordForm" (ngSubmit)="submitPasswordChange()" autocomplete="off">
+      <section class="profile-section">
+        <h3 class="profile-section-title">
+          {{ 'EDIT_PROFILE.PASSWORD_CHANGE.TITLE' | translate }}
+        </h3>
+
+        <p class="password-hint">
+          {{ 'EDIT_PROFILE.PASSWORD_CHANGE.HINT' | translate }}
+        </p>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>{{ 'EDIT_PROFILE.PASSWORD_CHANGE.CURRENT' | translate }}</label>
+            <input type="password" formControlName="currentPassword" autocomplete="current-password"
+                   [ngClass]="{'invalid': isInvalidControl(passwordForm, 'currentPassword') || !!passwordError}">
+            <p *ngIf="passwordForm.get('currentPassword')?.hasError('required')
+                     && passwordForm.get('currentPassword')?.touched"
+               class="field-error">
+              {{ 'EDIT_PROFILE.PASSWORD_CHANGE.ERRORS.CURRENT_REQUIRED' | translate }}
+            </p>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label>{{ 'EDIT_PROFILE.PASSWORD_CHANGE.NEW' | translate }}</label>
+            <input type="password" formControlName="newPassword" autocomplete="new-password"
+                   [ngClass]="{'invalid': isInvalidControl(passwordForm, 'newPassword')}">
+            <p *ngIf="passwordForm.get('newPassword')?.hasError('required')
+                     && passwordForm.get('newPassword')?.touched"
+               class="field-error">
+              {{ 'EDIT_PROFILE.PASSWORD_CHANGE.ERRORS.NEW_REQUIRED' | translate }}
+            </p>
+            <p *ngIf="(passwordForm.get('newPassword')?.hasError('minlength')
+                       || passwordForm.get('newPassword')?.hasError('maxlength'))
+                     && passwordForm.get('newPassword')?.touched"
+               class="field-error">
+              {{ 'EDIT_PROFILE.PASSWORD_CHANGE.ERRORS.NEW_LENGTH' | translate }}
+            </p>
+          </div>
+
+          <div class="form-group">
+            <label>{{ 'EDIT_PROFILE.PASSWORD_CHANGE.CONFIRM' | translate }}</label>
+            <input type="password" formControlName="confirmNewPassword" autocomplete="new-password"
+                   [ngClass]="{'invalid': isInvalidControl(passwordForm, 'confirmNewPassword')
+                                          || (passwordForm.hasError('passwordsMismatch')
+                                              && passwordForm.get('confirmNewPassword')?.touched)}">
+            <p *ngIf="passwordForm.get('confirmNewPassword')?.hasError('required')
+                     && passwordForm.get('confirmNewPassword')?.touched"
+               class="field-error">
+              {{ 'EDIT_PROFILE.PASSWORD_CHANGE.ERRORS.CONFIRM_REQUIRED' | translate }}
+            </p>
+            <p *ngIf="passwordForm.hasError('passwordsMismatch')
+                     && passwordForm.get('confirmNewPassword')?.touched
+                     && !passwordForm.get('confirmNewPassword')?.hasError('required')"
+               class="field-error">
+              {{ 'EDIT_PROFILE.PASSWORD_CHANGE.ERRORS.MISMATCH' | translate }}
+            </p>
+          </div>
+        </div>
+
+        <p *ngIf="passwordError" class="password-error-banner">
+          {{ passwordError }}
+        </p>
+        <p *ngIf="passwordSuccess" class="password-success-banner">
+          {{ passwordSuccess }}
+        </p>
+
+        <div class="form-actions">
+          <button type="submit"
+                  [disabled]="!passwordForm.valid || passwordSubmitting">
+            {{ passwordSubmitting
+                ? ('EDIT_PROFILE.PASSWORD_CHANGE.SUBMITTING' | translate)
+                : ('EDIT_PROFILE.PASSWORD_CHANGE.SUBMIT' | translate) }}
+          </button>
+        </div>
+      </section>
+    </form>
+  </div>
+</div>
+
+<!-- Modal: confirmar cambio de correo -->
+<div *ngIf="showEmailChangeModal" class="modal-overlay" (click)="cancelEmailChange()">
+  <div class="modal-content email-change-modal" (click)="$event.stopPropagation()">
+    <h2>{{ 'EDIT_PROFILE.EMAIL_CHANGE.TITLE' | translate }}</h2>
+    <p class="email-change-question">
+      {{ 'EDIT_PROFILE.EMAIL_CHANGE.QUESTION' | translate }}
+    </p>
+
+    <ul class="email-change-summary" *ngIf="pendingChangesSummary">
+      <li *ngIf="pendingChangesSummary.email">
+        <strong>{{ 'EDIT_PROFILE.EMAIL' | translate }}:</strong>
+        {{ pendingChangesSummary.email }}
+      </li>
+      <li *ngIf="pendingChangesSummary.name">
+        <strong>{{ 'EDIT_PROFILE.NAME' | translate }}:</strong>
+        {{ pendingChangesSummary.name }}
+      </li>
+      <li *ngIf="pendingChangesSummary.cafeteriaName">
+        <strong>{{ 'EDIT_PROFILE.CAFETERIA_NAME' | translate }}:</strong>
+        {{ pendingChangesSummary.cafeteriaName }}
+      </li>
+    </ul>
+
+    <p *ngIf="emailChangeModalError" class="email-change-error">
+      {{ emailChangeModalError }}
+    </p>
+
+    <div class="form-actions email-change-actions">
+      <button type="button" class="cancel-btn"
+              (click)="cancelEmailChange()"
+              [disabled]="emailChangeSubmitting">
+        {{ 'EDIT_PROFILE.EMAIL_CHANGE.CANCEL' | translate }}
+      </button>
+      <button type="button" class="confirm-btn"
+              (click)="confirmEmailChange()"
+              [disabled]="emailChangeSubmitting">
+        {{ emailChangeSubmitting
+            ? ('EDIT_PROFILE.EMAIL_CHANGE.CHECKING' | translate)
+            : ('EDIT_PROFILE.EMAIL_CHANGE.CONFIRM' | translate) }}
+      </button>
+    </div>
   </div>
 </div>

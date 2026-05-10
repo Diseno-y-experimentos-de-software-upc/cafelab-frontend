@@ -153,6 +153,8 @@
             [(ngModel)]="newSupplier.phone"
             name="phone"
             required
+            inputmode="numeric"
+            pattern="[0-9]*"
             [class.input-invalid]="!!registerFieldErrors['phone']"
             (ngModelChange)="clearRegisterFieldError('phone')"
           />
@@ -236,6 +238,8 @@
             [(ngModel)]="editingSupplier.phone"
             name="editPhone"
             required
+            inputmode="numeric"
+            pattern="[0-9]*"
             [class.input-invalid]="!!editFieldErrors['phone']"
             (ngModelChange)="clearEditFieldError('phone')"
           />

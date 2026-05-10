@@ -24,22 +24,6 @@
         </div>
       </div>
 
-      <div class="payment-section">
-        <label>{{ 'EDIT_PROFILE.PAYMENT_METHOD' | translate }}</label>
-        <div class="payment-options">
-          <label class="payment-radio">
-            <input type="radio" formControlName="paymentMethod" value="visa">
-            <img src="/assets/Visa.png" alt="Visa">
-            {{ 'EDIT_PROFILE.VISA' | translate }}
-          </label>
-          <label class="payment-radio">
-            <input type="radio" formControlName="paymentMethod" value="mastercard">
-            <img src="/assets/MasterCard.png" alt="MasterCard">
-            {{ 'EDIT_PROFILE.MASTERCARD' | translate }}
-          </label>
-        </div>
-      </div>
-
       <div class="form-actions">
         <button type="button" [disabled]="!editProfileForm.valid" (click)="continueToSelectPlan()">
           {{ 'EDIT_PROFILE.CONTINUE' | translate }}
