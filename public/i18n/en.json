@@ -646,6 +646,31 @@
         "tbsp": "Tablespoons",
         "tsp": "Teaspoons"
       },
+      "unit_label": "Unit",
+      "grind_options": {
+        "very_fine": "Very fine",
+        "fine": "Fine",
+        "medium": "Medium",
+        "coarse": "Coarse"
+      },
+      "ratios": {
+        "1:12": "1:12 (Concentrated)",
+        "1:14": "1:14 (Balanced)",
+        "1:15": "1:15 (Standard)",
+        "1:16": "1:16 (Mild)",
+        "1:17": "1:17 (Light)",
+        "1:1": "1:1 (Ristretto)",
+        "1:1.5": "1:1.5 (Short)",
+        "1:2": "1:2 (Standard)",
+        "1:2.5": "1:2.5 (Long)",
+        "1:3": "1:3 (Lungo)"
+      },
+      "ingredients_default": {
+        "water": "Water",
+        "coffee": "Coffee"
+      },
+      "image_preview_alt": "Image preview",
+      "close": "Close",
       "add_ingredient": "Add Ingredient",
       "pasos": "Preparation Steps",
       "pasos_placeholder": "Describe the steps to prepare the drink",
@@ -1152,7 +1177,13 @@
     "FINAL_VOLUME_LABEL": "Final Volume (ml)",
     "DATE_LABEL": "Calibration Date",
     "VISUALIZATION_LABEL": "Visualization",
+    "VISUALIZATION_LINK": "Visualization (Image link)",
+    "PLACEHOLDER_LINK": "Ex: https://...",
     "ATTACH_SAMPLES": "Attach samples",
+    "ERRORS": {
+      "REQUIRED": "This field is required.",
+      "PATTERN_NAME": "Numbers and special characters are not allowed."
+    },
     "COMMENTS_LABEL": "Comments:",
     "NOTES_LABEL": "Notes:",
     "REGISTER_BUTTON": "Register Calibration",
@@ -1172,7 +1203,11 @@
     "COMMENTS_PLACEHOLDER": "e.g. Espresso density may vary between 0.95–1.05 g/mL",
     "NOTES_PLACEHOLDER": "e.g. At higher altitude, water boils at a lower temperature",
     "SAMPLE_IMAGE_ALT": "Calibration sample",
-    "IMAGE_LOADED": "Image on file"
+    "IMAGE_LOADED": "Image on file",
+    "DELETE_CONFIRMATION": "Delete Calibration",
+    "DELETE_SUCCESS": "Calibration deleted successfully",
+    "DELETE_ERROR": "Error deleting calibration",
+    "DATE_PAST_ERROR": "Calibration date cannot be in the past"
   },
   "GRIND_CALIBRATION_BC": {
     "ERRORS": {

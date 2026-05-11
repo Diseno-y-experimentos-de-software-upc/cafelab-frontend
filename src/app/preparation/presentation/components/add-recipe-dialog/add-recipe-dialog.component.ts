@@ -7,6 +7,7 @@ import { MatCheckboxModule } from '@angular/material/checkbox';
 import { FormsModule } from '@angular/forms';
 import { RecipeService } from '../../../infrastructure/recipe.service';
 import { Recipe } from '../../../domain/model/recipe.entity';
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-add-recipe-dialog',
@@ -17,7 +18,8 @@ import { Recipe } from '../../../domain/model/recipe.entity';
     MatButtonModule,
     MatListModule,
     MatCheckboxModule,
-    FormsModule
+    FormsModule,
+    TranslateModule
   ],
   templateUrl: './add-recipe-dialog.component.html',
   styleUrls: ['./add-recipe-dialog.component.css']

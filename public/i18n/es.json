@@ -648,6 +648,31 @@
         "tbsp": "Cucharadas",
         "tsp": "Cucharaditas"
       },
+      "unit_label": "Unidad",
+      "grind_options": {
+        "very_fine": "Muy fino",
+        "fine": "Fino",
+        "medium": "Medio",
+        "coarse": "Grueso"
+      },
+      "ratios": {
+        "1:12": "1:12 (Concentrado)",
+        "1:14": "1:14 (Balanceado)",
+        "1:15": "1:15 (Estándar)",
+        "1:16": "1:16 (Suave)",
+        "1:17": "1:17 (Ligero)",
+        "1:1": "1:1 (Ristretto)",
+        "1:1.5": "1:1.5 (Corto)",
+        "1:2": "1:2 (Estándar)",
+        "1:2.5": "1:2.5 (Largo)",
+        "1:3": "1:3 (Lungo)"
+      },
+      "ingredients_default": {
+        "water": "Agua",
+        "coffee": "Café"
+      },
+      "image_preview_alt": "Vista previa de la imagen",
+      "close": "Cerrar",
       "add_ingredient": "Agregar Ingrediente",
       "pasos": "Pasos de Preparación",
       "pasos_placeholder": "Describe los pasos para preparar la bebida",
@@ -1154,7 +1179,13 @@
     "FINAL_VOLUME_LABEL": "Volumen final (ml)",
     "DATE_LABEL": "Fecha de calibración",
     "VISUALIZATION_LABEL": "Visualización",
+    "VISUALIZATION_LINK": "Visualización (Link de imagen)",
+    "PLACEHOLDER_LINK": "Ej: https://...",
     "ATTACH_SAMPLES": "Adjuntar muestras",
+    "ERRORS": {
+      "REQUIRED": "Este campo es obligatorio.",
+      "PATTERN_NAME": "No se permiten números ni caracteres especiales."
+    },
     "COMMENTS_LABEL": "Comentarios:",
     "NOTES_LABEL": "Notas:",
     "REGISTER_BUTTON": "Registrar Calibracion",
@@ -1174,7 +1205,11 @@
     "COMMENTS_PLACEHOLDER": "Ej.: La densidad del espresso puede variar entre 0,95–1,05 g/mL",
     "NOTES_PLACEHOLDER": "Ej.: A mayor altitud, menor punto de ebullición del agua",
     "SAMPLE_IMAGE_ALT": "Muestra de calibración",
-    "IMAGE_LOADED": "Imagen en archivo"
+    "IMAGE_LOADED": "Imagen en archivo",
+    "DELETE_CONFIRMATION": "Eliminar Calibración",
+    "DELETE_SUCCESS": "Calibración eliminada correctamente",
+    "DELETE_ERROR": "Error al eliminar la calibración",
+    "DATE_PAST_ERROR": "La fecha de calibración no puede ser anterior al día de hoy"
   },
   "GRIND_CALIBRATION_BC": {
     "ERRORS": {

@@ -1,7 +1,7 @@
-<h2 mat-dialog-title>Añadir recetas al portafolio</h2>
+<h2 mat-dialog-title>{{ 'recipes.add_to_portfolio' | translate }}</h2>
 <mat-dialog-content>
   <div *ngIf="availableRecipes.length === 0">
-    <p>No hay recetas disponibles para añadir.</p>
+    <p>{{ 'recipes.no_available' | translate }}</p>
   </div>
   <mat-selection-list #recipeList>
     <mat-list-option
@@ -10,25 +10,19 @@
       (click)="toggleRecipeSelection(recipe.id)"
       [selected]="isRecipeSelected(recipe.id)"
     >
-      <div class="recipe-item">
-        <img
-          [src]="recipe.imageUrl"
-          [alt]="recipe.name"
-          class="recipe-thumb"
-        />
-        <span>{{ recipe.name }}</span>
-      </div>
+      <img matListItemAvatar [src]="recipe.imageUrl" [alt]="recipe.name" style="object-fit: cover;" />
+      <span matListItemTitle>{{ recipe.name }}</span>
     </mat-list-option>
   </mat-selection-list>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
-  <button mat-button (click)="onCancel()">Cancelar</button>
+  <button mat-button (click)="onCancel()">{{ 'portfolio.actions.cancel' | translate }}</button>
   <button
     mat-raised-button
     color="primary"
     (click)="onAddRecipes()"
     [disabled]="selectedRecipes.length === 0"
   >
-    Añadir recetas
+    {{ 'portfolio.add_recipes' | translate }}
   </button>
 </mat-dialog-actions>
