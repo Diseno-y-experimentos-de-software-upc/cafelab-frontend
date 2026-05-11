@@ -26,11 +26,25 @@
           <input matInput formControlName="coffeeVariety" />
           <mat-error *ngIf="controlErrorMessage('coffeeVariety') as err">{{ err }}</mat-error>
         </mat-form-field>
-        <mat-form-field appearance="fill">
-          <mat-label>{{ 'DEFECT_BC.FORM.COFFEE_WEIGHT' | translate }}</mat-label>
-          <input matInput formControlName="coffeeTotalWeight" type="number" step="0.01" />
-          <mat-error *ngIf="controlErrorMessage('coffeeTotalWeight') as err">{{ err }}</mat-error>
-        </mat-form-field>
+        <div class="weight-block">
+          <div class="weight-field-group">
+            <mat-form-field appearance="fill" class="weight-value">
+              <mat-label>{{ 'DEFECT_BC.FORM.COFFEE_WEIGHT' | translate }}</mat-label>
+              <input matInput formControlName="coffeeTotalWeight" type="number" step="0.01" min="0" />
+              <mat-error *ngIf="controlErrorMessage('coffeeTotalWeight') as err">{{ err }}</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="fill" class="weight-unit">
+              <mat-label>{{ 'DEFECT_BC.FORM.MASS_UNIT_LABEL' | translate }}</mat-label>
+              <mat-select formControlName="coffeeTotalWeightUnit">
+                <mat-option value="g">{{ 'DEFECT_BC.FORM.MASS_UNIT_G' | translate }}</mat-option>
+                <mat-option value="kg">{{ 'DEFECT_BC.FORM.MASS_UNIT_KG' | translate }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <p *ngIf="shouldShowCoffeeWeightFeedback()" class="weight-field-feedback" role="note">
+            {{ 'DEFECT_BC.FORM.COFFEE_WEIGHT_UNIT_HINT' | translate }}
+          </p>
+        </div>
       </div>
     </div>
 
@@ -49,11 +63,25 @@
         </mat-form-field>
       </div>
       <div class="form-row">
-        <mat-form-field appearance="fill">
-          <mat-label>{{ 'DEFECT_BC.FORM.DEFECT_WEIGHT' | translate }}</mat-label>
-          <input matInput formControlName="defectWeight" type="number" step="0.01" />
-          <mat-error *ngIf="controlErrorMessage('defectWeight') as err">{{ err }}</mat-error>
-        </mat-form-field>
+        <div class="weight-block">
+          <div class="weight-field-group">
+            <mat-form-field appearance="fill" class="weight-value">
+              <mat-label>{{ 'DEFECT_BC.FORM.DEFECT_WEIGHT' | translate }}</mat-label>
+              <input matInput formControlName="defectWeight" type="number" step="0.01" min="0" />
+              <mat-error *ngIf="controlErrorMessage('defectWeight') as err">{{ err }}</mat-error>
+            </mat-form-field>
+            <mat-form-field appearance="fill" class="weight-unit">
+              <mat-label>{{ 'DEFECT_BC.FORM.MASS_UNIT_LABEL' | translate }}</mat-label>
+              <mat-select formControlName="defectWeightUnit">
+                <mat-option value="g">{{ 'DEFECT_BC.FORM.MASS_UNIT_G' | translate }}</mat-option>
+                <mat-option value="kg">{{ 'DEFECT_BC.FORM.MASS_UNIT_KG' | translate }}</mat-option>
+              </mat-select>
+            </mat-form-field>
+          </div>
+          <p *ngIf="shouldShowDefectWeightFeedback()" class="weight-field-feedback" role="note">
+            {{ 'DEFECT_BC.FORM.DEFECT_WEIGHT_UNIT_HINT' | translate }}
+          </p>
+        </div>
         <mat-form-field appearance="fill">
           <mat-label>{{ 'DEFECT_BC.FORM.DEFECT_PERCENTAGE' | translate }}</mat-label>
           <input matInput formControlName="percentage" type="number" step="0.1" />

@@ -4,33 +4,63 @@
   <div class="form-container">
     <mat-form-field appearance="outline">
       <mat-label>{{ 'CUPPING_SESSIONS.SESSION_NAME_LABEL' | translate }}</mat-label>
+
       <input
         matInput
         [(ngModel)]="form.name"
         name="name"
+        #nameModel="ngModel"
+        required
+        maxlength="50"
+        [pattern]="textPattern.source"
         [placeholder]="'CUPPING_SESSIONS.SESSION_NAME_PLACEHOLDER' | translate"
       />
+
+      <mat-error *ngIf="nameModel.invalid && nameModel.touched">
+        {{ 'CUPPING_SESSIONS.ERROR_INVALID_NAME' | translate }}
+      </mat-error>
     </mat-form-field>
+
 
     <mat-form-field appearance="outline">
       <mat-label>{{ 'CUPPING_SESSIONS.ORIGIN' | translate }}</mat-label>
+
       <input
         matInput
         [(ngModel)]="form.origin"
         name="origin"
+        #originModel="ngModel"
+        required
+        maxlength="50"
+        [pattern]="textPattern.source"
         [placeholder]="'CUPPING_SESSIONS.ORIGIN_PLACEHOLDER' | translate"
       />
+
+      <mat-error *ngIf="originModel.invalid && originModel.touched">
+        {{ 'CUPPING_SESSIONS.ERROR_INVALID_ORIGIN' | translate }}
+      </mat-error>
     </mat-form-field>
+
 
     <mat-form-field appearance="outline">
       <mat-label>{{ 'CUPPING_SESSIONS.VARIETY' | translate }}</mat-label>
+
       <input
         matInput
         [(ngModel)]="form.variety"
         name="variety"
+        #varietyModel="ngModel"
+        required
+        maxlength="50"
+        [pattern]="textPattern.source"
         [placeholder]="'CUPPING_SESSIONS.VARIETY_PLACEHOLDER' | translate"
       />
+
+      <mat-error *ngIf="varietyModel.invalid && varietyModel.touched">
+        {{ 'CUPPING_SESSIONS.ERROR_INVALID_VARIETY' | translate }}
+      </mat-error>
     </mat-form-field>
+
 
     <mat-form-field appearance="outline">
       <mat-label>{{ 'CUPPING_SESSIONS.PROCESSING' | translate }}</mat-label>
@@ -43,9 +73,16 @@
 
     <mat-form-field appearance="outline">
       <mat-label>{{ 'CUPPING_SESSIONS.SESSION_DATE_LABEL' | translate }}</mat-label>
-      <input matInput [matDatepicker]="picker" [(ngModel)]="form.sessionDate" name="sessionDate" />
+      <input
+        matInput
+        [matDatepicker]="picker"
+        [min]="minSessionDate"
+        [(ngModel)]="form.sessionDate"
+        name="sessionDate"
+      />
       <mat-datepicker-toggle matIconSuffix [for]="picker"></mat-datepicker-toggle>
       <mat-datepicker #picker></mat-datepicker>
+      <mat-hint>{{ 'CUPPING_SESSIONS.SESSION_DATE_MIN_TODAY_HINT' | translate }}</mat-hint>
     </mat-form-field>
 
     <mat-form-field appearance="outline">
@@ -59,6 +96,8 @@
       ></textarea>
     </mat-form-field>
   </div>
+
+  <div *ngIf="formErrorKey" class="nueva-cata-form-error" role="alert">{{ formErrorKey | translate }}</div>
 
   <div class="actions">
     <button mat-raised-button class="create-button" type="button" (click)="crearSesion()">

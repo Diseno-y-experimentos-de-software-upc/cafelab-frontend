@@ -16,11 +16,10 @@ if (fs.existsSync(envPath)) {
 // ─── Inyectar en los archivos de environment de Angular ──────────
 const apiUrl = process.env.API_URL || 'http://localhost:8080';
 
+// environment.local.ts / environment.remote.ts: mismo origen + proxy; no sobrescribir aquí.
 const targetPaths = [
   './src/environments/environment.ts',
-  './src/environments/environment.local.ts',
   './src/environments/environment.development.ts',
-  './src/environments/environment.remote.ts',
 ];
 
 targetPaths.forEach((targetPath) => {

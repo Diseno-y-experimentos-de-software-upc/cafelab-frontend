@@ -96,7 +96,8 @@
               "proxyConfig": "proxy.remote.conf.js"
             },
             "local": {
-              "buildTarget": "cafe-lab:build:local"
+              "buildTarget": "cafe-lab:build:local",
+              "proxyConfig": "proxy.local.conf.js"
             }
           },
           "defaultConfiguration": "development"

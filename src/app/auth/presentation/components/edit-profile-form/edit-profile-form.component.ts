@@ -39,7 +39,6 @@ export class EditProfileFormComponent extends BaseFormComponent implements OnIni
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
       cafeteriaName: [''],
-      paymentMethod: ['', Validators.required]
     });
   }
 
@@ -51,7 +50,6 @@ export class EditProfileFormComponent extends BaseFormComponent implements OnIni
         name: this.currentUser.name || '',
         email: this.currentUser.email || '',
         cafeteriaName: this.currentUser.cafeteriaName || '',
-        paymentMethod: this.currentUser.paymentMethod || '',
       });
       this.syncCafeteriaFieldState();
     }
@@ -103,7 +101,6 @@ export class EditProfileFormComponent extends BaseFormComponent implements OnIni
       name: string;
       email: string;
       cafeteriaName: string;
-      paymentMethod: string;
     };
     const isBarista = this.currentUser.role === 'barista';
     const isFullPlan = this.currentUser.plan === 'full';
@@ -115,7 +112,6 @@ export class EditProfileFormComponent extends BaseFormComponent implements OnIni
       name: raw.name.trim(),
       email: raw.email.trim(),
       cafeteriaName,
-      paymentMethod: raw.paymentMethod,
       experience: this.currentUser.experience,
       isFirstLogin: false,
     };

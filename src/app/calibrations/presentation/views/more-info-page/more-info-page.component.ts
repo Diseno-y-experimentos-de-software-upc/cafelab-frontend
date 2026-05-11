@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { MatToolbar } from '@angular/material/toolbar';
 import { TranslatePipe } from '@ngx-translate/core';
 import { ToolbarComponent } from '../../../../public/presentation/components/toolbar/toolbar.component';
@@ -9,7 +9,7 @@ import { AuthService } from '../../../../auth/infrastructure/AuthService';
 @Component({
   selector: 'app-more-info-page',
   standalone: true,
-  imports: [MatToolbar, ToolbarComponent, MoreInfoCalibrationComponent, TranslatePipe],
+  imports: [MoreInfoCalibrationComponent, MatToolbar, ToolbarComponent, TranslatePipe, RouterModule],
   templateUrl: './more-info-page.component.html',
   styleUrls: ['./more-info-page.component.css', '../calibration-breadcrumb-shell.css'],
 })

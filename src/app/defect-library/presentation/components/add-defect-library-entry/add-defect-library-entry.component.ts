@@ -5,12 +5,14 @@ import { NgIf } from '@angular/common';
 import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
+import { MatSelectModule } from '@angular/material/select';
 import { MatButtonModule } from '@angular/material/button';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { DefectLibraryApi } from '../../../application/defect-library.api';
 import type { DefectLibraryEntry } from '../../../domain/model/defect-library-entry.entity';
 import type { ApiError } from '../../../../shared/infrastructure/base-api-endpoint';
 import { getUserFacingApiMessage } from '../../../../shared/infrastructure/api-error-message';
+import { massInputToGrams, type MassUnit } from '../../../domain/mass-unit.util';
 
 @Component({
   selector: 'app-add-defect-library-entry',
@@ -22,6 +24,7 @@ import { getUserFacingApiMessage } from '../../../../shared/infrastructure/api-e
     ReactiveFormsModule,
     MatFormFieldModule,
     MatInputModule,
+    MatSelectModule,
     MatButtonModule,
     NgIf,
     MatSnackBarModule,
@@ -59,9 +62,11 @@ export class AddDefectLibraryEntryComponent implements OnInit {
       coffeeRegion: ['', [Validators.maxLength(255)]],
       coffeeVariety: ['', [Validators.maxLength(255)]],
       coffeeTotalWeight: [null as number | null],
+      coffeeTotalWeightUnit: ['g' as MassUnit],
       defectName: ['', [Validators.required, Validators.maxLength(255)]],
       defectType: ['', [Validators.required, Validators.maxLength(255)]],
       defectWeight: ['', [Validators.required]],
+      defectWeightUnit: ['g' as MassUnit],
       percentage: ['', [Validators.required]],
       probableCause: ['', [Validators.required]],
       suggestedSolution: ['', [Validators.required]],
@@ -110,6 +115,7 @@ export class AddDefectLibraryEntryComponent implements OnInit {
 
     const v = this.form.value as Record<string, unknown>;
     const dw = Number(v['defectWeight']);
+    const defectUnit = (v['defectWeightUnit'] as MassUnit) || 'g';
     const pct = Number(v['percentage']);
     let clientInvalid = false;
 
@@ -132,6 +138,7 @@ export class AddDefectLibraryEntryComponent implements OnInit {
       rawTw === null || rawTw === undefined || rawTw === ''
         ? null
         : Number(rawTw);
+    const coffeeUnit = (v['coffeeTotalWeightUnit'] as MassUnit) || 'g';
     if (tw !== null && (Number.isNaN(tw) || tw < 0)) {
       const c = this.form.get('coffeeTotalWeight');
       c?.setErrors({ ...(c.errors ?? {}), custom: 'DEFECT_BC.FORM.ERRORS.COFFEE_WEIGHT_NEGATIVE' });
@@ -144,16 +151,19 @@ export class AddDefectLibraryEntryComponent implements OnInit {
       return;
     }
 
+    const coffeeTotalWeightGrams = tw === null ? null : massInputToGrams(tw, coffeeUnit);
+    const defectWeightGrams = massInputToGrams(dw, defectUnit);
+
     const entry: DefectLibraryEntry = {
       id: 0,
       userId: null,
       coffeeDisplayName: String(v['coffeeDisplayName']).trim(),
       coffeeRegion: String(v['coffeeRegion'] ?? '').trim() || null,
       coffeeVariety: String(v['coffeeVariety'] ?? '').trim() || null,
-      coffeeTotalWeight: tw,
+      coffeeTotalWeight: coffeeTotalWeightGrams,
       name: String(v['defectName']).trim(),
       defectType: String(v['defectType']).trim(),
-      defectWeight: dw,
+      defectWeight: defectWeightGrams,
       percentage: pct,
       probableCause: String(v['probableCause']).trim(),
       suggestedSolution: String(v['suggestedSolution']).trim(),
@@ -179,6 +189,24 @@ export class AddDefectLibraryEntryComponent implements OnInit {
 
   onCancel(): void {
     void this.router.navigate(['/libraryDefects']);
+  }
+
+  /** Texto de ayuda g/kg solo tras intento de envío y error en el peso del café. */
+  shouldShowCoffeeWeightFeedback(): boolean {
+    if (!this.submitAttempted) {
+      return false;
+    }
+    const c = this.form.get('coffeeTotalWeight');
+    return !!(c && c.invalid);
+  }
+
+  /** Texto de ayuda g/kg solo tras intento de envío y error en el peso del defecto. */
+  shouldShowDefectWeightFeedback(): boolean {
+    if (!this.submitAttempted) {
+      return false;
+    }
+    const c = this.form.get('defectWeight');
+    return !!(c && c.invalid);
   }
 
   

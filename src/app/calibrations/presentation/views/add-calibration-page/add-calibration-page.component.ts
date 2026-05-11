@@ -1,5 +1,5 @@
 import { Component } from '@angular/core';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { MatToolbar } from '@angular/material/toolbar';
 import { TranslatePipe } from '@ngx-translate/core';
 import { AddNewCalibrationComponent } from '../../components/add-new-calibration/add-new-calibration.component';
@@ -9,7 +9,7 @@ import { AuthService } from '../../../../auth/infrastructure/AuthService';
 @Component({
   selector: 'app-add-calibration-page',
   standalone: true,
-  imports: [AddNewCalibrationComponent, MatToolbar, ToolbarComponent, TranslatePipe],
+  imports: [AddNewCalibrationComponent, MatToolbar, ToolbarComponent, TranslatePipe, RouterModule],
   templateUrl: './add-calibration-page.component.html',
   styleUrls: ['./add-calibration-page.component.css', '../calibration-breadcrumb-shell.css'],
 })

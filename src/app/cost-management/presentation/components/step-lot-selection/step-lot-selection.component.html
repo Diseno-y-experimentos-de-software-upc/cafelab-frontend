@@ -2,7 +2,7 @@
 
 <h2>{{ 'COST_MANAGEMENT.STEP_LOT_SELECTION' | translate }}</h2>
 
-<form [formGroup]="formGroup" class="step-form">
+<div [formGroup]="formGroup" class="step-form">
   <mat-form-field appearance="outline" class="full-width">
     <mat-label>{{ 'COST_MANAGEMENT.LOT_LABEL' | translate }}</mat-label>
     <mat-select formControlName="selectedLot">
@@ -13,5 +13,19 @@
         {{ 'COST_MANAGEMENT.NO_LOTS' | translate }}
       </mat-option>
     </mat-select>
+    <mat-error *ngIf="formGroup.get('selectedLot')?.hasError('required')">
+      {{ 'COST_MANAGEMENT.VALIDATION.REQUIRED' | translate }}
+    </mat-error>
   </mat-form-field>
-</form>
+
+  <mat-form-field appearance="outline" class="full-width">
+    <mat-label>{{ 'COST_MANAGEMENT.CURRENCY_LABEL' | translate }}</mat-label>
+    <mat-select formControlName="currency" required>
+      <mat-option value="PEN">{{ 'COST_MANAGEMENT.CURRENCY_OPTION_PEN' | translate }}</mat-option>
+      <mat-option value="USD">{{ 'COST_MANAGEMENT.CURRENCY_OPTION_USD' | translate }}</mat-option>
+    </mat-select>
+    <mat-error *ngIf="formGroup.get('currency')?.hasError('required')">
+      {{ 'COST_MANAGEMENT.VALIDATION.REQUIRED' | translate }}
+    </mat-error>
+  </mat-form-field>
+</div>

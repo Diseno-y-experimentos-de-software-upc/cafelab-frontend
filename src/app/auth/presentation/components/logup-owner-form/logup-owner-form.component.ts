@@ -6,6 +6,10 @@ import { MatInputModule } from '@angular/material/input';
 import { MatButtonModule } from '@angular/material/button';
 import { TranslateModule } from '@ngx-translate/core';
 import { UserService } from '../../../infrastructure/user.service';
+import {
+  classifyLogupRegistrationError,
+  type LogupRegistrationError,
+} from '../../../infrastructure/resolve-logup-api-error';
 import { AuthService } from '../../../infrastructure/AuthService';
 import { Router } from '@angular/router';
 import { User } from '../../../domain/model/user.entity';
@@ -29,6 +33,7 @@ import { switchMap, map } from 'rxjs/operators';
 })
 export class LogupOwnerFormComponent extends BaseFormComponent {
   logupForm: FormGroup;
+  submitError: LogupRegistrationError | null = null;
 
   constructor(
     private formBuilder: FormBuilder,
@@ -40,13 +45,14 @@ export class LogupOwnerFormComponent extends BaseFormComponent {
     this.logupForm = this.formBuilder.group({
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      password: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(120)]],
       cafeteriaName: ['', Validators.required],
       experience: ['', Validators.required],
     });
   }
 
   onSubmit() {
+    this.submitError = null;
     if (this.logupForm.valid) {
       const { name, email, password, cafeteriaName, experience } = this.logupForm.value;
       const newUser: User = {
@@ -77,7 +83,7 @@ export class LogupOwnerFormComponent extends BaseFormComponent {
             void this.router.navigate(['/logup/owner/success']);
           },
           error: (error: unknown) => {
-            console.error('Registration error:', error);
+            this.submitError = classifyLogupRegistrationError(error);
           },
         });
     }

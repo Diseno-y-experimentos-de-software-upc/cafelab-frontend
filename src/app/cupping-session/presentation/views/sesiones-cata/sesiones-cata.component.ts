@@ -27,6 +27,7 @@ import type {
 } from '../../../../cupping-session/domain/model/cupping-session-entry.entity';
 import { parseSensory } from '../../../../cupping-session/domain/model/cupping-session-entry.entity';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
+import { getUserFacingApiMessage } from '../../../../shared/infrastructure/api-error-message';
 import { MatToolbarModule } from '@angular/material/toolbar';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../auth/infrastructure/AuthService';
@@ -278,8 +279,9 @@ export class SesionesCataComponent implements OnInit {
         next: (creada) => {
           this.sesiones = [creada, ...this.sesiones];
         },
-        error: () => {
-          this.snackBar.open(this.translate.instant('CUPPING_BC.ERRORS.REGISTER'), undefined, { duration: 4000 });
+        error: (err: unknown) => {
+          const msg = getUserFacingApiMessage(err, this.translate.instant('CUPPING_BC.ERRORS.REGISTER'));
+          this.snackBar.open(msg, undefined, { duration: 5000 });
         },
       });
     });

@@ -2,7 +2,7 @@
 // y proxy.remote.conf.js las reenvía al host de Azure (evita CORS en el navegador).
 export const environment = {
   production: false,
-  serverBaseUrl: 'http://localhost:8023',
+  serverBaseUrl: '',
   coffeeLotsEndpointPath: '/api/v1/coffee-lots',
   suppliersEndpointPath: '/api/v1/suppliers',
   roastProfileEndpointPath: '/api/v1/roast-profile',
@@ -17,5 +17,6 @@ export const environment = {
   contactUsEndpointPath: '/contact-us',
   calibrationsEndpointPath: '/api/v1/calibrations',
   coastEndpointPath: '/api/v1/coast-productions',
-  inventoryEndpointPath: '/api/v1/inventory-entries'
+  inventoryEndpointPath: '/api/v1/inventory-entries',
+  productionCostRecordsEndpointPath: '/api/v1/production-cost-records',
 };

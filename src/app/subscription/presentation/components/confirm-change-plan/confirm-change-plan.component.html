@@ -27,6 +27,27 @@
 
         <form [formGroup]="paymentForm" (ngSubmit)="onSubmit()" class="payment-form">
 
+          <div class="form-field payment-method-field">
+            <label class="payment-method-label">
+              {{ 'CONFIRM.PAYMENT.METHOD' | translate }}
+            </label>
+            <div class="payment-method-options">
+              <label class="payment-method-radio">
+                <input type="radio" formControlName="paymentMethod" value="visa" />
+                <img src="/assets/Visa.png" alt="Visa" />
+                {{ 'CONFIRM.PAYMENT.VISA' | translate }}
+              </label>
+              <label class="payment-method-radio">
+                <input type="radio" formControlName="paymentMethod" value="mastercard" />
+                <img src="/assets/MasterCard.png" alt="MasterCard" />
+                {{ 'CONFIRM.PAYMENT.MASTERCARD' | translate }}
+              </label>
+            </div>
+            <div *ngIf="hasError('paymentMethod', 'required')" class="error-message">
+              {{ 'CONFIRM.ERRORS.PAYMENT_METHOD_REQUIRED' | translate }}
+            </div>
+          </div>
+
           <div class="form-field">
             <input
               formControlName="email"
@@ -77,6 +98,12 @@
             <div *ngIf="hasError('expiry', 'pattern')" class="error-message">
               {{ 'CONFIRM.ERRORS.EXPIRY_INVALID' | translate }}
               <span class="error-example">{{ 'CONFIRM.EXAMPLES.EXPIRY' | translate }}</span>
+            </div>
+            <div *ngIf="hasError('expiry', 'expired')" class="error-message">
+              {{ 'CONFIRM.ERRORS.EXPIRY_PAST' | translate }}
+            </div>
+            <div *ngIf="hasError('expiry', 'tooFarFuture')" class="error-message">
+              {{ 'CONFIRM.ERRORS.EXPIRY_TOO_FAR' | translate:{ years: 5 } }}
             </div>
           </div>
 

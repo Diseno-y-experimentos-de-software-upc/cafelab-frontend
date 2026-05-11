@@ -18,7 +18,7 @@ import { RoastProfileComparisonComponent } from './roasting/presentation/compone
 import { LotsComponent } from './coffee-lot/presentation/views/lots-page/lots.component';
 import { SupplyPageComponent } from './supplier/presentation/views/supply-page/supply-page.component';
 import { DefectLibraryListComponent } from './defect-library/presentation/components/defect-library-list/defect-library-list.component';
-import { SesionesCataComponent } from './cupping-sessions/presentation/views/sesiones-cata/sesiones-cata.component';
+import { SesionesCataComponent } from './cupping-session/presentation/views/sesiones-cata/sesiones-cata.component';
 import { InventaryComponent } from './inventory/presentation/views/inventary.component';
 import { ProductionCostPageComponent } from './cost-management/presentation/views/production-cost-management/production-cost-management.component';
 import { ViewNewDefectLibraryEntryComponent } from './defect-library/presentation/views/view-new-defect-library-entry/view-new-defect-library-entry.component';

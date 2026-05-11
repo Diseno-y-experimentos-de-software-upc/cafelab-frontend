@@ -19,6 +19,11 @@
   width: 100%;
 }
 
+.session-date-readonly .session-date-readonly-input {
+  cursor: default;
+  color: rgba(0, 0, 0, 0.65);
+}
+
 .columna {
   padding: 1rem;
 }

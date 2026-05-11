@@ -68,7 +68,107 @@
             accept=".pdf,.doc,.docx,.jpg,.jpeg,.png">
         </div>
 
-        <button type="submit" class="submit-btn">
+        <div class="terms-panel">
+          <h3 class="terms-panel-title">{{ 'TERMS.DOC_TITLE' | translate }}</h3>
+          <p class="terms-panel-lead">{{ 'TERMS.FOOTER_LEAD' | translate }}</p>
+
+          <div class="terms-panel-scroll">
+            <section class="terms-section">
+              <h4 class="terms-section-title">{{ 'TERMS.S1_TITLE' | translate }}</h4>
+              <ul class="terms-list">
+                <li><strong>{{ 'TERMS.S1_B1_TITLE' | translate }}</strong> {{ 'TERMS.S1_B1_TEXT' | translate }}</li>
+                <li><strong>{{ 'TERMS.S1_B2_TITLE' | translate }}</strong> {{ 'TERMS.S1_B2_TEXT' | translate }}</li>
+              </ul>
+            </section>
+
+            <section class="terms-section">
+              <h4 class="terms-section-title">{{ 'TERMS.S2_TITLE' | translate }}</h4>
+              <p class="terms-paragraph">{{ 'TERMS.S2_INTRO' | translate }}</p>
+              <ul class="terms-list">
+                <li>{{ 'TERMS.S2_B1' | translate }}</li>
+                <li>{{ 'TERMS.S2_B2' | translate }}</li>
+              </ul>
+            </section>
+
+            <section class="terms-section">
+              <h4 class="terms-section-title">{{ 'TERMS.S3_TITLE' | translate }}</h4>
+              <ul class="terms-list">
+                <li><strong>{{ 'TERMS.S3_B1_TITLE' | translate }}</strong> {{ 'TERMS.S3_B1_TEXT' | translate }}</li>
+                <li><strong>{{ 'TERMS.S3_B2_TITLE' | translate }}</strong> {{ 'TERMS.S3_B2_TEXT' | translate }}</li>
+              </ul>
+            </section>
+
+            <section class="terms-section">
+              <h4 class="terms-section-title">{{ 'TERMS.S4_TITLE' | translate }}</h4>
+              <ul class="terms-list">
+                <li><strong>{{ 'TERMS.S4_B1_TITLE' | translate }}</strong> {{ 'TERMS.S4_B1_TEXT' | translate }}</li>
+                <li><strong>{{ 'TERMS.S4_B2_TITLE' | translate }}</strong> {{ 'TERMS.S4_B2_TEXT' | translate }}</li>
+              </ul>
+            </section>
+
+            <section class="terms-section">
+              <h4 class="terms-section-title">{{ 'TERMS.S5_TITLE' | translate }}</h4>
+              <ul class="terms-list">
+                <li><strong>{{ 'TERMS.S5_B1_TITLE' | translate }}</strong> {{ 'TERMS.S5_B1_TEXT' | translate }}</li>
+                <li><strong>{{ 'TERMS.S5_B2_TITLE' | translate }}</strong> {{ 'TERMS.S5_B2_TEXT' | translate }}</li>
+              </ul>
+            </section>
+
+            <section class="terms-section">
+              <h4 class="terms-section-title">{{ 'TERMS.S8_TITLE' | translate }}</h4>
+              <p class="terms-paragraph">{{ 'TERMS.S8_INTRO' | translate }}</p>
+              <ul class="terms-list">
+                <li><strong>{{ 'TERMS.S8_B1_TITLE' | translate }}</strong> {{ 'TERMS.S8_B1_TEXT' | translate }}</li>
+                <li><strong>{{ 'TERMS.S8_B2_TITLE' | translate }}</strong> {{ 'TERMS.S8_B2_TEXT' | translate }}</li>
+                <li><strong>{{ 'TERMS.S8_B3_TITLE' | translate }}</strong> {{ 'TERMS.S8_B3_TEXT' | translate }}</li>
+              </ul>
+            </section>
+
+            <section class="terms-section">
+              <h4 class="terms-section-title">{{ 'TERMS.S9_TITLE' | translate }}</h4>
+              <p class="terms-paragraph">{{ 'TERMS.S9_INTRO' | translate }}</p>
+              <ul class="terms-list">
+                <li><strong>{{ 'TERMS.S9_B1_TITLE' | translate }}</strong> {{ 'TERMS.S9_B1_TEXT' | translate }}</li>
+                <li><strong>{{ 'TERMS.S9_B2_TITLE' | translate }}</strong> {{ 'TERMS.S9_B2_TEXT' | translate }}</li>
+              </ul>
+            </section>
+
+            <section class="terms-section">
+              <h4 class="terms-section-title">{{ 'TERMS.S10_TITLE' | translate }}</h4>
+              <p class="terms-paragraph">{{ 'TERMS.S10_INTRO' | translate }}</p>
+              <ul class="terms-list">
+                <li><strong>{{ 'TERMS.S10_B1_TITLE' | translate }}</strong> {{ 'TERMS.S10_B1_TEXT' | translate }}</li>
+                <li><strong>{{ 'TERMS.S10_B2_TITLE' | translate }}</strong> {{ 'TERMS.S10_B2_TEXT' | translate }}</li>
+                <li><strong>{{ 'TERMS.S10_B3_TITLE' | translate }}</strong> {{ 'TERMS.S10_B3_TEXT' | translate }}</li>
+                <li><strong>{{ 'TERMS.S10_B4_TITLE' | translate }}</strong> {{ 'TERMS.S10_B4_TEXT' | translate }}</li>
+              </ul>
+            </section>
+
+            <section class="terms-section">
+              <h4 class="terms-section-title">{{ 'TERMS.S6_TITLE' | translate }}</h4>
+              <p class="terms-paragraph">{{ 'TERMS.S6_TEXT' | translate }}</p>
+            </section>
+
+            <section class="terms-section">
+              <h4 class="terms-section-title">{{ 'TERMS.S7_TITLE' | translate }}</h4>
+              <ul class="terms-list">
+                <li>{{ 'TERMS.S7_B1' | translate }}</li>
+              </ul>
+            </section>
+          </div>
+
+          <label class="terms-accept">
+            <input
+              type="checkbox"
+              id="aceptoTerminos"
+              name="aceptoTerminos"
+              [(ngModel)]="contactForm.aceptoTerminos"
+              required>
+            <span>{{ 'CONTACT.FORM.TERMS_ACCEPT' | translate }}</span>
+          </label>
+        </div>
+
+        <button type="submit" class="submit-btn" [disabled]="!contactForm.aceptoTerminos">
           {{ 'CONTACT.FORM.SEND' | translate }}
         </button>
       </form>

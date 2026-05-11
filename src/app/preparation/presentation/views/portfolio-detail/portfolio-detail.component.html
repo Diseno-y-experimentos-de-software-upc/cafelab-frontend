@@ -7,6 +7,8 @@
     <nav class="breadcrumb" aria-label="Breadcrumb">
       <a (click)="goToHome()">{{ 'BREADCRUMB.HOME' | translate }}</a>
       <span class="breadcrumb-sep">&gt;</span>
+      <a routerLink="/preparation/recipes">{{ 'BREADCRUMB.BREW_RECIPES' | translate }}</a>
+      <span class="breadcrumb-sep">&gt;</span>
       <span class="breadcrumb-current">{{ portfolio?.name || ('BREADCRUMB.PORTFOLIO_VIEW' | translate) }}</span>
     </nav>
 

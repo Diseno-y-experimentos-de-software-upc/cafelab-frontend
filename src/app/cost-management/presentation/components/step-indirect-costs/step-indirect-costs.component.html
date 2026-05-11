@@ -6,14 +6,26 @@
     <mat-card-content class="inputs-grid-bottom">
       <mat-form-field appearance="outline">
         <mat-label>{{ 'COST_MANAGEMENT.TRANSPORT_COST_PER_KG' | translate }}</mat-label>
-        <input matInput type="number" formControlName="costPerKg">
+        <input matInput type="number" formControlName="costPerKg" min="0.10" max="100" step="0.01">
+        <mat-error *ngIf="trCostKg.invalid && (trCostKg.dirty || trCostKg.touched)">
+          <span *ngIf="trCostKg.hasError('required')">{{ 'COST_MANAGEMENT.VALIDATION.REQUIRED' | translate }}</span>
+          <span *ngIf="trCostKg.hasError('invalidNumber')">{{ 'COST_MANAGEMENT.VALIDATION.INVALID_NUMBER' | translate }}</span>
+          <span *ngIf="trCostKg.hasError('maxDecimals')">{{ 'COST_MANAGEMENT.VALIDATION.MAX_DECIMALS' | translate:{ max: 2 } }}</span>
+          <span *ngIf="trCostKg.hasError('min') || trCostKg.hasError('max')">{{ 'COST_MANAGEMENT.VALIDATION.TRANSPORT_COST_KG' | translate }}</span>
+        </mat-error>
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>{{ 'COST_MANAGEMENT.TRANSPORT_QUANTITY_KG' | translate }}</mat-label>
-        <input matInput type="number" formControlName="quantity">
+        <input matInput type="number" formControlName="quantity" min="1" max="200" step="0.01">
+        <mat-error *ngIf="trQty.invalid && (trQty.dirty || trQty.touched)">
+          <span *ngIf="trQty.hasError('required')">{{ 'COST_MANAGEMENT.VALIDATION.REQUIRED' | translate }}</span>
+          <span *ngIf="trQty.hasError('invalidNumber')">{{ 'COST_MANAGEMENT.VALIDATION.INVALID_NUMBER' | translate }}</span>
+          <span *ngIf="trQty.hasError('maxDecimals')">{{ 'COST_MANAGEMENT.VALIDATION.MAX_DECIMALS' | translate:{ max: 2 } }}</span>
+          <span *ngIf="trQty.hasError('min') || trQty.hasError('max')">{{ 'COST_MANAGEMENT.VALIDATION.TRANSPORT_QTY' | translate }}</span>
+        </mat-error>
       </mat-form-field>
     </mat-card-content>
-    <p class="total"><strong>{{ 'COST_MANAGEMENT.TOTAL' | translate }}:</strong> {{ 'COST_MANAGEMENT.CURRENCY' | translate }} {{ transportTotal | number:'1.2-2' }}</p>
+    <p class="total"><strong>{{ 'COST_MANAGEMENT.TOTAL' | translate }}:</strong> {{ currencySymbol }} {{ transportTotal | number:'1.2-2' }}</p>
   </mat-card>
 
   <mat-card formGroupName="storage">
@@ -23,14 +35,25 @@
     <mat-card-content class="inputs-grid-bottom">
       <mat-form-field appearance="outline">
         <mat-label>{{ 'COST_MANAGEMENT.DAYS_IN_STORAGE' | translate }}</mat-label>
-        <input matInput type="number" formControlName="daysInStorage">
+        <input matInput type="number" formControlName="daysInStorage" min="1" max="30" step="1">
+        <mat-error *ngIf="stDays.invalid && (stDays.dirty || stDays.touched)">
+          <span *ngIf="stDays.hasError('required')">{{ 'COST_MANAGEMENT.VALIDATION.REQUIRED' | translate }}</span>
+          <span *ngIf="stDays.hasError('notInteger')">{{ 'COST_MANAGEMENT.VALIDATION.NOT_INTEGER' | translate }}</span>
+          <span *ngIf="stDays.hasError('range')">{{ 'COST_MANAGEMENT.VALIDATION.STORAGE_DAYS' | translate }}</span>
+        </mat-error>
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>{{ 'COST_MANAGEMENT.DAILY_COST' | translate }}</mat-label>
-        <input matInput type="number" formControlName="dailyCost">
+        <input matInput type="number" formControlName="dailyCost" min="0.10" max="100" step="0.01">
+        <mat-error *ngIf="stDaily.invalid && (stDaily.dirty || stDaily.touched)">
+          <span *ngIf="stDaily.hasError('required')">{{ 'COST_MANAGEMENT.VALIDATION.REQUIRED' | translate }}</span>
+          <span *ngIf="stDaily.hasError('invalidNumber')">{{ 'COST_MANAGEMENT.VALIDATION.INVALID_NUMBER' | translate }}</span>
+          <span *ngIf="stDaily.hasError('maxDecimals')">{{ 'COST_MANAGEMENT.VALIDATION.MAX_DECIMALS' | translate:{ max: 2 } }}</span>
+          <span *ngIf="stDaily.hasError('min') || stDaily.hasError('max')">{{ 'COST_MANAGEMENT.VALIDATION.DAILY_COST' | translate }}</span>
+        </mat-error>
       </mat-form-field>
     </mat-card-content>
-    <p class="total"><strong>{{ 'COST_MANAGEMENT.TOTAL' | translate }}:</strong> {{ 'COST_MANAGEMENT.CURRENCY' | translate }} {{ storageTotal | number:'1.2-2' }}</p>
+    <p class="total"><strong>{{ 'COST_MANAGEMENT.TOTAL' | translate }}:</strong> {{ currencySymbol }} {{ storageTotal | number:'1.2-2' }}</p>
   </mat-card>
 
   <mat-card formGroupName="processing">
@@ -40,26 +63,56 @@
     <mat-card-content class="inputs-grid">
       <mat-form-field appearance="outline">
         <mat-label>{{ 'COST_MANAGEMENT.ELECTRICITY' | translate }}</mat-label>
-        <input matInput type="number" formControlName="electricity">
+        <input matInput type="number" formControlName="electricity" min="0" max="200" step="0.01">
+        <mat-error *ngIf="prElectric.invalid && (prElectric.dirty || prElectric.touched)">
+          <span *ngIf="prElectric.hasError('required')">{{ 'COST_MANAGEMENT.VALIDATION.REQUIRED' | translate }}</span>
+          <span *ngIf="prElectric.hasError('invalidNumber')">{{ 'COST_MANAGEMENT.VALIDATION.INVALID_NUMBER' | translate }}</span>
+          <span *ngIf="prElectric.hasError('maxDecimals')">{{ 'COST_MANAGEMENT.VALIDATION.MAX_DECIMALS' | translate:{ max: 2 } }}</span>
+          <span *ngIf="prElectric.hasError('min') || prElectric.hasError('max')">{{ 'COST_MANAGEMENT.VALIDATION.PROCESSING_FIELD' | translate }}</span>
+        </mat-error>
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>{{ 'COST_MANAGEMENT.WATER' | translate }}</mat-label>
-        <input matInput type="number" formControlName="water">
+        <input matInput type="number" formControlName="water" min="0" max="200" step="0.01">
+        <mat-error *ngIf="prWater.invalid && (prWater.dirty || prWater.touched)">
+          <span *ngIf="prWater.hasError('required')">{{ 'COST_MANAGEMENT.VALIDATION.REQUIRED' | translate }}</span>
+          <span *ngIf="prWater.hasError('invalidNumber')">{{ 'COST_MANAGEMENT.VALIDATION.INVALID_NUMBER' | translate }}</span>
+          <span *ngIf="prWater.hasError('maxDecimals')">{{ 'COST_MANAGEMENT.VALIDATION.MAX_DECIMALS' | translate:{ max: 2 } }}</span>
+          <span *ngIf="prWater.hasError('min') || prWater.hasError('max')">{{ 'COST_MANAGEMENT.VALIDATION.PROCESSING_FIELD' | translate }}</span>
+        </mat-error>
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>{{ 'COST_MANAGEMENT.SUPPLIES' | translate }}</mat-label>
-        <input matInput type="number" formControlName="supplies">
+        <input matInput type="number" formControlName="supplies" min="0" max="200" step="0.01">
+        <mat-error *ngIf="prSupplies.invalid && (prSupplies.dirty || prSupplies.touched)">
+          <span *ngIf="prSupplies.hasError('required')">{{ 'COST_MANAGEMENT.VALIDATION.REQUIRED' | translate }}</span>
+          <span *ngIf="prSupplies.hasError('invalidNumber')">{{ 'COST_MANAGEMENT.VALIDATION.INVALID_NUMBER' | translate }}</span>
+          <span *ngIf="prSupplies.hasError('maxDecimals')">{{ 'COST_MANAGEMENT.VALIDATION.MAX_DECIMALS' | translate:{ max: 2 } }}</span>
+          <span *ngIf="prSupplies.hasError('min') || prSupplies.hasError('max')">{{ 'COST_MANAGEMENT.VALIDATION.PROCESSING_FIELD' | translate }}</span>
+        </mat-error>
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>{{ 'COST_MANAGEMENT.MAINTENANCE' | translate }}</mat-label>
-        <input matInput type="number" formControlName="maintenance">
+        <input matInput type="number" formControlName="maintenance" min="0" max="200" step="0.01">
+        <mat-error *ngIf="prMaint.invalid && (prMaint.dirty || prMaint.touched)">
+          <span *ngIf="prMaint.hasError('required')">{{ 'COST_MANAGEMENT.VALIDATION.REQUIRED' | translate }}</span>
+          <span *ngIf="prMaint.hasError('invalidNumber')">{{ 'COST_MANAGEMENT.VALIDATION.INVALID_NUMBER' | translate }}</span>
+          <span *ngIf="prMaint.hasError('maxDecimals')">{{ 'COST_MANAGEMENT.VALIDATION.MAX_DECIMALS' | translate:{ max: 2 } }}</span>
+          <span *ngIf="prMaint.hasError('min') || prMaint.hasError('max')">{{ 'COST_MANAGEMENT.VALIDATION.PROCESSING_FIELD' | translate }}</span>
+        </mat-error>
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>{{ 'COST_MANAGEMENT.DEPRECIATION' | translate }}</mat-label>
-        <input matInput type="number" formControlName="depreciation">
+        <input matInput type="number" formControlName="depreciation" min="0" max="200" step="0.01">
+        <mat-error *ngIf="prDepr.invalid && (prDepr.dirty || prDepr.touched)">
+          <span *ngIf="prDepr.hasError('required')">{{ 'COST_MANAGEMENT.VALIDATION.REQUIRED' | translate }}</span>
+          <span *ngIf="prDepr.hasError('invalidNumber')">{{ 'COST_MANAGEMENT.VALIDATION.INVALID_NUMBER' | translate }}</span>
+          <span *ngIf="prDepr.hasError('maxDecimals')">{{ 'COST_MANAGEMENT.VALIDATION.MAX_DECIMALS' | translate:{ max: 2 } }}</span>
+          <span *ngIf="prDepr.hasError('min') || prDepr.hasError('max')">{{ 'COST_MANAGEMENT.VALIDATION.PROCESSING_FIELD' | translate }}</span>
+        </mat-error>
       </mat-form-field>
     </mat-card-content>
-    <p class="total"><strong>{{ 'COST_MANAGEMENT.TOTAL' | translate }}:</strong> {{ 'COST_MANAGEMENT.CURRENCY' | translate }} {{ processingTotal | number:'1.2-2' }}</p>
+    <p class="total"><strong>{{ 'COST_MANAGEMENT.TOTAL' | translate }}:</strong> {{ currencySymbol }} {{ processingTotal | number:'1.2-2' }}</p>
   </mat-card>
 
   <mat-card formGroupName="others">
@@ -69,21 +122,45 @@
     <mat-card-content class="inputs-grid-bottom">
       <mat-form-field appearance="outline">
         <mat-label>{{ 'COST_MANAGEMENT.QUALITY_CONTROL' | translate }}</mat-label>
-        <input matInput type="number" formControlName="qualityControl">
+        <input matInput type="number" formControlName="qualityControl" min="0" max="200" step="0.01">
+        <mat-error *ngIf="otQc.invalid && (otQc.dirty || otQc.touched)">
+          <span *ngIf="otQc.hasError('required')">{{ 'COST_MANAGEMENT.VALIDATION.REQUIRED' | translate }}</span>
+          <span *ngIf="otQc.hasError('invalidNumber')">{{ 'COST_MANAGEMENT.VALIDATION.INVALID_NUMBER' | translate }}</span>
+          <span *ngIf="otQc.hasError('maxDecimals')">{{ 'COST_MANAGEMENT.VALIDATION.MAX_DECIMALS' | translate:{ max: 2 } }}</span>
+          <span *ngIf="otQc.hasError('min') || otQc.hasError('max')">{{ 'COST_MANAGEMENT.VALIDATION.OTHERS_FIELD' | translate }}</span>
+        </mat-error>
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>{{ 'COST_MANAGEMENT.CERTIFICATIONS' | translate }}</mat-label>
-        <input matInput type="number" formControlName="certifications">
+        <input matInput type="number" formControlName="certifications" min="0" max="200" step="0.01">
+        <mat-error *ngIf="otCert.invalid && (otCert.dirty || otCert.touched)">
+          <span *ngIf="otCert.hasError('required')">{{ 'COST_MANAGEMENT.VALIDATION.REQUIRED' | translate }}</span>
+          <span *ngIf="otCert.hasError('invalidNumber')">{{ 'COST_MANAGEMENT.VALIDATION.INVALID_NUMBER' | translate }}</span>
+          <span *ngIf="otCert.hasError('maxDecimals')">{{ 'COST_MANAGEMENT.VALIDATION.MAX_DECIMALS' | translate:{ max: 2 } }}</span>
+          <span *ngIf="otCert.hasError('min') || otCert.hasError('max')">{{ 'COST_MANAGEMENT.VALIDATION.OTHERS_FIELD' | translate }}</span>
+        </mat-error>
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>{{ 'COST_MANAGEMENT.INSURANCE' | translate }}</mat-label>
-        <input matInput type="number" formControlName="insurance">
+        <input matInput type="number" formControlName="insurance" min="0" max="200" step="0.01">
+        <mat-error *ngIf="otIns.invalid && (otIns.dirty || otIns.touched)">
+          <span *ngIf="otIns.hasError('required')">{{ 'COST_MANAGEMENT.VALIDATION.REQUIRED' | translate }}</span>
+          <span *ngIf="otIns.hasError('invalidNumber')">{{ 'COST_MANAGEMENT.VALIDATION.INVALID_NUMBER' | translate }}</span>
+          <span *ngIf="otIns.hasError('maxDecimals')">{{ 'COST_MANAGEMENT.VALIDATION.MAX_DECIMALS' | translate:{ max: 2 } }}</span>
+          <span *ngIf="otIns.hasError('min') || otIns.hasError('max')">{{ 'COST_MANAGEMENT.VALIDATION.OTHERS_FIELD' | translate }}</span>
+        </mat-error>
       </mat-form-field>
       <mat-form-field appearance="outline">
         <mat-label>{{ 'COST_MANAGEMENT.ADMINISTRATIVE' | translate }}</mat-label>
-        <input matInput type="number" formControlName="administrative">
+        <input matInput type="number" formControlName="administrative" min="0" max="200" step="0.01">
+        <mat-error *ngIf="otAdm.invalid && (otAdm.dirty || otAdm.touched)">
+          <span *ngIf="otAdm.hasError('required')">{{ 'COST_MANAGEMENT.VALIDATION.REQUIRED' | translate }}</span>
+          <span *ngIf="otAdm.hasError('invalidNumber')">{{ 'COST_MANAGEMENT.VALIDATION.INVALID_NUMBER' | translate }}</span>
+          <span *ngIf="otAdm.hasError('maxDecimals')">{{ 'COST_MANAGEMENT.VALIDATION.MAX_DECIMALS' | translate:{ max: 2 } }}</span>
+          <span *ngIf="otAdm.hasError('min') || otAdm.hasError('max')">{{ 'COST_MANAGEMENT.VALIDATION.OTHERS_FIELD' | translate }}</span>
+        </mat-error>
       </mat-form-field>
     </mat-card-content>
-    <p class="total"><strong>{{ 'COST_MANAGEMENT.TOTAL' | translate }}:</strong> {{ 'COST_MANAGEMENT.CURRENCY' | translate }} {{ othersTotal | number:'1.2-2' }}</p>
+    <p class="total"><strong>{{ 'COST_MANAGEMENT.TOTAL' | translate }}:</strong> {{ currencySymbol }} {{ othersTotal | number:'1.2-2' }}</p>
   </mat-card>
 </div>

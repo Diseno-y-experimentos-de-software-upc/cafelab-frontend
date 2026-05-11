@@ -6,6 +6,10 @@
   <a (click)="goToHome()">{{ 'BREADCRUMB.HOME' | translate }}</a>
   <span> &gt; </span>
   <span>{{ 'BREADCRUMB.COST_MANAGEMENT' | translate }}</span>
+  <ng-container *ngIf="mode === 'wizard'">
+    <span> &gt; </span>
+    <a (click)="backToList()">{{ 'COST_MANAGEMENT.NEW_CALCULATION' | translate }}</a>
+  </ng-container>
 </nav>
 
 <div class="main-container">
@@ -13,126 +17,198 @@
     {{ error }}
   </div>
 
-  <div *ngIf="loading" class="loading-indicator">
-    <div class="spinner"></div>
-    <p>{{ 'COST_MANAGEMENT.LOADING_LOTS' | translate }}</p>
+  <!-- Pantalla inicial: tabla de registros -->
+  <div *ngIf="mode === 'list'">
+    <app-cost-records-list (newCalculation)="startNewCalculation()"></app-cost-records-list>
   </div>
 
-  <div *ngIf="isSuccess" class="success-screen">
-    <div class="success-message">
-      <h2>{{ 'COST_MANAGEMENT.SUCCESS_MESSAGE' | translate }}</h2>
-      <p class="registration-code">{{ 'COST_MANAGEMENT.REGISTRATION_CODE' | translate }}: {{ registrationCode }}</p>
+  <!-- Wizard de cálculo -->
+  <ng-container *ngIf="mode === 'wizard'">
+    <div *ngIf="loading" class="loading-indicator">
+      <div class="spinner"></div>
+      <p>{{ 'COST_MANAGEMENT.LOADING_LOTS' | translate }}</p>
     </div>
 
-    <div class="success-content">
-      <app-metrics-card
-        [costPerKg]="costPerKg"
-        [potentialMargin]="potentialMargin"
-        [suggestedPrice]="suggestedPrice">
-      </app-metrics-card>
+    <div *ngIf="isSuccess" class="success-screen">
+      <div class="success-message">
+        <h2>{{ 'COST_MANAGEMENT.SUCCESS_MESSAGE' | translate }}</h2>
+        <p class="registration-code">{{ 'COST_MANAGEMENT.REGISTRATION_CODE' | translate }}: {{ registrationCode }}</p>
+      </div>
+
+      <div class="success-content">
+        <app-metrics-card
+          [costPerKg]="costPerKg"
+          [potentialMargin]="potentialMargin"
+          [suggestedPrice]="suggestedPrice"
+          [currencySymbol]="currencySymbol">
+        </app-metrics-card>
+      </div>
+
+      <div class="button-container">
+        <button mat-raised-button class="action-button" (click)="backToList()">
+          {{ 'COST_MANAGEMENT.RECORDS.BACK_TO_LIST' | translate }}
+        </button>
+        <button mat-raised-button class="action-button" (click)="resetForm()">
+          {{ 'COST_MANAGEMENT.NEW_CALCULATION' | translate }}
+        </button>
+        <button mat-raised-button class="action-button" (click)="downloadPDF()">
+          {{ 'COST_MANAGEMENT.DOWNLOAD_PDF' | translate }}
+        </button>
+        <button mat-raised-button class="action-button" (click)="onExit()">
+          {{ 'COST_MANAGEMENT.EXIT' | translate }}
+        </button>
+      </div>
     </div>
 
-    <div class="button-container">
-      <button mat-raised-button class="action-button" (click)="resetForm()">
-        {{ 'COST_MANAGEMENT.NEW_CALCULATION' | translate }}
-      </button>
-      <button mat-raised-button class="action-button" (click)="downloadPDF()">
-        {{ 'COST_MANAGEMENT.DOWNLOAD_PDF' | translate }}
-      </button>
-      <button mat-raised-button class="action-button" (click)="onExit()">
-        {{ 'COST_MANAGEMENT.EXIT' | translate }}
-      </button>
-    </div>
-  </div>
+    <div *ngIf="!isSuccess && !loading">
+      <mat-stepper linear [selectedIndex]="currentStep" (selectionChange)="onStepperSelectionChange($event)">
+        <mat-step [stepControl]="firstFormGroup" [completed]="firstFormGroup.valid">
+          <ng-template matStepLabel>{{ 'COST_MANAGEMENT.STEP_LOT_SELECTION' | translate }}</ng-template>
+          <form [formGroup]="firstFormGroup">
+            <app-step-lot-selection
+              [formGroup]="firstFormGroup"
+              [lots]="lots"
+              [progressValue]="progressValue">
+            </app-step-lot-selection>
 
-  <div *ngIf="!isSuccess && !loading">
-    <mat-stepper linear [selectedIndex]="currentStep" (selectionChange)="currentStep = $event.selectedIndex">
-      <mat-step [stepControl]="firstFormGroup" [completed]="firstFormGroup.valid">
-        <ng-template matStepLabel>{{ 'COST_MANAGEMENT.STEP_LOT_SELECTION' | translate }}</ng-template>
-        <form [formGroup]="firstFormGroup">
-          <app-step-lot-selection
-            [formGroup]="firstFormGroup"
-            [lots]="lots"
-            [progressValue]="progressValue">
-          </app-step-lot-selection>
+            <div class="button-container">
+              <button mat-raised-button color="primary" matStepperNext [disabled]="firstFormGroup.invalid">
+                {{ 'COST_MANAGEMENT.CONTINUE' | translate }}
+              </button>
+              <button mat-stroked-button color="warn" (click)="onCancel()">
+                {{ 'COST_MANAGEMENT.CANCEL' | translate }}
+              </button>
+            </div>
+          </form>
+        </mat-step>
 
-          <div class="button-container">
-            <button mat-raised-button color="primary" matStepperNext [disabled]="firstFormGroup.invalid">
-              {{ 'COST_MANAGEMENT.CONTINUE' | translate }}
-            </button>
-            <button mat-stroked-button color="warn" (click)="onCancel()">
-              {{ 'COST_MANAGEMENT.CANCEL' | translate }}
-            </button>
-          </div>
-        </form>
-      </mat-step>
+        <mat-step [stepControl]="directCostsForm" [completed]="directCostsForm.valid">
+          <ng-template matStepLabel>{{ 'COST_MANAGEMENT.STEP_DIRECT_COSTS' | translate }}</ng-template>
+          <form [formGroup]="directCostsForm">
+            <app-step-direct-costs [formGroup]="directCostsForm" [currencySymbol]="currencySymbol"></app-step-direct-costs>
 
-      <mat-step [stepControl]="directCostsForm" [completed]="directCostsForm.valid">
-        <ng-template matStepLabel>{{ 'COST_MANAGEMENT.STEP_DIRECT_COSTS' | translate }}</ng-template>
-        <form [formGroup]="directCostsForm">
-          <app-step-direct-costs [formGroup]="directCostsForm"></app-step-direct-costs>
+            <div class="button-container">
+              <button mat-button matStepperPrevious>{{ 'COST_MANAGEMENT.BACK' | translate }}</button>
+              <button mat-raised-button color="primary" matStepperNext [disabled]="directCostsForm.invalid">
+                {{ 'COST_MANAGEMENT.CONTINUE' | translate }}
+              </button>
+            </div>
+          </form>
+        </mat-step>
 
-          <div class="button-container">
-            <button mat-button matStepperPrevious>{{ 'COST_MANAGEMENT.BACK' | translate }}</button>
-            <button mat-raised-button color="primary" matStepperNext [disabled]="directCostsForm.invalid">
-              {{ 'COST_MANAGEMENT.CONTINUE' | translate }}
-            </button>
-          </div>
-        </form>
-      </mat-step>
+        <mat-step [stepControl]="indirectCostsForm" [completed]="indirectCostsForm.valid">
+          <ng-template matStepLabel>{{ 'COST_MANAGEMENT.STEP_INDIRECT_COSTS' | translate }}</ng-template>
+          <form [formGroup]="indirectCostsForm">
+            <app-step-indirect-costs [formGroup]="indirectCostsForm" [currencySymbol]="currencySymbol"></app-step-indirect-costs>
 
-      <mat-step [stepControl]="indirectCostsForm" [completed]="indirectCostsForm.valid">
-        <ng-template matStepLabel>{{ 'COST_MANAGEMENT.STEP_INDIRECT_COSTS' | translate }}</ng-template>
-        <form [formGroup]="indirectCostsForm">
-          <app-step-indirect-costs [formGroup]="indirectCostsForm"></app-step-indirect-costs>
+            <div class="button-container">
+              <button mat-button matStepperPrevious>{{ 'COST_MANAGEMENT.BACK' | translate }}</button>
+              <button mat-raised-button color="primary" matStepperNext [disabled]="indirectCostsForm.invalid">
+                {{ 'COST_MANAGEMENT.CONTINUE' | translate }}
+              </button>
+            </div>
+          </form>
+        </mat-step>
 
-          <div class="button-container">
-            <button mat-button matStepperPrevious>{{ 'COST_MANAGEMENT.BACK' | translate }}</button>
-            <button mat-raised-button color="primary" matStepperNext [disabled]="indirectCostsForm.invalid">
-              {{ 'COST_MANAGEMENT.CONTINUE' | translate }}
-            </button>
-          </div>
-        </form>
-      </mat-step>
+        <mat-step>
+          <ng-template matStepLabel>{{ 'COST_MANAGEMENT.STEP_SUMMARY' | translate }}</ng-template>
+          <div class="summary-container">
 
-      <mat-step>
-        <ng-template matStepLabel>{{ 'COST_MANAGEMENT.STEP_SUMMARY' | translate }}</ng-template>
-        <div class="summary-container">
+            <h3 class="summary-section-title">{{ 'COST_MANAGEMENT.INPUT_DETAIL_TITLE' | translate }}</h3>
+            <table mat-table [dataSource]="summaryFieldRows" class="mat-elevation-z2 summary-table-full summary-fields-table">
 
-          <mat-card>
-            <h3>{{ 'COST_MANAGEMENT.SUMMARY_TITLE' | translate }}</h3>
-            <table mat-table [dataSource]="costSummary" class="mat-elevation-z8 full-width">
-
-              <ng-container matColumnDef="tipo">
-                <th mat-header-cell *matHeaderCellDef> {{ 'COST_MANAGEMENT.SUMMARY_TYPE' | translate }} </th>
-                <td mat-cell *matCellDef="let element"> {{ element.tipo | translate }} </td>
+              <ng-container matColumnDef="field">
+                <th mat-header-cell *matHeaderCellDef>{{ 'COST_MANAGEMENT.SUMMARY_TYPE' | translate }}</th>
+                <td mat-cell *matCellDef="let row">{{ row.labelKey | translate }}</td>
               </ng-container>
 
-              <ng-container matColumnDef="monto">
-                <th mat-header-cell *matHeaderCellDef> {{ 'COST_MANAGEMENT.SUMMARY_AMOUNT' | translate }} </th>
-                <td mat-cell *matCellDef="let element"> {{ element.monto | number:'1.2-2' }} </td>
+              <ng-container matColumnDef="value">
+                <th mat-header-cell *matHeaderCellDef>{{ 'COST_MANAGEMENT.SUMMARY_FIELD_VALUE' | translate }}</th>
+                <td mat-cell *matCellDef="let row">{{ row.value }}</td>
               </ng-container>
 
-              <tr mat-header-row *matHeaderRowDef="['tipo', 'monto']"></tr>
-              <tr mat-row *matRowDef="let row; columns: ['tipo', 'monto'];"></tr>
+              <ng-container matColumnDef="edit">
+                <th mat-header-cell *matHeaderCellDef></th>
+                <td mat-cell *matCellDef="let row">
+                  <button mat-button type="button" color="primary" (click)="goToStep(row.stepIndex)">
+                    {{ row.editLabelKey | translate }}
+                  </button>
+                </td>
+              </ng-container>
+
+              <tr mat-header-row *matHeaderRowDef="summaryFieldColumns"></tr>
+              <tr mat-row *matRowDef="let row; columns: summaryFieldColumns;"></tr>
             </table>
-          </mat-card>
 
-          <app-metrics-card
-            [costPerKg]="costPerKg"
-            [potentialMargin]="potentialMargin"
-            [suggestedPrice]="suggestedPrice">
-          </app-metrics-card>
+            <h3 class="summary-section-title">{{ 'COST_MANAGEMENT.GENERATED_SUMMARY_TITLE' | translate }}</h3>
+            <mat-card class="summary-card-wrapper">
+              <table mat-table [dataSource]="costSummary" class="mat-elevation-z8 summary-table-full">
 
-          <div class="button-container">
-            <button mat-button matStepperPrevious>{{ 'COST_MANAGEMENT.BACK' | translate }}</button>
-            <button mat-raised-button color="primary" (click)="saveProductionCost()" [disabled]="isSubmitting">
-              {{ isSubmitting ? ('COST_MANAGEMENT.CALCULATING' | translate) : ('COST_MANAGEMENT.FINISH_AND_SAVE' | translate) }}
-            </button>
+                <ng-container matColumnDef="tipo">
+                  <th mat-header-cell *matHeaderCellDef> {{ 'COST_MANAGEMENT.SUMMARY_TYPE' | translate }} </th>
+                  <td mat-cell *matCellDef="let element"> {{ element.tipo | translate }} </td>
+                </ng-container>
 
+                <ng-container matColumnDef="monto">
+                  <th mat-header-cell *matHeaderCellDef> {{ 'COST_MANAGEMENT.SUMMARY_AMOUNT' | translate }} </th>
+                  <td mat-cell *matCellDef="let element"> {{ currencySymbol }} {{ element.monto | number:'1.2-2' }} </td>
+                </ng-container>
+
+                <tr mat-header-row *matHeaderRowDef="['tipo', 'monto']"></tr>
+                <tr mat-row *matRowDef="let row; columns: ['tipo', 'monto'];"></tr>
+              </table>
+            </mat-card>
+
+            <app-metrics-card
+              [costPerKg]="costPerKg"
+              [potentialMargin]="potentialMargin"
+              [suggestedPrice]="suggestedPrice"
+              [currencySymbol]="currencySymbol">
+            </app-metrics-card>
+
+            <div class="button-container">
+              <button mat-button matStepperPrevious>{{ 'COST_MANAGEMENT.BACK' | translate }}</button>
+              <button mat-raised-button color="primary" (click)="requestSaveConfirmation()"
+                      [disabled]="isSubmitting || !isFormValid()">
+                {{ isSubmitting ? ('COST_MANAGEMENT.CALCULATING' | translate) : ('COST_MANAGEMENT.FINISH_AND_SAVE' | translate) }}
+              </button>
+
+            </div>
           </div>
-        </div>
-      </mat-step>
-    </mat-stepper>
+        </mat-step>
+      </mat-stepper>
+    </div>
+  </ng-container>
+</div>
+
+<!--
+  Disclaimer previo al guardado: el usuario revisa lo capturado en el resumen y confirma o
+  cancela. Si cancela, vuelve al paso resumen sin perder los datos editables.
+-->
+<div *ngIf="showSaveConfirmation" class="modal-overlay" (click)="cancelSaveConfirmation()">
+  <div class="modal-content save-confirmation-modal" (click)="$event.stopPropagation()">
+    <h2>{{ 'COST_MANAGEMENT.SAVE_CONFIRM.TITLE' | translate }}</h2>
+    <p class="save-confirm-warning">
+      {{ 'COST_MANAGEMENT.SAVE_CONFIRM.DISCLAIMER' | translate }}
+    </p>
+    <p class="save-confirm-hint">
+      {{ 'COST_MANAGEMENT.SAVE_CONFIRM.HINT' | translate }}
+    </p>
+    <div class="form-actions">
+      <button mat-stroked-button type="button"
+              class="cancel-confirm-button"
+              (click)="cancelSaveConfirmation()"
+              [disabled]="isSubmitting">
+        {{ 'COST_MANAGEMENT.SAVE_CONFIRM.CANCEL' | translate }}
+      </button>
+      <button mat-raised-button color="primary" type="button"
+              class="accept-confirm-button"
+              (click)="confirmSaveConfirmation()"
+              [disabled]="isSubmitting">
+        {{ isSubmitting
+            ? ('COST_MANAGEMENT.CALCULATING' | translate)
+            : ('COST_MANAGEMENT.SAVE_CONFIRM.CONFIRM' | translate) }}
+      </button>
+    </div>
   </div>
 </div>

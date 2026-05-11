@@ -7,6 +7,8 @@
     <nav class="breadcrumb" aria-label="Breadcrumb">
       <a (click)="goToHome()">{{ 'BREADCRUMB.HOME' | translate }}</a>
       <span class="breadcrumb-sep">&gt;</span>
+      <a routerLink="/grind-calibration">Grind Calibration</a>
+      <span class="breadcrumb-sep">&gt;</span>
       <span class="breadcrumb-current">{{ 'CALIBRATIONS.REGISTER_TITLE' | translate }}</span>
     </nav>
     <app-add-new-calibration />

@@ -77,42 +77,42 @@ export class CreateRecipeComponent implements OnInit {
   isSubmitting = false;
   isEditMode = false;
   recipeId: string | null = null;
-  
+
   private loadedRecipe: Recipe | null = null;
 
   extractionMethods: { value: ExtractionMethod; label: string }[] = [
-    { value: 'pour-over',   label: 'Pour Over' },
-    { value: 'french-press', label: 'French Press' },
-    { value: 'cold-brew',   label: 'Cold Brew' },
-    { value: 'aeropress',   label: 'AeroPress' },
-    { value: 'chemex',      label: 'Chemex' },
-    { value: 'v60',         label: 'V60' },
-    { value: 'clever',      label: 'Clever Dripper' }
+    { value: 'pour-over', label: 'recipes.creation.extraction_methods.pour-over' },
+    { value: 'french-press', label: 'recipes.creation.extraction_methods.french-press' },
+    { value: 'cold-brew', label: 'recipes.creation.extraction_methods.cold-brew' },
+    { value: 'aeropress', label: 'recipes.creation.extraction_methods.aeropress' },
+    { value: 'chemex', label: 'recipes.creation.extraction_methods.chemex' },
+    { value: 'v60', label: 'recipes.creation.extraction_methods.v60' },
+    { value: 'clever', label: 'recipes.creation.extraction_methods.clever' }
   ];
 
   availableUnits = [
-    { value: 'gr',    label: 'Gramos (gr)' },
-    { value: 'ml',    label: 'Mililitros (ml)' },
-    { value: 'oz',    label: 'Onzas (oz)' },
-    { value: 'cups',  label: 'Tazas' },
-    { value: 'tbsp',  label: 'Cucharadas' },
-    { value: 'tsp',   label: 'Cucharaditas' }
+    { value: 'gr', label: 'recipes.creation.unidades.gr' },
+    { value: 'ml', label: 'recipes.creation.unidades.ml' },
+    { value: 'oz', label: 'recipes.creation.unidades.oz' },
+    { value: 'cups', label: 'recipes.creation.unidades.cups' },
+    { value: 'tbsp', label: 'recipes.creation.unidades.tbsp' },
+    { value: 'tsp', label: 'recipes.creation.unidades.tsp' }
   ];
 
   coffeeRatios = [
-    { value: '1:12', label: '1:12 (Concentrado)' },
-    { value: '1:14', label: '1:14 (Balanceado)' },
-    { value: '1:15', label: '1:15 (Estándar)' },
-    { value: '1:16', label: '1:16 (Suave)' },
-    { value: '1:17', label: '1:17 (Ligero)' }
+    { value: '1:12', label: 'recipes.creation.ratios.1:12' },
+    { value: '1:14', label: 'recipes.creation.ratios.1:14' },
+    { value: '1:15', label: 'recipes.creation.ratios.1:15' },
+    { value: '1:16', label: 'recipes.creation.ratios.1:16' },
+    { value: '1:17', label: 'recipes.creation.ratios.1:17' }
   ];
 
   espressoRatios = [
-    { value: '1:1', label: '1:1 (Ristretto)' },
-    { value: '1:1.5', label: '1:1.5 (Corto)' },
-    { value: '1:2', label: '1:2 (Estándar)' },
-    { value: '1:2.5', label: '1:2.5 (Largo)' },
-    { value: '1:3', label: '1:3 (Lungo)' }
+    { value: '1:1', label: 'recipes.creation.ratios.1:1' },
+    { value: '1:1.5', label: 'recipes.creation.ratios.1:1.5' },
+    { value: '1:2', label: 'recipes.creation.ratios.1:2' },
+    { value: '1:2.5', label: 'recipes.creation.ratios.1:2.5' },
+    { value: '1:3', label: 'recipes.creation.ratios.1:3' }
   ];
 
   get availableRatios() {
@@ -200,7 +200,7 @@ export class CreateRecipeComponent implements OnInit {
         console.error('Error al cargar la receta:', err);
         this.snackBar.open(
           this.translate.instant('recipes.edit.error_loading'),
-          this.translate.instant('Cerrar'),
+          this.translate.instant('recipes.creation.close'),
           { duration: 3000 }
         );
         this.router.navigate(['/preparation/recipes']);
@@ -248,9 +248,9 @@ export class CreateRecipeComponent implements OnInit {
 
   createIngredientFormGroup(): FormGroup {
     return this.fb.group({
-      name:   ['', Validators.required],
+      name: ['', Validators.required],
       amount: ['', Validators.required],
-      unit:   ['gr', Validators.required]
+      unit: ['gr', Validators.required]
     });
   }
 
@@ -259,7 +259,7 @@ export class CreateRecipeComponent implements OnInit {
       next: data => this.portfolios = data,
       error: () => this.snackBar.open(
         this.translate.instant('recipes.creation.error_loading_portfolios'),
-        this.translate.instant('Cerrar'),
+        this.translate.instant('recipes.creation.close'),
         { duration: 3000 }
       )
     });
@@ -288,16 +288,21 @@ export class CreateRecipeComponent implements OnInit {
     }
 
     if (category === 'coffee') {
-      this.ingredients.push(this.fb.group({
-        name:   ['Agua', Validators.required],
-        amount: ['', Validators.required],
-        unit:   ['ml', Validators.required]
-      }));
-      this.ingredients.push(this.fb.group({
-        name:   ['Café', Validators.required],
-        amount: ['', Validators.required],
-        unit:   ['gr', Validators.required]
-      }));
+      this.translate.get([
+        'recipes.creation.ingredients_default.water',
+        'recipes.creation.ingredients_default.coffee'
+      ]).subscribe(translations => {
+        this.ingredients.push(this.fb.group({
+          name: [translations['recipes.creation.ingredients_default.water'], Validators.required],
+          amount: ['', Validators.required],
+          unit: ['ml', Validators.required]
+        }));
+        this.ingredients.push(this.fb.group({
+          name: [translations['recipes.creation.ingredients_default.coffee'], Validators.required],
+          amount: ['', Validators.required],
+          unit: ['gr', Validators.required]
+        }));
+      });
     } else {
       this.addIngredient();
     }
@@ -329,7 +334,7 @@ export class CreateRecipeComponent implements OnInit {
           ? parts.join(' • ')
           : this.translate.instant('recipes.creation.form_validation_generic');
       const title = this.translate.instant('recipes.creation.form_validation_title');
-      this.snackBar.open(`${title}: ${detail}`, this.translate.instant('Cerrar'), {
+      this.snackBar.open(`${title}: ${detail}`, this.translate.instant('recipes.creation.close'), {
         duration: 10000,
         panelClass: ['recipe-form-validation-snackbar'],
       });
@@ -386,7 +391,7 @@ export class CreateRecipeComponent implements OnInit {
       next: (recipe) => {
         this.snackBar.open(
           this.translate.instant(this.isEditMode ? 'recipes.edit.success' : 'recipes.creation.success'),
-          this.translate.instant('Cerrar'),
+          this.translate.instant('recipes.creation.close'),
           { duration: 3000 }
         );
 
@@ -403,7 +408,7 @@ export class CreateRecipeComponent implements OnInit {
         const fallback = this.translate.instant(
           this.isEditMode ? 'recipes.edit.error' : 'recipes.creation.error',
         );
-        this.snackBar.open(apiText || fallback, this.translate.instant('Cerrar'), {
+        this.snackBar.open(apiText || fallback, this.translate.instant('recipes.creation.close'), {
           duration: apiText.length > 120 ? 12000 : 6000,
           panelClass: ['recipe-form-api-error-snackbar'],
         });

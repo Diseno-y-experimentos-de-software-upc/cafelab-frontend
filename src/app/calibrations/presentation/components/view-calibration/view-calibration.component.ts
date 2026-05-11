@@ -21,6 +21,8 @@ import { MatIconModule } from '@angular/material/icon';
 import { ToolbarComponent } from '../../../../public/presentation/components/toolbar/toolbar.component';
 import { GrindCalibrationApi } from '../../../../grind-calibration/application/grind-calibration.api';
 import type { GrindCalibrationEntry } from '../../../../grind-calibration/domain/model/grind-calibration-entry.entity';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { TranslateService } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-view-calibration',
@@ -48,6 +50,7 @@ import type { GrindCalibrationEntry } from '../../../../grind-calibration/domain
     MatHeaderRowDef,
     MatRowDef,
     ToolbarComponent,
+    MatSnackBarModule,
   ],
   styleUrls: ['./view-calibration.component.css'],
 })
@@ -60,6 +63,8 @@ export class ViewCalibrationComponent implements OnInit {
   constructor(
     private readonly grindCalibrationApi: GrindCalibrationApi,
     private readonly router: Router,
+    private readonly snackBar: MatSnackBar,
+    private readonly translate: TranslateService,
   ) {}
 
   ngOnInit(): void {
@@ -106,5 +111,19 @@ export class ViewCalibrationComponent implements OnInit {
 
   goToRegister(): void {
     void this.router.navigate(['/add-new-calibration']);
+  }
+
+  deleteCalibration(id: number): void {
+    if (confirm(this.translate.instant('CALIBRATIONS.DELETE_CONFIRMATION') || 'Are you sure you want to delete this?')) {
+      this.grindCalibrationApi.delete(id).subscribe({
+        next: () => {
+          this.snackBar.open(this.translate.instant('CALIBRATIONS.DELETE_SUCCESS') || 'Deleted successfully', undefined, { duration: 3000 });
+          this.loadCalibrations();
+        },
+        error: () => {
+          this.snackBar.open(this.translate.instant('CALIBRATIONS.DELETE_ERROR') || 'Error deleting', undefined, { duration: 3000 });
+        }
+      });
+    }
   }
 }
