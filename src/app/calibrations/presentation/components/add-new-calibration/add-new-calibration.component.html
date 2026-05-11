@@ -1,88 +1,105 @@
 <div class="form-container">
   <div class="title">{{ 'CALIBRATIONS.REGISTER_TITLE' | translate }}</div>
-  <form (ngSubmit)="onSubmit()" #calibrationForm="ngForm" autocomplete="off">
+  <form (ngSubmit)="calibrationForm.valid && onSubmit()" #calibrationForm="ngForm" autocomplete="off">
     <div class="form-row">
       <div class="form-col">
         <label for="name">{{ 'CALIBRATIONS.NAME_LABEL' | translate }}</label>
-        <input id="name" type="text" [(ngModel)]="calibration.name" name="name" required />
+        <input id="name" type="text" [(ngModel)]="calibration.name" name="name" required
+          pattern="^[a-zA-ZáéíóúÁÉÍÓÚñÑ\s]+$" #nameCtrl="ngModel" />
+        <div *ngIf="calibrationForm.submitted && nameCtrl.invalid"
+          style="color: red; font-size: 12px; margin-top: -10px; margin-bottom: 10px;">
+          <span *ngIf="nameCtrl.errors?.['required']">{{ 'CALIBRATIONS.ERRORS.REQUIRED' | translate }}</span>
+          <span *ngIf="nameCtrl.errors?.['pattern']">{{ 'CALIBRATIONS.ERRORS.PATTERN_NAME' | translate }}</span>
+        </div>
 
         <label for="method">{{ 'CALIBRATIONS.METHOD_LABEL' | translate }}</label>
-        <select id="method" [(ngModel)]="calibration.method" name="method" required>
+        <select id="method" [(ngModel)]="calibration.method" name="method" required #methodCtrl="ngModel">
           <option value="" disabled selected hidden>--</option>
           <option value="Espresso">Espresso</option>
           <option value="V60">V60</option>
           <option value="Chemex">Chemex</option>
         </select>
+        <div *ngIf="calibrationForm.submitted && methodCtrl.invalid"
+          style="color: red; font-size: 12px; margin-top: -10px; margin-bottom: 10px;">
+          {{ 'CALIBRATIONS.ERRORS.REQUIRED' | translate }}
+        </div>
 
         <label for="equipment">{{ 'CALIBRATIONS.EQUIPMENT_LABEL' | translate }}</label>
-        <select id="equipment" [(ngModel)]="calibration.equipment" name="equipment" required>
+        <select id="equipment" [(ngModel)]="calibration.equipment" name="equipment" required #equipmentCtrl="ngModel">
           <option value="" disabled selected hidden>--</option>
           <option value="Maquina Espresso">Maquina Espresso</option>
           <option value="V60">V60</option>
           <option value="Chemex">Chemex</option>
         </select>
-
-        <label>{{ 'CALIBRATIONS.VISUALIZATION_LABEL' | translate }}</label>
-        <input
-          type="file"
-          id="sampleImage"
-          (change)="onFileSelected($event)"
-          accept="image/*"
-          style="display: none"
-        />
-        <button type="button" class="attach-btn" (click)="triggerFileInput()">
-          {{ 'CALIBRATIONS.ATTACH_SAMPLES' | translate }}
-          <span style="font-size: 18px;">&#8679;</span>
-        </button>
-        <div *ngIf="sampleImageName" class="file-name">
-          {{ sampleImageName }}
+        <div *ngIf="calibrationForm.submitted && equipmentCtrl.invalid"
+          style="color: red; font-size: 12px; margin-top: -10px; margin-bottom: 10px;">
+          {{ 'CALIBRATIONS.ERRORS.REQUIRED' | translate }}
         </div>
+
+        <label for="sampleImage">{{ 'CALIBRATIONS.VISUALIZATION_LINK' | translate }}</label>
+        <input id="sampleImage" type="url" [(ngModel)]="calibration.sampleImage" name="sampleImage"
+          [placeholder]="'CALIBRATIONS.PLACEHOLDER_LINK' | translate" />
       </div>
       <div class="form-col">
         <label for="grindNumber">{{ 'CALIBRATIONS.GRIND_LABEL' | translate }}</label>
-        <select id="grindNumber" [(ngModel)]="calibration.grindNumber" name="grindNumber" required>
+        <select id="grindNumber" [(ngModel)]="calibration.grindNumber" name="grindNumber" required
+          #grindNumberCtrl="ngModel">
           <option value="" disabled selected hidden>--</option>
           <option value="5-15">5-15</option>
           <option value="16-25">16-25</option>
         </select>
+        <div *ngIf="calibrationForm.submitted && grindNumberCtrl.invalid"
+          style="color: red; font-size: 12px; margin-top: -10px; margin-bottom: 10px;">
+          {{ 'CALIBRATIONS.ERRORS.REQUIRED' | translate }}
+        </div>
 
         <label for="aperture">{{ 'CALIBRATIONS.APERTURE_LABEL' | translate }}</label>
-        <select id="aperture" [(ngModel)]="calibration.aperture" name="aperture" required>
+        <select id="aperture" [(ngModel)]="calibration.aperture" name="aperture" required #apertureCtrl="ngModel">
           <option [ngValue]="58">58</option>
           <option [ngValue]="60">60</option>
         </select>
+        <div *ngIf="calibrationForm.submitted && apertureCtrl.invalid"
+          style="color: red; font-size: 12px; margin-top: -10px; margin-bottom: 10px;">
+          {{ 'CALIBRATIONS.ERRORS.REQUIRED' | translate }}
+        </div>
 
         <label for="calibrationDate">{{ 'CALIBRATIONS.DATE_LABEL' | translate }}</label>
-        <input id="calibrationDate" type="date" [(ngModel)]="calibration.calibrationDate" name="calibrationDate" required>
+        <input id="calibrationDate" type="date" [(ngModel)]="calibration.calibrationDate" name="calibrationDate"
+          [min]="minDate" required #dateCtrl="ngModel">
+        <div *ngIf="calibrationForm.submitted && dateCtrl.invalid"
+          style="color: red; font-size: 12px; margin-top: -10px; margin-bottom: 10px;">
+          {{ 'CALIBRATIONS.ERRORS.REQUIRED' | translate }}
+        </div>
       </div>
       <div class="form-col">
         <label for="cupVolume">{{ 'CALIBRATIONS.CUP_VOLUME_LABEL' | translate }}</label>
-        <select id="cupVolume" [(ngModel)]="calibration.cupVolume" name="cupVolume" required>
+        <select id="cupVolume" [(ngModel)]="calibration.cupVolume" name="cupVolume" required #cupVolCtrl="ngModel">
           <option [ngValue]="30">30</option>
           <option [ngValue]="60">60</option>
         </select>
+        <div *ngIf="calibrationForm.submitted && cupVolCtrl.invalid"
+          style="color: red; font-size: 12px; margin-top: -10px; margin-bottom: 10px;">
+          {{ 'CALIBRATIONS.ERRORS.REQUIRED' | translate }}
+        </div>
 
         <label for="finalVolume">{{ 'CALIBRATIONS.FINAL_VOLUME_LABEL' | translate }}</label>
-        <select id="finalVolume" [(ngModel)]="calibration.finalVolume" name="finalVolume" required>
+        <select id="finalVolume" [(ngModel)]="calibration.finalVolume" name="finalVolume" required
+          #finalVolCtrl="ngModel">
           <option [ngValue]="25">25</option>
           <option [ngValue]="50">50</option>
         </select>
+        <div *ngIf="calibrationForm.submitted && finalVolCtrl.invalid"
+          style="color: red; font-size: 12px; margin-top: -10px; margin-bottom: 10px;">
+          {{ 'CALIBRATIONS.ERRORS.REQUIRED' | translate }}
+        </div>
 
         <label for="comments">{{ 'CALIBRATIONS.COMMENTS_LABEL' | translate }}</label>
-        <textarea
-          id="comments"
-          [(ngModel)]="calibration.comments"
-          name="comments"
-          [attr.placeholder]="'CALIBRATIONS.COMMENTS_PLACEHOLDER' | translate"
-        ></textarea>
+        <textarea id="comments" [(ngModel)]="calibration.comments" name="comments"
+          [attr.placeholder]="'CALIBRATIONS.COMMENTS_PLACEHOLDER' | translate"></textarea>
 
         <label for="notes">{{ 'CALIBRATIONS.NOTES_LABEL' | translate }}</label>
-        <textarea
-          id="notes"
-          [(ngModel)]="calibration.notes"
-          name="notes"
-          [attr.placeholder]="'CALIBRATIONS.NOTES_PLACEHOLDER' | translate"
-        ></textarea>
+        <textarea id="notes" [(ngModel)]="calibration.notes" name="notes"
+          [attr.placeholder]="'CALIBRATIONS.NOTES_PLACEHOLDER' | translate"></textarea>
       </div>
     </div>
     <button class="register-btn" type="submit">

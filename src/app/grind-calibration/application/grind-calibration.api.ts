@@ -24,4 +24,8 @@ export class GrindCalibrationApi {
   update(id: number, entity: GrindCalibrationEntry): Observable<GrindCalibrationEntry> {
     return this.endpoint.update(entity, id);
   }
+
+  delete(id: number): Observable<void> {
+    return this.endpoint.delete(id);
+  }
 }

@@ -7,257 +7,219 @@
     <nav class="breadcrumb" aria-label="Breadcrumb">
       <a (click)="goToHome()">{{ 'BREADCRUMB.HOME' | translate }}</a>
       <span class="breadcrumb-sep">&gt;</span>
+      <a routerLink="/preparation/recipes">{{ 'BREADCRUMB.BREW_RECIPES' | translate }}</a>
+      <span class="breadcrumb-sep">&gt;</span>
       <span class="breadcrumb-current">{{
         (isEditMode ? 'recipes.edit.title' : 'recipes.creation.title') | translate
-      }}</span>
+        }}</span>
     </nav>
 
     <div class="container">
       <div class="recipe-form-card">
-    <div class="extraction-method-toggle">
-      <div class="toggle-container">
-        <button
-          [class.active]="extractionCategory === 'coffee'"
-          (click)="changeExtractionCategory('coffee')"
-          class="toggle-button">
-          {{ 'recipes.creation.extraction_coffee' | translate }}
-        </button>
-        <button
-          [class.active]="extractionCategory === 'espresso'"
-          (click)="changeExtractionCategory('espresso')"
-          class="toggle-button">
-          {{ 'recipes.creation.extraction_espresso' | translate }}
-        </button>
-      </div>
-    </div>
-
-    <form [formGroup]="recipeForm" (ngSubmit)="onSubmit()">
-      <div class="form-content">
-        <div class="recipe-info-container">
-
-          <div class="basic-info">
-            <h3>{{ 'recipes.creation.name' | translate }}</h3>
-            <mat-form-field appearance="outline" class="full-width">
-              <input
-                matInput
-                formControlName="name"
-                [placeholder]="'recipes.creation.name_placeholder' | translate">
-              <mat-error *ngIf="recipeForm.get('name')?.hasError('required')">
-                {{ 'recipes.creation.name_required' | translate }}
-              </mat-error>
-            </mat-form-field>
-
-            <mat-form-field appearance="outline" class="full-width">
-              <mat-label>{{ 'recipes.creation.upload_image' | translate }}</mat-label>
-              <input
-                matInput
-                formControlName="imageUrl"
-                [placeholder]="'recipes.creation.image_placeholder' | translate">
-              <mat-error *ngIf="recipeForm.get('imageUrl')?.hasError('required')">
-                {{ 'recipes.creation.image_required' | translate }}
-              </mat-error>
-            </mat-form-field>
-
-            <div class="image-preview" *ngIf="recipeForm.get('imageUrl')?.value">
-              <img [src]="recipeForm.get('imageUrl')?.value" alt="Vista previa de la imagen">
-            </div>
+        <div class="extraction-method-toggle">
+          <div class="toggle-container">
+            <button [class.active]="extractionCategory === 'coffee'" (click)="changeExtractionCategory('coffee')"
+              class="toggle-button">
+              {{ 'recipes.creation.extraction_coffee' | translate }}
+            </button>
+            <button [class.active]="extractionCategory === 'espresso'" (click)="changeExtractionCategory('espresso')"
+              class="toggle-button">
+              {{ 'recipes.creation.extraction_espresso' | translate }}
+            </button>
           </div>
+        </div>
 
-          <div class="recipe-details">
-            <div class="form-row">
-              <mat-form-field appearance="outline">
-                <mat-label>{{ 'recipes.creation.cata' | translate }}</mat-label>
-                <mat-select formControlName="cuppingSessionId">
-                  <mat-option [value]="null">{{ 'recipes.creation.no_cupping_session' | translate }}</mat-option>
-                  <mat-option *ngFor="let session of cuppingSessions" [value]="session.id">
-                    {{ session.name }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
+        <form [formGroup]="recipeForm" (ngSubmit)="onSubmit()">
+          <div class="form-content">
+            <div class="recipe-info-container">
 
-              <mat-form-field appearance="outline">
-                <mat-label>{{ 'recipes.creation.portfolio' | translate }}</mat-label>
-                <mat-select formControlName="portfolioId">
-                  <mat-option [value]="null">{{ 'recipes.creation.no_portfolio' | translate }}</mat-option>
-                  <mat-option *ngFor="let p of portfolios" [value]="p.id">
-                    {{ p.name }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
+              <div class="basic-info">
+                <h3>{{ 'recipes.creation.name' | translate }}</h3>
+                <mat-form-field appearance="outline" class="full-width">
+                  <input matInput formControlName="name"
+                    [placeholder]="'recipes.creation.name_placeholder' | translate">
+                  <mat-error *ngIf="recipeForm.get('name')?.hasError('required')">
+                    {{ 'recipes.creation.name_required' | translate }}
+                  </mat-error>
+                </mat-form-field>
 
-            <div class="form-row" *ngIf="extractionCategory === 'coffee'">
-              <mat-form-field appearance="outline">
-                <mat-label>{{ 'recipes.creation.extraction_method' | translate }}</mat-label>
-                <mat-select formControlName="extractionMethod">
-                  <mat-option *ngFor="let m of extractionMethods" [value]="m.value">
-                    {{ m.label }}
-                  </mat-option>
-                </mat-select>
-              </mat-form-field>
-            </div>
+                <mat-form-field appearance="outline" class="full-width">
+                  <mat-label>{{ 'recipes.creation.upload_image' | translate }}</mat-label>
+                  <input matInput formControlName="imageUrl"
+                    [placeholder]="'recipes.creation.image_placeholder' | translate">
+                  <mat-error *ngIf="recipeForm.get('imageUrl')?.hasError('required')">
+                    {{ 'recipes.creation.image_required' | translate }}
+                  </mat-error>
+                </mat-form-field>
 
-            <div class="form-row">
-              <mat-form-field appearance="outline">
-                <mat-label>{{ 'recipes.creation.molienda' | translate }}</mat-label>
-                <mat-select formControlName="grindSize">
-                  <mat-option value="Muy fino">Muy fino</mat-option>
-                  <mat-option value="Fino">Fino</mat-option>
-                  <mat-option value="Medio">Medio</mat-option>
-                  <mat-option value="Grueso">Grueso</mat-option>
-                </mat-select>
-                <mat-error *ngIf="recipeForm.get('grindSize')?.hasError('required')">
-                  {{ 'recipes.creation.grind_required' | translate }}
-                </mat-error>
-              </mat-form-field>
-
-              <mat-form-field appearance="outline">
-                <mat-label>{{ 'recipes.creation.ratio' | translate }}</mat-label>
-                <mat-select formControlName="ratio">
-                  <mat-option *ngFor="let r of availableRatios" [value]="r.value">
-                    {{ r.label }}
-                  </mat-option>
-                </mat-select>
-                <mat-error *ngIf="recipeForm.get('ratio')?.hasError('required')">
-                  {{ 'recipes.creation.ratio_required' | translate }}
-                </mat-error>
-              </mat-form-field>
-            </div>
-
-            <div class="form-row">
-              <mat-form-field appearance="outline">
-                <mat-label>{{ 'recipes.creation.tiempo' | translate }}</mat-label>
-                <input
-                  matInput
-                  formControlName="preparationTime"
-                  type="text"
-                  inputmode="numeric"
-                  [placeholder]="'recipes.creation.tiempo_placeholder' | translate">
-                <mat-error *ngIf="recipeForm.get('preparationTime')?.hasError('required')">
-                  {{ 'recipes.creation.preparation_time_required' | translate }}
-                </mat-error>
-                <mat-error *ngIf="recipeForm.get('preparationTime')?.hasError('invalidPreparationTime')">
-                  {{ 'recipes.creation.preparation_time_invalid' | translate }}
-                </mat-error>
-              </mat-form-field>
-            </div>
-
-            <div class="ingredients-section">
-              <h3>{{ 'recipes.creation.ingredientes' | translate }}</h3>
-              <div formArrayName="ingredients">
-                <div
-                  *ngFor="let ing of ingredients.controls; let i = index"
-                  [formGroupName]="i"
-                  class="ingredient-row">
-
-                  <mat-form-field appearance="outline" *ngIf="extractionCategory === 'espresso'">
-                    <mat-label>{{ 'recipes.creation.ingrediente' | translate }}</mat-label>
-                    <input
-                      matInput
-                      formControlName="name"
-                      [placeholder]="'recipes.creation.ingrediente' | translate">
-                    <mat-error *ngIf="ing.get('name')?.hasError('required')">
-                      {{ 'recipes.creation.ingredient_name_required' | translate }}
-                    </mat-error>
-                  </mat-form-field>
-
-                  <mat-form-field appearance="outline" *ngIf="extractionCategory === 'coffee'">
-                    <mat-label>{{ 'recipes.creation.ingrediente' | translate }}</mat-label>
-                    <input
-                      matInput
-                      [value]="ing.get('name')?.value"
-                      readonly>
-                  </mat-form-field>
-
-                  <mat-form-field appearance="outline">
-                    <mat-label>{{ 'recipes.creation.medida' | translate }}</mat-label>
-                    <input
-                      matInput
-                      formControlName="amount"
-                      type="number"
-                      min="0">
-                    <mat-error *ngIf="ing.get('amount')?.hasError('required')">
-                      {{ 'recipes.creation.ingredient_amount_required' | translate }}
-                    </mat-error>
-                  </mat-form-field>
-
-                  <mat-form-field appearance="outline">
-                    <mat-label>Unidad</mat-label>
-                    <mat-select formControlName="unit">
-                      <mat-option *ngFor="let u of availableUnits" [value]="u.value">
-                        {{ u.label }}
-                      </mat-option>
-                    </mat-select>
-                    <mat-error *ngIf="ing.get('unit')?.hasError('required')">
-                      {{ 'recipes.creation.ingredient_unit_required' | translate }}
-                    </mat-error>
-                  </mat-form-field>
-
-                  <button
-                    mat-icon-button
-                    type="button"
-                    color="warn"
-                    (click)="removeIngredient(i)"
-                    *ngIf="extractionCategory === 'espresso'">
-                    <mat-icon>delete</mat-icon>
-                  </button>
+                <div class="image-preview" *ngIf="recipeForm.get('imageUrl')?.value">
+                  <img [src]="recipeForm.get('imageUrl')?.value"
+                    [alt]="'recipes.creation.image_preview_alt' | translate">
                 </div>
               </div>
 
-              <button
-                mat-stroked-button
-                type="button"
-                class="add-ingredient-btn"
-                (click)="addIngredient()"
-                *ngIf="extractionCategory === 'espresso'">
-                <mat-icon>add</mat-icon>
-                {{ 'recipes.creation.add_ingredient' | translate }}
+              <div class="recipe-details">
+                <div class="form-row">
+                  <mat-form-field appearance="outline">
+                    <mat-label>{{ 'recipes.creation.cata' | translate }}</mat-label>
+                    <mat-select formControlName="cuppingSessionId">
+                      <mat-option [value]="null">{{ 'recipes.creation.no_cupping_session' | translate }}</mat-option>
+                      <mat-option *ngFor="let session of cuppingSessions" [value]="session.id">
+                        {{ session.name }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>{{ 'recipes.creation.portfolio' | translate }}</mat-label>
+                    <mat-select formControlName="portfolioId">
+                      <mat-option [value]="null">{{ 'recipes.creation.no_portfolio' | translate }}</mat-option>
+                      <mat-option *ngFor="let p of portfolios" [value]="p.id">
+                        {{ p.name }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-row" *ngIf="extractionCategory === 'coffee'">
+                  <mat-form-field appearance="outline">
+                    <mat-label>{{ 'recipes.creation.extraction_method' | translate }}</mat-label>
+                    <mat-select formControlName="extractionMethod">
+                      <mat-option *ngFor="let m of extractionMethods" [value]="m.value">
+                        {{ m.label | translate }}
+                      </mat-option>
+                    </mat-select>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-row">
+                  <mat-form-field appearance="outline">
+                    <mat-label>{{ 'recipes.creation.molienda' | translate }}</mat-label>
+                    <mat-select formControlName="grindSize">
+                      <mat-option value="Muy fino">{{ 'recipes.creation.grind_options.very_fine' | translate
+                        }}</mat-option>
+                      <mat-option value="Fino">{{ 'recipes.creation.grind_options.fine' | translate }}</mat-option>
+                      <mat-option value="Medio">{{ 'recipes.creation.grind_options.medium' | translate }}</mat-option>
+                      <mat-option value="Grueso">{{ 'recipes.creation.grind_options.coarse' | translate }}</mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="recipeForm.get('grindSize')?.hasError('required')">
+                      {{ 'recipes.creation.grind_required' | translate }}
+                    </mat-error>
+                  </mat-form-field>
+
+                  <mat-form-field appearance="outline">
+                    <mat-label>{{ 'recipes.creation.ratio' | translate }}</mat-label>
+                    <mat-select formControlName="ratio">
+                      <mat-option *ngFor="let r of availableRatios" [value]="r.value">
+                        {{ r.label | translate }}
+                      </mat-option>
+                    </mat-select>
+                    <mat-error *ngIf="recipeForm.get('ratio')?.hasError('required')">
+                      {{ 'recipes.creation.ratio_required' | translate }}
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div class="form-row">
+                  <mat-form-field appearance="outline">
+                    <mat-label>{{ 'recipes.creation.tiempo' | translate }}</mat-label>
+                    <input matInput formControlName="preparationTime" type="number" inputmode="numeric"
+                      [placeholder]="'recipes.creation.tiempo_placeholder' | translate">
+                    <mat-error *ngIf="recipeForm.get('preparationTime')?.hasError('required')">
+                      {{ 'recipes.creation.preparation_time_required' | translate }}
+                    </mat-error>
+                    <mat-error *ngIf="recipeForm.get('preparationTime')?.hasError('invalidPreparationTime')">
+                      {{ 'recipes.creation.preparation_time_invalid' | translate }}
+                    </mat-error>
+                  </mat-form-field>
+                </div>
+
+                <div class="ingredients-section">
+                  <h3>{{ 'recipes.creation.ingredientes' | translate }}</h3>
+                  <div formArrayName="ingredients">
+                    <div *ngFor="let ing of ingredients.controls; let i = index" [formGroupName]="i"
+                      class="ingredient-row">
+
+                      <mat-form-field appearance="outline" *ngIf="extractionCategory === 'espresso'">
+                        <mat-label>{{ 'recipes.creation.ingrediente' | translate }}</mat-label>
+                        <input matInput formControlName="name"
+                          [placeholder]="'recipes.creation.ingrediente' | translate">
+                        <mat-error *ngIf="ing.get('name')?.hasError('required')">
+                          {{ 'recipes.creation.ingredient_name_required' | translate }}
+                        </mat-error>
+                      </mat-form-field>
+
+                      <mat-form-field appearance="outline" *ngIf="extractionCategory === 'coffee'">
+                        <mat-label>{{ 'recipes.creation.ingrediente' | translate }}</mat-label>
+                        <input matInput [value]="ing.get('name')?.value | translate" readonly>
+                      </mat-form-field>
+
+                      <mat-form-field appearance="outline">
+                        <mat-label>{{ 'recipes.creation.medida' | translate }}</mat-label>
+                        <input matInput formControlName="amount" type="number" min="0">
+                        <mat-error *ngIf="ing.get('amount')?.hasError('required')">
+                          {{ 'recipes.creation.ingredient_amount_required' | translate }}
+                        </mat-error>
+                      </mat-form-field>
+
+                      <mat-form-field appearance="outline">
+                        <mat-label>{{ 'recipes.creation.unit_label' | translate }}</mat-label>
+                        <mat-select formControlName="unit">
+                          <mat-option *ngFor="let u of availableUnits" [value]="u.value">
+                            {{ u.label | translate }}
+                          </mat-option>
+                        </mat-select>
+                        <mat-error *ngIf="ing.get('unit')?.hasError('required')">
+                          {{ 'recipes.creation.ingredient_unit_required' | translate }}
+                        </mat-error>
+                      </mat-form-field>
+
+                      <button mat-icon-button type="button" color="warn" (click)="removeIngredient(i)"
+                        *ngIf="extractionCategory === 'espresso'">
+                        <mat-icon>delete</mat-icon>
+                      </button>
+                    </div>
+                  </div>
+
+                  <button mat-stroked-button type="button" class="add-ingredient-btn" (click)="addIngredient()"
+                    *ngIf="extractionCategory === 'espresso'">
+                    <mat-icon>add</mat-icon>
+                    {{ 'recipes.creation.add_ingredient' | translate }}
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <div class="steps-tips-container">
+              <div class="form-group">
+                <h3>{{ 'recipes.creation.pasos' | translate }}</h3>
+                <mat-form-field appearance="outline" class="full-width">
+                  <textarea matInput formControlName="steps" rows="10"
+                    [placeholder]="'recipes.creation.pasos_placeholder' | translate">
+              </textarea>
+                  <mat-error *ngIf="recipeForm.get('steps')?.hasError('required')">
+                    {{ 'recipes.creation.steps_required' | translate }}
+                  </mat-error>
+                </mat-form-field>
+              </div>
+
+              <div class="form-group">
+                <h3>{{ 'recipes.creation.consejos' | translate }}</h3>
+                <mat-form-field appearance="outline" class="full-width">
+                  <textarea matInput formControlName="tips" rows="10"
+                    [placeholder]="'recipes.creation.consejos_placeholder' | translate">
+              </textarea>
+                </mat-form-field>
+              </div>
+            </div>
+
+            <div class="form-actions">
+              <button mat-raised-button color="primary" type="submit" [disabled]="isSubmitting" class="submit-button">
+                {{ isEditMode ? ('recipes.edit.submit' | translate) : ('recipes.creation.submit' | translate) }}
               </button>
             </div>
           </div>
-        </div>
-
-        <div class="steps-tips-container">
-          <div class="form-group">
-            <h3>{{ 'recipes.creation.pasos' | translate }}</h3>
-            <mat-form-field appearance="outline" class="full-width">
-              <textarea
-                matInput
-                formControlName="steps"
-                rows="10"
-                [placeholder]="'recipes.creation.pasos_placeholder' | translate">
-              </textarea>
-              <mat-error *ngIf="recipeForm.get('steps')?.hasError('required')">
-                {{ 'recipes.creation.steps_required' | translate }}
-              </mat-error>
-            </mat-form-field>
-          </div>
-
-          <div class="form-group">
-            <h3>{{ 'recipes.creation.consejos' | translate }}</h3>
-            <mat-form-field appearance="outline" class="full-width">
-              <textarea
-                matInput
-                formControlName="tips"
-                rows="10"
-                [placeholder]="'recipes.creation.consejos_placeholder' | translate">
-              </textarea>
-            </mat-form-field>
-          </div>
-        </div>
-
-        <div class="form-actions">
-          <button
-            mat-raised-button
-            color="primary"
-            type="submit"
-            [disabled]="isSubmitting"
-            class="submit-button">
-            {{ isEditMode ? ('recipes.edit.submit' | translate) : ('recipes.creation.submit' | translate) }}
-          </button>
-        </div>
-      </div>
-    </form>
+        </form>
       </div>
     </div>
   </div>

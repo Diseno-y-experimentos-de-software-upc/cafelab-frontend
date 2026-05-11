@@ -7,6 +7,12 @@
     <nav class="breadcrumb" aria-label="Breadcrumb">
       <a (click)="goToHome()">{{ 'BREADCRUMB.HOME' | translate }}</a>
       <span class="breadcrumb-sep">&gt;</span>
+      <a routerLink="/preparation/recipes">{{ 'BREADCRUMB.BREW_RECIPES' | translate }}</a>
+      <ng-container *ngIf="portfolio">
+        <span class="breadcrumb-sep">&gt;</span>
+        <a [routerLink]="['/preparation/portfolios', portfolio.id]">{{ portfolio.name }}</a>
+      </ng-container>
+      <span class="breadcrumb-sep">&gt;</span>
       <span class="breadcrumb-current">
         <ng-container *ngIf="error">{{ 'recipes.detail.error_loading' | translate }}</ng-container>
         <ng-container *ngIf="!error && isLoading">{{ 'BREADCRUMB.RECIPE_VIEW' | translate }}</ng-container>
