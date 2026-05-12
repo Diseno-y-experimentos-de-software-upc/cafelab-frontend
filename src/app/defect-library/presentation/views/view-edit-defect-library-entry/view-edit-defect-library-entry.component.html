@@ -1,0 +1,16 @@
+<mat-toolbar color="primary">
+  <app-toolbar />
+</mat-toolbar>
+
+<div class="body">
+  <div class="defect-library-page">
+    <nav class="breadcrumb" aria-label="Breadcrumb">
+      <a (click)="goToHome()">{{ 'BREADCRUMB.HOME' | translate }}</a>
+      <span class="breadcrumb-sep">&gt;</span>
+      <a routerLink="/libraryDefects">{{ 'BREADCRUMB.DEFECT_LIBRARY' | translate }}</a>
+      <span class="breadcrumb-sep">&gt;</span>
+      <span class="breadcrumb-current">{{ 'DEFECT_BC.FORM.EDIT_TITLE' | translate }}</span>
+    </nav>
+    <app-add-defect-library-entry *ngIf="editId" [editEntryId]="editId" />
+  </div>
+</div>

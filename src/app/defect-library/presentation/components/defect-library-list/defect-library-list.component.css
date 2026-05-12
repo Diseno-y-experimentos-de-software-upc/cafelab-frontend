@@ -105,6 +105,32 @@ button[mat-icon-button] {
   color: #414535;
 }
 
+.defect-list-action-btn {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  margin: 0 2px;
+}
+
+.defect-list-action-btn mat-icon,
+.defect-list-action-btn .mat-icon {
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+}
+
+.search-field mat-icon.mat-icon {
+  font-size: 24px;
+  width: 24px;
+  height: 24px;
+  line-height: 24px;
+}
+
+.actions-cell {
+  white-space: nowrap;
+}
+
 .add-defect-btn {
   display: flex;
   justify-content: flex-end;

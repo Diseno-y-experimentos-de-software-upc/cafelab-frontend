@@ -19,10 +19,10 @@
         <tr *ngFor="let item of tableData">
           <td>{{ item.date }}</td>
           <td>{{ item.lotName }}</td>
-          <td>{{ item.consumptionKg }} {{ 'COMMON.KG' | translate }}</td>
+          <td>{{ item.consumptionKg | number:'1.0-2' }} {{ 'COMMON.KG' | translate }}</td>
           <td>
             <ng-container *ngIf="item.currentLotStockKg != null; else stockNa">
-              {{ item.currentLotStockKg }} {{ 'COMMON.KG' | translate }}
+              {{ item.currentLotStockKg | number:'1.0-2' }} {{ 'COMMON.KG' | translate }}
             </ng-container>
             <ng-template #stockNa>—</ng-template>
           </td>

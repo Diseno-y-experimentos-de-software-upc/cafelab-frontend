@@ -1,5 +1,5 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators, ReactiveFormsModule } from '@angular/forms';
 import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
 import { CommonModule } from '@angular/common';
 import { MatFormFieldModule } from '@angular/material/form-field';
@@ -16,7 +16,6 @@ import { CoffeeLotApi } from '../../../../coffee-lot/application/coffee-lot.api'
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import {control} from 'leaflet';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import {MatCheckbox} from '@angular/material/checkbox';
 
@@ -60,6 +59,24 @@ interface PreviousConsumption {
   ]
 })
 export class RegisterConsumptionDialogComponent implements OnInit {
+  private static maxTwoDecimalsValidator(control: AbstractControl): ValidationErrors | null {
+    const raw = control.value;
+    if (raw === null || raw === undefined || raw === '') {
+      return null;
+    }
+    const n = Number(raw);
+    if (!Number.isFinite(n)) {
+      return null;
+    }
+    const normalized = n.toFixed(10).replace(/\.?0+$/, '');
+    const dot = normalized.indexOf('.');
+    if (dot === -1) {
+      return null;
+    }
+    const frac = normalized.slice(dot + 1);
+    return frac.length > 2 ? { maxDecimals: true } : null;
+  }
+
   form: FormGroup;
   availableLots: CoffeeLot[] = [];
   consumptionSummary: ConsumptionSummary | null = null;
@@ -100,7 +117,7 @@ export class RegisterConsumptionDialogComponent implements OnInit {
       ],
       consumptionKg: [
         null,
-        [Validators.required, Validators.min(0.001)],
+        [Validators.required, Validators.min(0.01), RegisterConsumptionDialogComponent.maxTwoDecimalsValidator],
       ],
       noEdit: [false, Validators.requiredTrue]
     });
@@ -202,7 +219,7 @@ export class RegisterConsumptionDialogComponent implements OnInit {
         return;
       }
 
-      const qty = Number(formValue.consumptionKg);
+      const qty = Math.round(Number(formValue.consumptionKg) * 100) / 100;
       const lot = this.availableLots.find((l) => Number(l.id) === coffeeLotId);
       if (lot && qty > lot.weight) {
         this.error = this.translate.instant('INVENTORY.ERRORS.QUANTITY_EXCEEDS_STOCK');

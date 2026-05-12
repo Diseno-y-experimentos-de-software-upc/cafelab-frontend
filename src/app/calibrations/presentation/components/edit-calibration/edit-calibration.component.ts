@@ -6,6 +6,8 @@ import { NgIf } from '@angular/common';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { GrindCalibrationApi } from '../../../../grind-calibration/application/grind-calibration.api';
 import type { GrindCalibrationEntry } from '../../../../grind-calibration/domain/model/grind-calibration-entry.entity';
+import { todayLocalYyyyMmDd, toYyyyMmDdDateInput } from '../../utils/calibration-date.util';
+import { isSafeHttpUrlForImgPreview } from '../../utils/sample-image-url.util';
 
 @Component({
   selector: 'app-edit-calibration',
@@ -30,7 +32,12 @@ export class EditCalibrationComponent implements OnInit {
     notes: '',
     sampleImage: null,
   };
-  minDate: string;
+
+  get minDate(): string {
+    return todayLocalYyyyMmDd();
+  }
+
+  sampleImagePreviewBroken = false;
 
   constructor(
     private readonly route: ActivatedRoute,
@@ -38,9 +45,26 @@ export class EditCalibrationComponent implements OnInit {
     private readonly router: Router,
     private readonly snackBar: MatSnackBar,
     private readonly translate: TranslateService,
-  ) {
-    const today = new Date();
-    this.minDate = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+  ) {}
+
+  isSafeSampleImageUrl(): boolean {
+    return isSafeHttpUrlForImgPreview(this.calibration.sampleImage);
+  }
+
+  onSampleImageUrlChange(): void {
+    this.sampleImagePreviewBroken = false;
+  }
+
+  onSampleImageError(): void {
+    this.sampleImagePreviewBroken = true;
+  }
+
+  isCalibrationDateInPast(): boolean {
+    const v = toYyyyMmDdDateInput(this.calibration.calibrationDate);
+    if (!v) {
+      return false;
+    }
+    return v < this.minDate;
   }
 
   ngOnInit(): void {
@@ -53,6 +77,10 @@ export class EditCalibrationComponent implements OnInit {
     this.grindCalibrationApi.getById(id).subscribe({
       next: (data) => {
         this.calibration = { ...data };
+        const normalized = toYyyyMmDdDateInput(data.calibrationDate);
+        const today = todayLocalYyyyMmDd();
+        this.calibration.calibrationDate =
+          normalized && normalized < today ? today : normalized;
       },
       error: () => {
         this.snackBar.open(
@@ -66,16 +94,12 @@ export class EditCalibrationComponent implements OnInit {
   }
 
   onUpdate(): void {
-    if (!this.calibration.calibrationDate?.trim()) {
+    const chosen = toYyyyMmDdDateInput(this.calibration.calibrationDate);
+    if (!chosen) {
       return;
     }
-    // Prevent manual bypass of [min]
-    if (this.calibration.calibrationDate < this.minDate) {
-      this.snackBar.open(
-        this.translate.instant('CALIBRATIONS.DATE_PAST_ERROR'),
-        undefined,
-        { duration: 4000 }
-      );
+    if (chosen < this.minDate) {
+      this.snackBar.open(this.translate.instant('CALIBRATIONS.DATE_PAST_ERROR'), undefined, { duration: 4000 });
       return;
     }
     const id = this.calibration.id;
@@ -88,7 +112,7 @@ export class EditCalibrationComponent implements OnInit {
       aperture: Number(this.calibration.aperture),
       cupVolume: Number(this.calibration.cupVolume),
       finalVolume: Number(this.calibration.finalVolume),
-      calibrationDate: this.calibration.calibrationDate.slice(0, 10),
+      calibrationDate: chosen,
       comments: this.calibration.comments?.trim() ?? '',
       notes: this.calibration.notes?.trim() ?? '',
     };

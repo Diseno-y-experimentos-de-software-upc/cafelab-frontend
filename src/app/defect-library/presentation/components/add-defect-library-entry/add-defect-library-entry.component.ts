@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, Input, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { NgIf } from '@angular/common';
@@ -31,6 +31,9 @@ import { massInputToGrams, type MassUnit } from '../../../domain/mass-unit.util'
   ],
 })
 export class AddDefectLibraryEntryComponent implements OnInit {
+  /** Nombre del café: solo letras (incl. acentos) y espacios; al menos una letra. */
+  private static readonly COFFEE_DISPLAY_NAME_PATTERN = /^(?=.*\p{L})[\p{L} ]+$/u;
+
   private static readonly API_FIELD_TO_CONTROL: Record<string, string> = {
     coffeeDisplayName: 'coffeeDisplayName',
     coffeeRegion: 'coffeeRegion',
@@ -44,9 +47,33 @@ export class AddDefectLibraryEntryComponent implements OnInit {
     suggestedSolution: 'suggestedSolution',
   };
 
+  private static readonly API_FIELD_I18N: Record<string, string> = {
+    coffeeDisplayName: 'DEFECT_BC.FORM.ERRORS.COFFEE_NAME_REQUIRED',
+    coffeeVariety: 'DEFECT_BC.FORM.ERRORS.VARIETY_REQUIRED',
+    name: 'DEFECT_BC.FORM.ERRORS.DEFECT_NAME_REQUIRED',
+    defectType: 'DEFECT_BC.FORM.ERRORS.DEFECT_TYPE_REQUIRED',
+    defectWeight: 'DEFECT_BC.FORM.ERRORS.DEFECT_WEIGHT_POSITIVE',
+    percentage: 'DEFECT_BC.FORM.ERRORS.PERCENTAGE_RANGE',
+    probableCause: 'DEFECT_BC.FORM.ERRORS.CAUSE_REQUIRED',
+    suggestedSolution: 'DEFECT_BC.FORM.ERRORS.SOLUTION_REQUIRED',
+  };
+
+  private static readonly REQUIRED_I18N: Record<string, string> = {
+    coffeeDisplayName: 'DEFECT_BC.FORM.ERRORS.COFFEE_NAME_REQUIRED',
+    coffeeVariety: 'DEFECT_BC.FORM.ERRORS.VARIETY_REQUIRED',
+    defectName: 'DEFECT_BC.FORM.ERRORS.DEFECT_NAME_REQUIRED',
+    defectType: 'DEFECT_BC.FORM.ERRORS.DEFECT_TYPE_REQUIRED',
+    probableCause: 'DEFECT_BC.FORM.ERRORS.CAUSE_REQUIRED',
+    suggestedSolution: 'DEFECT_BC.FORM.ERRORS.SOLUTION_REQUIRED',
+    percentage: 'DEFECT_BC.FORM.ERRORS.PERCENTAGE_REQUIRED',
+  };
+
   form!: FormGroup;
   submitAttempted = false;
   apiBannerError: string | null = null;
+
+  /** Si está definido (>0), el formulario actúa en modo edición (PUT). */
+  @Input() editEntryId: number | null = null;
 
   constructor(
     private readonly fb: FormBuilder,
@@ -58,9 +85,16 @@ export class AddDefectLibraryEntryComponent implements OnInit {
 
   ngOnInit(): void {
     this.form = this.fb.group({
-      coffeeDisplayName: ['', [Validators.required, Validators.maxLength(255)]],
+      coffeeDisplayName: [
+        '',
+        [
+          Validators.required,
+          Validators.maxLength(255),
+          Validators.pattern(AddDefectLibraryEntryComponent.COFFEE_DISPLAY_NAME_PATTERN),
+        ],
+      ],
       coffeeRegion: ['', [Validators.maxLength(255)]],
-      coffeeVariety: ['', [Validators.maxLength(255)]],
+      coffeeVariety: ['', [Validators.required, Validators.maxLength(255)]],
       coffeeTotalWeight: [null as number | null],
       coffeeTotalWeightUnit: ['g' as MassUnit],
       defectName: ['', [Validators.required, Validators.maxLength(255)]],
@@ -70,6 +104,44 @@ export class AddDefectLibraryEntryComponent implements OnInit {
       percentage: ['', [Validators.required]],
       probableCause: ['', [Validators.required]],
       suggestedSolution: ['', [Validators.required]],
+    });
+    if (this.editEntryId != null && this.editEntryId > 0) {
+      this.loadForEdit(this.editEntryId);
+    }
+  }
+
+  private gramsToInput(grams: number, unit: MassUnit): number {
+    return unit === 'kg' ? grams / 1000 : grams;
+  }
+
+  private loadForEdit(id: number): void {
+    this.defectLibraryApi.getById(id).subscribe({
+      next: (e) => {
+        const coffeeUnit: MassUnit =
+          e.coffeeTotalWeight != null && e.coffeeTotalWeight >= 1000 ? 'kg' : 'g';
+        const defectUnit: MassUnit = e.defectWeight >= 1000 ? 'kg' : 'g';
+        this.form.patchValue({
+          coffeeDisplayName: e.coffeeDisplayName,
+          coffeeRegion: e.coffeeRegion ?? '',
+          coffeeVariety: e.coffeeVariety ?? '',
+          coffeeTotalWeight:
+            e.coffeeTotalWeight != null
+              ? this.gramsToInput(e.coffeeTotalWeight, coffeeUnit)
+              : null,
+          coffeeTotalWeightUnit: coffeeUnit,
+          defectName: e.name,
+          defectType: e.defectType,
+          defectWeight: this.gramsToInput(e.defectWeight, defectUnit),
+          defectWeightUnit: defectUnit,
+          percentage: e.percentage,
+          probableCause: e.probableCause,
+          suggestedSolution: e.suggestedSolution,
+        });
+      },
+      error: () => {
+        this.snackBar.open(this.translate.instant('DEFECT_BC.ERRORS.DETAIL'), undefined, { duration: 5000 });
+        void this.router.navigate(['/libraryDefects']);
+      },
     });
   }
 
@@ -89,12 +161,21 @@ export class AddDefectLibraryEntryComponent implements OnInit {
   private applyApiFieldErrors(fieldErrors: Record<string, string>): void {
     for (const [apiField, msg] of Object.entries(fieldErrors)) {
       const controlName = AddDefectLibraryEntryComponent.API_FIELD_TO_CONTROL[apiField];
-      if (!controlName || !msg.trim()) {
+      if (!controlName) {
+        continue;
+      }
+      const trimmed = msg.trim();
+      const display = trimmed.startsWith('DEFECT_BC.')
+        ? this.translate.instant(trimmed)
+        : AddDefectLibraryEntryComponent.API_FIELD_I18N[apiField]
+          ? this.translate.instant(AddDefectLibraryEntryComponent.API_FIELD_I18N[apiField])
+          : trimmed;
+      if (!display) {
         continue;
       }
       const c = this.form.get(controlName);
       if (c) {
-        c.setErrors({ ...(c.errors ?? {}), apiMessage: msg.trim() });
+        c.setErrors({ ...(c.errors ?? {}), apiMessage: display });
         c.markAsTouched();
       }
     }
@@ -159,7 +240,7 @@ export class AddDefectLibraryEntryComponent implements OnInit {
       userId: null,
       coffeeDisplayName: String(v['coffeeDisplayName']).trim(),
       coffeeRegion: String(v['coffeeRegion'] ?? '').trim() || null,
-      coffeeVariety: String(v['coffeeVariety'] ?? '').trim() || null,
+      coffeeVariety: String(v['coffeeVariety'] ?? '').trim(),
       coffeeTotalWeight: coffeeTotalWeightGrams,
       name: String(v['defectName']).trim(),
       defectType: String(v['defectType']).trim(),
@@ -169,7 +250,12 @@ export class AddDefectLibraryEntryComponent implements OnInit {
       suggestedSolution: String(v['suggestedSolution']).trim(),
     };
 
-    this.defectLibraryApi.create(entry).subscribe({
+    const save$ =
+      this.editEntryId != null && this.editEntryId > 0
+        ? this.defectLibraryApi.update(this.editEntryId, { ...entry, id: this.editEntryId })
+        : this.defectLibraryApi.create(entry);
+
+    save$.subscribe({
       next: () => void this.router.navigate(['/libraryDefects']),
       error: (err: unknown) => {
         const msg = getUserFacingApiMessage(
@@ -223,7 +309,11 @@ export class AddDefectLibraryEntryComponent implements OnInit {
       return this.translate.instant(String(c.getError('custom')));
     }
     if (show && c.hasError('required')) {
-      return this.translate.instant('DEFECT_BC.FORM.ERRORS.REQUIRED');
+      const key = AddDefectLibraryEntryComponent.REQUIRED_I18N[controlName];
+      return this.translate.instant(key ?? 'DEFECT_BC.FORM.ERRORS.REQUIRED');
+    }
+    if (show && c.hasError('pattern')) {
+      return this.translate.instant('DEFECT_BC.FORM.ERRORS.COFFEE_NAME_LETTERS_ONLY');
     }
     if (show && c.hasError('maxlength')) {
       const req = (c.errors?.['maxlength'] as { requiredLength?: number } | undefined)?.requiredLength;

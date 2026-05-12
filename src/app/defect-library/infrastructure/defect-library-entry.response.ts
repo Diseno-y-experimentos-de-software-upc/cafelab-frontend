@@ -19,7 +19,7 @@ export interface DefectLibraryResource extends BaseResource {
 export interface CreateDefectLibraryBody {
   coffeeDisplayName: string;
   coffeeRegion?: string;
-  coffeeVariety?: string;
+  coffeeVariety: string;
   coffeeTotalWeight?: number;
   name: string;
   defectType: string;

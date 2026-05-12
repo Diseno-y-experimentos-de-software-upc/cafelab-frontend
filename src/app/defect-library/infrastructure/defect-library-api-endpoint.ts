@@ -58,4 +58,20 @@ export class DefectLibraryApiEndpoint extends BaseApiEndpoint<
         catchError(this.handleError(this.translate.instant('DEFECT_BC.ERRORS.REGISTER'))),
       );
   }
+
+  override update(entity: DefectLibraryEntry, id: number): Observable<DefectLibraryEntry> {
+    const body = this.defectAssembler.toCreateBody(entity);
+    return this.http
+      .put<DefectLibraryResource>(`${this.endpointUrl}/${id}`, body, this.httpOptions)
+      .pipe(
+        map((r) => this.assembler.toEntityFromResource(r)),
+        catchError(this.handleError(this.translate.instant('DEFECT_BC.ERRORS.UPDATE'))),
+      );
+  }
+
+  override delete(id: number): Observable<void> {
+    return this.http
+      .delete<void>(`${this.endpointUrl}/${id}`, this.httpOptions)
+      .pipe(catchError(this.handleError(this.translate.instant('DEFECT_BC.ERRORS.DELETE'))));
+  }
 }

@@ -54,6 +54,7 @@ export class DefectLibraryEntryAssembler
   toCreateBody(entity: DefectLibraryEntry): CreateDefectLibraryBody {
     const body: CreateDefectLibraryBody = {
       coffeeDisplayName: entity.coffeeDisplayName.trim(),
+      coffeeVariety: (entity.coffeeVariety ?? '').trim(),
       name: entity.name.trim(),
       defectType: entity.defectType.trim(),
       defectWeight: Number(entity.defectWeight),
@@ -62,12 +63,8 @@ export class DefectLibraryEntryAssembler
       suggestedSolution: entity.suggestedSolution.trim(),
     };
     const r = entity.coffeeRegion?.trim();
-    const v = entity.coffeeVariety?.trim();
     if (r) {
       body.coffeeRegion = r;
-    }
-    if (v) {
-      body.coffeeVariety = v;
     }
     if (entity.coffeeTotalWeight !== null && entity.coffeeTotalWeight !== undefined) {
       body.coffeeTotalWeight = Number(entity.coffeeTotalWeight);

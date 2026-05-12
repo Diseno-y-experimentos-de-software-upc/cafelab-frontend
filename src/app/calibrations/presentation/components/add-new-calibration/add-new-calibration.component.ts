@@ -6,6 +6,8 @@ import { NgIf } from '@angular/common';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 import { GrindCalibrationApi } from '../../../../grind-calibration/application/grind-calibration.api';
 import type { GrindCalibrationEntry } from '../../../../grind-calibration/domain/model/grind-calibration-entry.entity';
+import { todayLocalYyyyMmDd, toYyyyMmDdDateInput } from '../../utils/calibration-date.util';
+import { isSafeHttpUrlForImgPreview } from '../../utils/sample-image-url.util';
 
 @Component({
   selector: 'app-add-new-calibration',
@@ -30,30 +32,48 @@ export class AddNewCalibrationComponent {
     notes: '',
     sampleImage: null,
   };
-  minDate: string;
+
+  /** Mínimo permitido = hoy local (se recalcula para evitar fecha “vieja” si la pestaña queda abierta). */
+  get minDate(): string {
+    return todayLocalYyyyMmDd();
+  }
+
+  sampleImagePreviewBroken = false;
 
   constructor(
     private readonly grindCalibrationApi: GrindCalibrationApi,
     private readonly router: Router,
     private readonly snackBar: MatSnackBar,
     private readonly translate: TranslateService,
-  ) {
-    const today = new Date();
-    // Use local date part YYYY-MM-DD
-    this.minDate = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+  ) {}
+
+  isSafeSampleImageUrl(): boolean {
+    return isSafeHttpUrlForImgPreview(this.calibration.sampleImage);
+  }
+
+  onSampleImageUrlChange(): void {
+    this.sampleImagePreviewBroken = false;
+  }
+
+  onSampleImageError(): void {
+    this.sampleImagePreviewBroken = true;
+  }
+
+  isCalibrationDateInPast(): boolean {
+    const v = toYyyyMmDdDateInput(this.calibration.calibrationDate);
+    if (!v) {
+      return false;
+    }
+    return v < this.minDate;
   }
 
   onSubmit(): void {
-    if (!this.calibration.calibrationDate?.trim()) {
+    const chosen = toYyyyMmDdDateInput(this.calibration.calibrationDate);
+    if (!chosen) {
       return;
     }
-    // Prevent manual bypass of [min]
-    if (this.calibration.calibrationDate < this.minDate) {
-      this.snackBar.open(
-        this.translate.instant('CALIBRATIONS.DATE_PAST_ERROR'),
-        undefined,
-        { duration: 4000 }
-      );
+    if (chosen < this.minDate) {
+      this.snackBar.open(this.translate.instant('CALIBRATIONS.DATE_PAST_ERROR'), undefined, { duration: 4000 });
       return;
     }
     const payload: GrindCalibrationEntry = {
@@ -65,7 +85,7 @@ export class AddNewCalibrationComponent {
       aperture: Number(this.calibration.aperture),
       cupVolume: Number(this.calibration.cupVolume),
       finalVolume: Number(this.calibration.finalVolume),
-      calibrationDate: this.calibration.calibrationDate.slice(0, 10),
+      calibrationDate: chosen,
       comments: this.calibration.comments?.trim() ?? '',
       notes: this.calibration.notes?.trim() ?? '',
     };

@@ -2,7 +2,7 @@ import type { BaseResource, BaseResponse } from '../../shared/infrastructure/bas
 
 export interface RoastProfileListResponse extends BaseResponse {}
 
-/** Alineado con {@code RoastProfileResource} del backend ({@code lot} = coffee lot id). */
+/** Respuesta API; el lote viene como {@code lot} (o {@code coffeeLotId} en respuestas antiguas). */
 export interface RoastProfileResource extends BaseResource {
   userId: number;
   name: string;
@@ -12,7 +12,8 @@ export interface RoastProfileResource extends BaseResource {
   tempEnd: number;
   isFavorite: boolean;
   createdAt: string;
-  lot: number;
+  lot?: number;
+  coffeeLotId?: number;
 }
 
 export interface CreateRoastProfileBody {

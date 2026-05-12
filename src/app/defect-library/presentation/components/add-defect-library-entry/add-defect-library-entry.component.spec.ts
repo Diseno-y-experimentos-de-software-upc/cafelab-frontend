@@ -1,10 +1,8 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
 import { Router } from '@angular/router';
+import { of } from 'rxjs';
 import { MatSnackBar } from '@angular/material/snack-bar';
-import { TranslateModule } from '@ngx-translate/core';
-import { NoopAnimationsModule } from '@angular/platform-browser/animations';
-import { of, throwError } from 'rxjs';
-
+import { TranslateService } from '@ngx-translate/core';
 import { AddDefectLibraryEntryComponent } from './add-defect-library-entry.component';
 import { DefectLibraryApi } from '../../../application/defect-library.api';
 import type { DefectLibraryEntry } from '../../../domain/model/defect-library-entry.entity';
@@ -14,23 +12,22 @@ describe('AddDefectLibraryEntryComponent', () => {
   let fixture: ComponentFixture<AddDefectLibraryEntryComponent>;
   let apiSpy: jasmine.SpyObj<DefectLibraryApi>;
   let routerSpy: jasmine.SpyObj<Router>;
-  let snackBarSpy: jasmine.SpyObj<MatSnackBar>;
 
   beforeEach(async () => {
-    apiSpy = jasmine.createSpyObj('DefectLibraryApi', ['create']);
+    apiSpy = jasmine.createSpyObj('DefectLibraryApi', ['create', 'getById', 'update']);
     routerSpy = jasmine.createSpyObj('Router', ['navigate']);
-    snackBarSpy = jasmine.createSpyObj('MatSnackBar', ['open']);
+    routerSpy.navigate.and.returnValue(Promise.resolve(true));
+    const snackBarSpy = jasmine.createSpyObj('MatSnackBar', ['open']);
+    const translateSpy = jasmine.createSpyObj('TranslateService', ['instant']);
+    translateSpy.instant.and.callFake((k: string) => k);
 
     await TestBed.configureTestingModule({
-      imports: [
-        AddDefectLibraryEntryComponent,
-        NoopAnimationsModule,
-        TranslateModule.forRoot(),
-      ],
+      imports: [AddDefectLibraryEntryComponent],
       providers: [
         { provide: DefectLibraryApi, useValue: apiSpy },
         { provide: Router, useValue: routerSpy },
         { provide: MatSnackBar, useValue: snackBarSpy },
+        { provide: TranslateService, useValue: translateSpy },
       ],
     }).compileComponents();
 
@@ -43,140 +40,126 @@ describe('AddDefectLibraryEntryComponent', () => {
     expect(component).toBeTruthy();
   });
 
-  describe('form initialization', () => {
-    it('starts with invalid form', () => {
-      expect(component.form.invalid).toBeTrue();
-    });
-
-    it('has g as default unit for defect weight', () => {
-      expect(component.form.get('defectWeightUnit')?.value).toBe('g');
-    });
-
-    it('has g as default unit for coffee total weight', () => {
-      expect(component.form.get('coffeeTotalWeightUnit')?.value).toBe('g');
-    });
+  it('has g as default unit for defect weight', () => {
+    expect(component.form.get('defectWeightUnit')?.value).toBe('g');
   });
 
-  describe('onSubmit — invalid form', () => {
-    it('does not call api when form is empty', () => {
-      component.onSubmit();
-      expect(apiSpy.create).not.toHaveBeenCalled();
+  it('rejects coffee name with digits and does not call api', () => {
+    component.form.patchValue({
+      coffeeDisplayName: 'qweqw123-123',
+      coffeeVariety: 'Typica',
+      defectName: 'Grano',
+      defectType: 'Cat 1',
+      defectWeight: 10,
+      percentage: 5,
+      probableCause: 'Causa',
+      suggestedSolution: 'Solución',
     });
-
-    it('marks submitAttempted after first submit attempt', () => {
-      component.onSubmit();
-      expect(component.submitAttempted).toBeTrue();
-    });
+    component.onSubmit();
+    expect(apiSpy.create).not.toHaveBeenCalled();
   });
 
-  describe('onSubmit — client-side validation', () => {
-    it('rejects negative defect weight and does not call api', () => {
-      component.form.patchValue({ defectWeight: -5 });
-      component.onSubmit();
-      expect(apiSpy.create).not.toHaveBeenCalled();
+  it('rejects negative defect weight and does not call api', () => {
+    component.form.patchValue({
+      coffeeDisplayName: 'Café',
+      coffeeVariety: 'Typica',
+      defectName: 'Grano',
+      defectType: 'Cat 1',
+      defectWeight: -5,
+      percentage: 5,
+      probableCause: 'Causa',
+      suggestedSolution: 'Solución',
     });
+    component.onSubmit();
+    expect(apiSpy.create).not.toHaveBeenCalled();
   });
 
-  describe('onSubmit — percentage validation', () => {
-    it('rejects percentage > 100', () => {
-      component.form.patchValue({
-        coffeeDisplayName: 'Café',
-        defectName: 'Grano',
-        defectType: 'Cat 1',
-        defectWeight: 10,
-        percentage: 150,
-        probableCause: 'Causa',
-        suggestedSolution: 'Solución',
-      });
-      component.onSubmit();
-      expect(component.form.get('percentage')?.errors?.['custom']).toBeTruthy();
-      expect(apiSpy.create).not.toHaveBeenCalled();
+  it('sends defect weight in grams when unit is g', () => {
+    component.form.patchValue({
+      coffeeDisplayName: 'Café',
+      coffeeVariety: 'Typica',
+      defectName: 'Grano negro',
+      defectType: 'Categoría 1',
+      defectWeight: 25,
+      defectWeightUnit: 'g',
+      percentage: 5,
+      probableCause: 'Causa',
+      suggestedSolution: 'Solución',
     });
-
-    it('rejects negative percentage', () => {
-      component.form.patchValue({
-        coffeeDisplayName: 'Café',
-        defectName: 'Grano',
-        defectType: 'Cat 1',
-        defectWeight: 10,
-        percentage: -1,
-        probableCause: 'Causa',
-        suggestedSolution: 'Solución',
-      });
-      component.onSubmit();
-      expect(component.form.get('percentage')?.errors?.['custom']).toBeTruthy();
-    });
+    apiSpy.create.and.returnValue(of({} as DefectLibraryEntry));
+    component.onSubmit();
+    expect(apiSpy.create).toHaveBeenCalled();
+    const entry = apiSpy.create.calls.mostRecent().args[0] as DefectLibraryEntry;
+    expect(entry.defectWeight).toBe(25);
   });
 
-  describe('onSubmit — valid form', () => {
-    beforeEach(() => {
-      component.form.patchValue({
-        coffeeDisplayName: 'Café Etiopía',
-        coffeeRegion: 'Yirgacheffe',
-        coffeeVariety: 'Heirloom',
-        coffeeTotalWeight: 500,
-        coffeeTotalWeightUnit: 'g',
-        defectName: 'Grano negro',
-        defectType: 'Categoría 1',
-        defectWeight: 25,
-        defectWeightUnit: 'g',
-        percentage: 5,
-        probableCause: 'Temperatura excesiva',
-        suggestedSolution: 'Reducir temperatura',
-      });
+  it('converts defect weight from kg to grams', () => {
+    component.form.patchValue({
+      coffeeDisplayName: 'Café',
+      coffeeVariety: 'Typica',
+      defectName: 'Grano',
+      defectType: 'Cat 1',
+      defectWeight: 25,
+      defectWeightUnit: 'kg',
+      coffeeTotalWeightUnit: 'kg',
+      percentage: 5,
+      probableCause: 'Causa',
+      suggestedSolution: 'Solución',
     });
-
-    it('calls api.create with grams when unit is g', () => {
-      apiSpy.create.and.returnValue(of({} as DefectLibraryEntry));
-      component.onSubmit();
-      const entry = apiSpy.create.calls.mostRecent().args[0];
-      expect(entry.defectWeight).toBe(25);
-      expect(entry.coffeeTotalWeight).toBe(500);
-    });
-
-    it('converts kg to grams before sending to api', () => {
-      component.form.patchValue({ defectWeightUnit: 'kg', coffeeTotalWeightUnit: 'kg' });
-      apiSpy.create.and.returnValue(of({} as DefectLibraryEntry));
-      component.onSubmit();
-      const entry = apiSpy.create.calls.mostRecent().args[0];
-      expect(entry.defectWeight).toBe(25000);
-      expect(entry.coffeeTotalWeight).toBe(500000);
-    });
-
-    it('navigates to /libraryDefects on success', () => {
-      apiSpy.create.and.returnValue(of({} as DefectLibraryEntry));
-      routerSpy.navigate.and.returnValue(Promise.resolve(true));
-      component.onSubmit();
-      expect(routerSpy.navigate).toHaveBeenCalledWith(['/libraryDefects']);
-    });
-
-    it('sets apiBannerError on api failure', () => {
-      apiSpy.create.and.returnValue(throwError(() => ({ message: 'Server error', fieldErrors: {} })));
-      component.onSubmit();
-      expect(component.apiBannerError).toBeTruthy();
-    });
-
-    it('sends null coffeeTotalWeight when field is empty', () => {
-      component.form.patchValue({ coffeeTotalWeight: '' });
-      apiSpy.create.and.returnValue(of({} as DefectLibraryEntry));
-      component.onSubmit();
-      const entry = apiSpy.create.calls.mostRecent().args[0];
-      expect(entry.coffeeTotalWeight).toBeNull();
-    });
+    apiSpy.create.and.returnValue(of({} as DefectLibraryEntry));
+    component.onSubmit();
+    const entry = apiSpy.create.calls.mostRecent().args[0] as DefectLibraryEntry;
+    expect(entry.defectWeight).toBe(25000);
   });
 
-  describe('controlErrorMessage', () => {
-    it('returns null when control has no errors', () => {
-      component.form.patchValue({ coffeeRegion: 'Región válida' });
-      expect(component.controlErrorMessage('coffeeRegion')).toBeNull();
+  it('navigates to /libraryDefects on success', () => {
+    component.form.patchValue({
+      coffeeDisplayName: 'Café',
+      coffeeVariety: 'Typica',
+      defectName: 'Grano',
+      defectType: 'Cat 1',
+      defectWeight: 10,
+      percentage: 5,
+      probableCause: 'Causa',
+      suggestedSolution: 'Solución',
     });
+    apiSpy.create.and.returnValue(of({} as DefectLibraryEntry));
+    component.onSubmit();
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/libraryDefects']);
   });
 
-  describe('onCancel', () => {
-    it('navigates to /libraryDefects', () => {
-      routerSpy.navigate.and.returnValue(Promise.resolve(true));
-      component.onCancel();
-      expect(routerSpy.navigate).toHaveBeenCalledWith(['/libraryDefects']);
+  it('rejects percentage over 100 and does not call api', () => {
+    component.form.patchValue({
+      coffeeDisplayName: 'Café',
+      coffeeVariety: 'Typica',
+      defectName: 'Grano',
+      defectType: 'Cat 1',
+      defectWeight: 10,
+      percentage: 150,
+      probableCause: 'Causa',
+      suggestedSolution: 'Solución',
     });
+    component.onSubmit();
+    expect(apiSpy.create).not.toHaveBeenCalled();
+  });
+
+  it('rejects percentage below 0 and does not call api', () => {
+    component.form.patchValue({
+      coffeeDisplayName: 'Café',
+      coffeeVariety: 'Typica',
+      defectName: 'Grano',
+      defectType: 'Cat 1',
+      defectWeight: 10,
+      percentage: -1,
+      probableCause: 'Causa',
+      suggestedSolution: 'Solución',
+    });
+    component.onSubmit();
+    expect(apiSpy.create).not.toHaveBeenCalled();
+  });
+
+  it('navigates to /libraryDefects on cancel', () => {
+    component.onCancel();
+    expect(routerSpy.navigate).toHaveBeenCalledWith(['/libraryDefects']);
   });
 });

@@ -1,5 +1,6 @@
 <div class="add-defect-container">
-  <h1 class="form-title">{{ 'DEFECT_BC.FORM.TITLE' | translate }}</h1>
+  <h1 class="form-title" *ngIf="!editEntryId">{{ 'DEFECT_BC.FORM.TITLE' | translate }}</h1>
+  <h1 class="form-title" *ngIf="editEntryId">{{ 'DEFECT_BC.FORM.EDIT_TITLE' | translate }}</h1>
 
   <div *ngIf="apiBannerError" class="api-error-banner" role="alert">
     {{ apiBannerError }}
@@ -8,7 +9,7 @@
   <form [formGroup]="form" (ngSubmit)="onSubmit()">
     <div class="form-section">
       <h2 class="section-title">{{ 'DEFECT_BC.FORM.COFFEE_DATA' | translate }}</h2>
-      <div class="form-row">
+      <div class="form-row form-row--full-field">
         <mat-form-field appearance="fill">
           <mat-label>{{ 'DEFECT_BC.FORM.COFFEE_NAME' | translate }}</mat-label>
           <input matInput formControlName="coffeeDisplayName" />
@@ -104,7 +105,7 @@
 
     <div class="form-actions">
       <button mat-raised-button color="primary" type="submit">
-        {{ 'DEFECT_BC.FORM.SAVE' | translate }}
+        {{ (editEntryId ? 'DEFECT_BC.FORM.SAVE_UPDATE' : 'DEFECT_BC.FORM.SAVE') | translate }}
       </button>
       <button mat-raised-button color="warn" type="button" (click)="onCancel()" style="margin-left: 16px">
         {{ 'DEFECT_BC.FORM.CANCEL' | translate }}
