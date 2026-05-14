@@ -1205,7 +1205,10 @@
     "ATTACH_SAMPLES": "Adjuntar muestras",
     "ERRORS": {
       "REQUIRED": "Este campo es obligatorio.",
-      "PATTERN_NAME": "No se permiten números ni caracteres especiales."
+      "PATTERN_NAME": "No se permiten números ni caracteres especiales.",
+      "APERTURE_NEGATIVE": "La apertura no puede ser negativa.",
+      "CUP_VOLUME_NEGATIVE": "El volumen en taza no puede ser negativo.",
+      "FINAL_VOLUME_NEGATIVE": "El volumen final no puede ser negativo."
     },
     "COMMENTS_LABEL": "Comentarios:",
     "NOTES_LABEL": "Notas:",

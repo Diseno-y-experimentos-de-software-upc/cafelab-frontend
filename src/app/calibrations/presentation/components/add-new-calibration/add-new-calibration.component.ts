@@ -76,6 +76,18 @@ export class AddNewCalibrationComponent {
       this.snackBar.open(this.translate.instant('CALIBRATIONS.DATE_PAST_ERROR'), undefined, { duration: 4000 });
       return;
     }
+    if (Number(this.calibration.aperture) < 0) {
+      this.snackBar.open(this.translate.instant('CALIBRATIONS.ERRORS.APERTURE_NEGATIVE'), undefined, { duration: 4000 });
+      return;
+    }
+    if (Number(this.calibration.cupVolume) < 0) {
+      this.snackBar.open(this.translate.instant('CALIBRATIONS.ERRORS.CUP_VOLUME_NEGATIVE'), undefined, { duration: 4000 });
+      return;
+    }
+    if (Number(this.calibration.finalVolume) < 0) {
+      this.snackBar.open(this.translate.instant('CALIBRATIONS.ERRORS.FINAL_VOLUME_NEGATIVE'), undefined, { duration: 4000 });
+      return;
+    }
     const payload: GrindCalibrationEntry = {
       ...this.calibration,
       name: this.calibration.name.trim(),

@@ -1203,7 +1203,10 @@
     "ATTACH_SAMPLES": "Attach samples",
     "ERRORS": {
       "REQUIRED": "This field is required.",
-      "PATTERN_NAME": "Numbers and special characters are not allowed."
+      "PATTERN_NAME": "Numbers and special characters are not allowed.",
+      "APERTURE_NEGATIVE": "Aperture cannot be negative.",
+      "CUP_VOLUME_NEGATIVE": "Cup volume cannot be negative.",
+      "FINAL_VOLUME_NEGATIVE": "Final volume cannot be negative."
     },
     "COMMENTS_LABEL": "Comments:",
     "NOTES_LABEL": "Notes:",

@@ -19,7 +19,12 @@ export abstract class BaseFormComponent {
       return `Máximo ${e['maxlength'].requiredLength} caracteres`;
     if (e['min']) return `Valor mínimo: ${e['min'].min}`;
     if (e['max']) return `Valor máximo: ${e['max'].max}`;
-    if (e['pattern']) return 'Formato inválido';
+    if (e['pattern']) {
+      if (controlName === 'password' || controlName === 'newPassword') {
+        return 'Debe tener mínimo 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial (@$!%*?&_-#)';
+      }
+      return 'Formato inválido';
+    }
     return 'Valor inválido';
   }
 }
