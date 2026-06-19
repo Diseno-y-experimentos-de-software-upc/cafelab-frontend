@@ -1,8 +1,12 @@
 import { Component, OnInit } from '@angular/core';
 import { TranslateService } from '@ngx-translate/core';
 import { CommonModule } from '@angular/common';
-import { RouterOutlet } from '@angular/router';
+import { RouterOutlet, Router, NavigationEnd } from '@angular/router';
 import { User } from './auth/domain/model/user.entity';
+import { filter } from 'rxjs/internal/operators/filter';
+import { environment } from '../environments/environment';
+
+declare var gtag: Function;
 
 @Component({
   selector: 'app-root',
@@ -15,10 +19,25 @@ export class App implements OnInit {
   title = 'Café Lab';
   currentUser: User | null = null;
 
-  constructor(private translate: TranslateService) {
+  constructor(private translate: TranslateService, private router: Router) {
     this.translate.addLangs(['en', 'es']);
     this.translate.setDefaultLang('en');
     this.translate.use('en');
+
+    // 3. Lógica de Google Analytics para Single Page Application
+      this.router.events
+      .pipe(filter(event => event instanceof NavigationEnd))
+      .subscribe((event: any) => {
+        // Solo envía datos si no se está en entorno de desarrollo local
+        if (window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+          gtag('config', 'G-V29W6GJWSY', {
+            page_path: event.urlAfterRedirects
+          });
+        } else {
+          console.log('GA4: Navegación simulada localmente a ' + event.urlAfterRedirects);
+        }
+      });
+
   }
 
   ngOnInit() {
