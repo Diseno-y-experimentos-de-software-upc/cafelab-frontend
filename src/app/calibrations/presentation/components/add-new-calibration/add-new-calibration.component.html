@@ -37,8 +37,28 @@
         </div>
 
         <label for="sampleImage">{{ 'CALIBRATIONS.VISUALIZATION_LINK' | translate }}</label>
-        <input id="sampleImage" type="url" [(ngModel)]="calibration.sampleImage" name="sampleImage"
-          [placeholder]="'CALIBRATIONS.PLACEHOLDER_LINK' | translate" />
+        <input
+          id="sampleImage"
+          type="url"
+          [(ngModel)]="calibration.sampleImage"
+          (ngModelChange)="onSampleImageUrlChange()"
+          name="sampleImage"
+          [placeholder]="'CALIBRATIONS.PLACEHOLDER_LINK' | translate"
+        />
+        <div *ngIf="isSafeSampleImageUrl()" class="sample-image-preview-wrap">
+          <span class="sample-image-preview-label">{{ 'CALIBRATIONS.PREVIEW_TITLE' | translate }}</span>
+          <div class="sample-image-preview-box">
+            <img
+              *ngIf="!sampleImagePreviewBroken"
+              [src]="calibration.sampleImage!.trim()"
+              [attr.alt]="'CALIBRATIONS.SAMPLE_IMAGE_ALT' | translate"
+              (error)="onSampleImageError()"
+            />
+          </div>
+          <p *ngIf="sampleImagePreviewBroken" class="preview-load-error">
+            {{ 'CALIBRATIONS.PREVIEW_LOAD_ERROR' | translate }}
+          </p>
+        </div>
       </div>
       <div class="form-col">
         <label for="grindNumber">{{ 'CALIBRATIONS.GRIND_LABEL' | translate }}</label>
@@ -66,9 +86,10 @@
         <label for="calibrationDate">{{ 'CALIBRATIONS.DATE_LABEL' | translate }}</label>
         <input id="calibrationDate" type="date" [(ngModel)]="calibration.calibrationDate" name="calibrationDate"
           [min]="minDate" required #dateCtrl="ngModel">
-        <div *ngIf="calibrationForm.submitted && dateCtrl.invalid"
+        <div *ngIf="calibrationForm.submitted && (dateCtrl.invalid || isCalibrationDateInPast())"
           style="color: red; font-size: 12px; margin-top: -10px; margin-bottom: 10px;">
-          {{ 'CALIBRATIONS.ERRORS.REQUIRED' | translate }}
+          <span *ngIf="dateCtrl.errors?.['required']">{{ 'CALIBRATIONS.ERRORS.REQUIRED' | translate }}</span>
+          <span *ngIf="!dateCtrl.errors?.['required'] && (dateCtrl.errors?.['rangeUnderflow'] || isCalibrationDateInPast())">{{ 'CALIBRATIONS.DATE_PAST_ERROR' | translate }}</span>
         </div>
       </div>
       <div class="form-col">

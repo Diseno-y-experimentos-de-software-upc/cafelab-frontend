@@ -47,13 +47,39 @@
 .form-row {
   display: flex;
   gap: clamp(12px, 3vw, 24px);
-  margin-bottom: 16px;
+  margin-bottom: 20px;
   flex-wrap: wrap;
+  align-items: flex-start;
+}
+
+/* Fila con un solo campo (p. ej. nombre del café): ancho completo para que el mat-error no quede recortado */
+.form-row--full-field {
+  display: block;
+}
+.form-row--full-field mat-form-field {
+  width: 100%;
 }
 
 .form-row > mat-form-field,
 .form-row > .weight-block {
   min-width: 0;
+}
+
+/* Material (MDC): el subscript suele usar overflow oculto y una sola línea; permitimos varias líneas */
+:host ::ng-deep mat-form-field .mat-mdc-form-field-subscript-wrapper {
+  overflow: visible;
+}
+:host ::ng-deep mat-form-field .mat-mdc-form-field-error-wrapper {
+  white-space: normal;
+  word-wrap: break-word;
+  overflow-wrap: anywhere;
+  position: static;
+}
+:host ::ng-deep mat-form-field mat-error {
+  display: block;
+  line-height: 1.45;
+  padding-top: 2px;
+  font-size: 0.8125rem;
 }
 
 .weight-block {

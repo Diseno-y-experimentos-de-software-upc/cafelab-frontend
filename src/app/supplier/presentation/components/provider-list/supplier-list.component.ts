@@ -8,11 +8,12 @@ import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { catchError, finalize, of } from 'rxjs';
 import { RouterModule } from '@angular/router';
 import { getUserFacingApiMessage } from '../../../../shared/infrastructure/api-error-message';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-Supplier-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule, RouterModule],
+  imports: [CommonModule, FormsModule, TranslateModule, RouterModule, MatSnackBarModule],
   templateUrl: './supplier-list.component.html',
   styleUrls: ['./supplier-list.component.css']
 })
@@ -61,6 +62,7 @@ export class SupplierListComponent implements OnInit {
   constructor(
     private supplierApi: SupplierApi,
     private translateService: TranslateService,
+    private snackBar: MatSnackBar,
   ) {}
 
   ngOnInit(): void {
@@ -182,7 +184,11 @@ export class SupplierListComponent implements OnInit {
           ) {
             return of(null);
           }
-          this.error = this.supplierErrorMessage(err, 'SUPPLIER_BC.ERRORS.UPDATE');
+          const msg = this.supplierErrorMessage(err, 'SUPPLIER_BC.ERRORS.UPDATE');
+          this.error = msg;
+          if (msg) {
+            this.snackBar.open(msg, 'Cerrar', { duration: 6000, panelClass: ['snack-error'] });
+          }
           return of(null);
         }),
         finalize(() => this.loading = false)
@@ -247,7 +253,11 @@ export class SupplierListComponent implements OnInit {
           ) {
             return of(null);
           }
-          this.error = this.supplierErrorMessage(err, 'SUPPLIER_BC.ERRORS.REGISTER');
+          const msg = this.supplierErrorMessage(err, 'SUPPLIER_BC.ERRORS.REGISTER');
+          this.error = msg;
+          if (msg) {
+            this.snackBar.open(msg, 'Cerrar', { duration: 6000, panelClass: ['snack-error'] });
+          }
           return of(null);
         }),
         finalize(() => this.loading = false)

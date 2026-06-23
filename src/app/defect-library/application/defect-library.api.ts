@@ -20,4 +20,12 @@ export class DefectLibraryApi {
   create(entity: DefectLibraryEntry): Observable<DefectLibraryEntry> {
     return this.defectLibraryApiEndpoint.create(entity);
   }
+
+  update(id: number, entity: DefectLibraryEntry): Observable<DefectLibraryEntry> {
+    return this.defectLibraryApiEndpoint.update(entity, id);
+  }
+
+  delete(id: number): Observable<void> {
+    return this.defectLibraryApiEndpoint.delete(id);
+  }
 }

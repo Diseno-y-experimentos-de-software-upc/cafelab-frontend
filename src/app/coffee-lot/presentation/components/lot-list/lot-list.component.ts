@@ -12,11 +12,12 @@ import { SupplierApi } from '../../../../supplier/application/supplier.api';
 import { Supplier } from '../../../../supplier/domain/model/supplier.entity';
 import type { ApiError } from '../../../../shared/infrastructure/base-api-endpoint';
 import { getUserFacingApiMessage } from '../../../../shared/infrastructure/api-error-message';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
 @Component({
   selector: 'app-lot-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule, RouterModule],
+  imports: [CommonModule, FormsModule, TranslateModule, RouterModule, MatSnackBarModule],
   templateUrl: './lot-list.component.html',
   styleUrls: ['./lot-list.component.css'],
 })
@@ -90,6 +91,7 @@ export class LotListComponent implements OnInit {
     private readonly supplierApi: SupplierApi,
     private readonly translateService: TranslateService,
     private readonly authService: AuthService,
+    private readonly snackBar: MatSnackBar,
   ) {}
 
   ngOnInit(): void {
@@ -304,6 +306,10 @@ export class LotListComponent implements OnInit {
     if (Object.keys(client).length > 0) {
       this.fieldErrors = client;
       this.error = this.translateService.instant('COFFEE_LOT_BC.VALIDATION.SUMMARY');
+      const toastMsg = client['weight'] ?? client['altitude'];
+      if (toastMsg) {
+        this.snackBar.open(toastMsg, undefined, { duration: 4000 });
+      }
       return;
     }
 
@@ -323,7 +329,11 @@ export class LotListComponent implements OnInit {
           if (api.fieldErrors && Object.keys(api.fieldErrors).length > 0) {
             this.fieldErrors = { ...api.fieldErrors };
           }
-          this.error = this.lotErrorMessage(err, 'COFFEE_LOT_BC.ERRORS.REGISTER');
+          const msg = this.lotErrorMessage(err, 'COFFEE_LOT_BC.ERRORS.REGISTER');
+          this.error = msg;
+          if (msg) {
+            this.snackBar.open(msg, 'Cerrar', { duration: 6000, panelClass: ['snack-error'] });
+          }
           return of(null);
         }),
         finalize(() => (this.loading = false)),
@@ -348,6 +358,10 @@ export class LotListComponent implements OnInit {
     if (Object.keys(client).length > 0) {
       this.editFieldErrors = client;
       this.error = this.translateService.instant('COFFEE_LOT_BC.VALIDATION.SUMMARY');
+      const toastMsg = client['weight'] ?? client['altitude'];
+      if (toastMsg) {
+        this.snackBar.open(toastMsg, undefined, { duration: 4000 });
+      }
       return;
     }
 
@@ -371,7 +385,11 @@ export class LotListComponent implements OnInit {
           if (api.fieldErrors && Object.keys(api.fieldErrors).length > 0) {
             this.editFieldErrors = { ...api.fieldErrors };
           }
-          this.error = this.lotErrorMessage(err, 'COFFEE_LOT_BC.ERRORS.UPDATE');
+          const msg = this.lotErrorMessage(err, 'COFFEE_LOT_BC.ERRORS.UPDATE');
+          this.error = msg;
+          if (msg) {
+            this.snackBar.open(msg, 'Cerrar', { duration: 6000, panelClass: ['snack-error'] });
+          }
           return of(null);
         }),
         finalize(() => (this.loading = false)),

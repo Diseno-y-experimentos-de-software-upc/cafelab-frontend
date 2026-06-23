@@ -777,6 +777,12 @@ export class RoastProfileListComponent implements OnInit {
   }
 
   private roastErrorMessage(err: unknown, i18nKey: string): string {
+    if (err && typeof err === 'object' && 'i18nKey' in err) {
+      const k = (err as { i18nKey: unknown }).i18nKey;
+      if (typeof k === 'string' && k.length > 0) {
+        return this.translate.instant(k);
+      }
+    }
     const fallback = this.translate.instant(i18nKey);
     if (err instanceof HttpErrorResponse) {
       if (err.status === 0) {

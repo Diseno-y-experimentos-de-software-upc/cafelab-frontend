@@ -1071,7 +1071,8 @@
       "REGISTER_CONSUMPTION": "Could not register consumption.",
       "SELECT_VALID_LOT": "Please select a valid lot.",
       "NO_LOTS_FOR_STATUS": "There are no {{statusLabel}} coffee lots available to register consumption.",
-      "QUANTITY_EXCEEDS_STOCK": "The amount cannot exceed the lot's available stock."
+      "QUANTITY_EXCEEDS_STOCK": "The amount cannot exceed the lot's available stock.",
+      "CONSUMPTION_DECIMALS": "Consumption may have at most 2 decimal places."
     },
     "CONSUMPTION_TABLE": {
       "TITLE": "Consumption History",
@@ -1114,6 +1115,8 @@
     "ERRORS": {
       "LOAD": "Defect records could not be loaded.",
       "REGISTER": "The defect record could not be saved.",
+      "UPDATE": "The defect record could not be updated.",
+      "DELETE": "The defect record could not be deleted.",
       "DETAIL": "The defect record could not be loaded.",
       "NETWORK": "Cannot reach the server.",
       "UNAUTHORIZED": "The server did not accept your session (missing token, invalid token, or user not found). Sign out and sign in again.",
@@ -1126,13 +1129,20 @@
         "WEIGHT": "Weight",
         "COFFEE": "Coffee",
         "DEFECT": "Defect",
-        "PERCENTAGE": "Percentage"
+        "PERCENTAGE": "Percentage",
+        "ACTIONS": "Actions"
       },
       "ADD": "Add defect",
-      "NO_DATA": "No data"
+      "NO_DATA": "No data",
+      "DELETE_CONFIRM": "Delete defect \"{{name}}\"? This cannot be undone.",
+      "DELETE_SUCCESS": "Defect deleted successfully.",
+      "EDIT": "Edit defect",
+      "DELETE": "Delete defect",
+      "VIEW_DETAIL": "View defect details"
     },
     "FORM": {
       "TITLE": "Register defect",
+      "EDIT_TITLE": "Edit defect",
       "COFFEE_DATA": "Coffee data",
       "COFFEE_NAME": "Coffee name",
       "COFFEE_REGION": "Region",
@@ -1151,9 +1161,18 @@
       "DEFECT_CAUSE": "Probable cause",
       "DEFECT_SOLUTION": "Suggested solution",
       "SAVE": "Save",
+      "SAVE_UPDATE": "Update record",
       "CANCEL": "Cancel",
       "ERRORS": {
         "REQUIRED": "This field is required.",
+        "COFFEE_NAME_REQUIRED": "Enter the coffee name.",
+        "COFFEE_NAME_LETTERS_ONLY": "Coffee name may only contain letters and spaces (no numbers or symbols).",
+        "VARIETY_REQUIRED": "Enter the coffee variety.",
+        "DEFECT_NAME_REQUIRED": "Enter the defect name.",
+        "DEFECT_TYPE_REQUIRED": "Enter the defect type.",
+        "CAUSE_REQUIRED": "Enter the probable cause.",
+        "SOLUTION_REQUIRED": "Enter the suggested solution.",
+        "PERCENTAGE_REQUIRED": "Enter the percentage.",
         "MAX_LENGTH": "Maximum {{max}} characters.",
         "COFFEE_WEIGHT_NEGATIVE": "Total coffee weight cannot be negative.",
         "DEFECT_WEIGHT_POSITIVE": "Defect weight must be greater than zero.",
@@ -1179,10 +1198,15 @@
     "VISUALIZATION_LABEL": "Visualization",
     "VISUALIZATION_LINK": "Visualization (Image link)",
     "PLACEHOLDER_LINK": "Ex: https://...",
+    "PREVIEW_TITLE": "Preview",
+    "PREVIEW_LOAD_ERROR": "Could not load this image. Check that the URL is correct and allows embedding.",
     "ATTACH_SAMPLES": "Attach samples",
     "ERRORS": {
       "REQUIRED": "This field is required.",
-      "PATTERN_NAME": "Numbers and special characters are not allowed."
+      "PATTERN_NAME": "Numbers and special characters are not allowed.",
+      "APERTURE_NEGATIVE": "Aperture cannot be negative.",
+      "CUP_VOLUME_NEGATIVE": "Cup volume cannot be negative.",
+      "FINAL_VOLUME_NEGATIVE": "Final volume cannot be negative."
     },
     "COMMENTS_LABEL": "Comments:",
     "NOTES_LABEL": "Notes:",
@@ -1329,7 +1353,8 @@
     "EMPTY_TABLE": "No roast profiles registered yet.",
     "PLACEHOLDER_CELSIUS": "°C",
     "DELETE_TOOLTIP": "Delete profile",
-    "DUPLICATE_SUFFIX": " (copy)",
+    "DUPLICATE_NAME_PATTERN": "Copy of {{name}}",
+    "DUPLICATE_NAME_DEFAULT": "profile",
     "HINT": {
       "NEED_LOT": "Register at least one of your coffee lots before creating a roast profile."
     },
@@ -1371,6 +1396,7 @@
       "UPDATE": "The roast profile could not be updated.",
       "DELETE": "The roast profile could not be deleted.",
       "DUPLICATE": "The profile could not be duplicated.",
+      "DUPLICATE_LIMIT": "This profile already has a copy. Only one copy is allowed per profile.",
       "TOGGLE_FAVORITE": "The favorite could not be updated.",
       "MISSING_ID": "The profile could not be identified.",
       "NETWORK": "Cannot reach the server. Check your connection and try again.",

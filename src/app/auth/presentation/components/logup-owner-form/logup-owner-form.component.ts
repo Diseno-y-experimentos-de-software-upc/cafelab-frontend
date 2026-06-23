@@ -45,7 +45,7 @@ export class LogupOwnerFormComponent extends BaseFormComponent {
     this.logupForm = this.formBuilder.group({
       name: ['', Validators.required],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6), Validators.maxLength(120)]],
+      password: ['', [Validators.required, Validators.minLength(8), Validators.maxLength(120), Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&_\-#])[A-Za-z\d@$!%*?&_\-#]{8,}$/)]],
       cafeteriaName: ['', Validators.required],
       experience: ['', Validators.required],
     });

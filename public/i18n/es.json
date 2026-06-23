@@ -1073,7 +1073,8 @@
       "REGISTER_CONSUMPTION": "Error al registrar el consumo.",
       "SELECT_VALID_LOT": "Debe seleccionar un lote válido.",
       "NO_LOTS_FOR_STATUS": "No hay lotes de café {{statusLabel}} disponibles para registrar consumo.",
-      "QUANTITY_EXCEEDS_STOCK": "La cantidad no puede superar el stock disponible del lote."
+      "QUANTITY_EXCEEDS_STOCK": "La cantidad no puede superar el stock disponible del lote.",
+      "CONSUMPTION_DECIMALS": "El consumo admite como máximo 2 decimales."
     },
     "CONSUMPTION_TABLE": {
       "TITLE": "Historial de Consumos",
@@ -1116,6 +1117,8 @@
     "ERRORS": {
       "LOAD": "No se pudieron cargar los registros de defectos.",
       "REGISTER": "No se pudo guardar el registro de defecto.",
+      "UPDATE": "No se pudo actualizar el registro de defecto.",
+      "DELETE": "No se pudo eliminar el registro de defecto.",
       "DETAIL": "No se pudo cargar el registro de defecto.",
       "NETWORK": "No hay conexión con el servidor.",
       "UNAUTHORIZED": "No se aceptó la sesión (token ausente, inválido o usuario no encontrado en el servidor). Cierre sesión y vuelva a entrar.",
@@ -1128,13 +1131,20 @@
         "WEIGHT": "Peso",
         "COFFEE": "Café",
         "DEFECT": "Defecto",
-        "PERCENTAGE": "Porcentaje"
+        "PERCENTAGE": "Porcentaje",
+        "ACTIONS": "Acciones"
       },
       "ADD": "Agregar defecto",
-      "NO_DATA": "Sin datos"
+      "NO_DATA": "Sin datos",
+      "DELETE_CONFIRM": "¿Eliminar el defecto \"{{name}}\"? Esta acción no se puede deshacer.",
+      "DELETE_SUCCESS": "Defecto eliminado correctamente.",
+      "EDIT": "Editar defecto",
+      "DELETE": "Eliminar defecto",
+      "VIEW_DETAIL": "Ver detalle del defecto"
     },
     "FORM": {
       "TITLE": "Registrar defecto",
+      "EDIT_TITLE": "Editar defecto",
       "COFFEE_DATA": "Datos del café",
       "COFFEE_NAME": "Nombre del café",
       "COFFEE_REGION": "Región",
@@ -1153,9 +1163,18 @@
       "DEFECT_CAUSE": "Causa probable",
       "DEFECT_SOLUTION": "Solución sugerida",
       "SAVE": "Guardar",
+      "SAVE_UPDATE": "Actualizar registro",
       "CANCEL": "Cancelar",
       "ERRORS": {
         "REQUIRED": "Este campo es obligatorio.",
+        "COFFEE_NAME_REQUIRED": "Indique el nombre del café.",
+        "COFFEE_NAME_LETTERS_ONLY": "El nombre del café solo puede contener letras y espacios (sin números ni símbolos).",
+        "VARIETY_REQUIRED": "Indique la variedad del café.",
+        "DEFECT_NAME_REQUIRED": "Indique el nombre del defecto.",
+        "DEFECT_TYPE_REQUIRED": "Indique el tipo de defecto.",
+        "CAUSE_REQUIRED": "Indique la causa probable.",
+        "SOLUTION_REQUIRED": "Indique la solución sugerida.",
+        "PERCENTAGE_REQUIRED": "Indique el porcentaje.",
         "MAX_LENGTH": "Máximo {{max}} caracteres.",
         "COFFEE_WEIGHT_NEGATIVE": "El peso total del café no puede ser negativo.",
         "DEFECT_WEIGHT_POSITIVE": "El peso del defecto debe ser mayor que cero.",
@@ -1181,10 +1200,15 @@
     "VISUALIZATION_LABEL": "Visualización",
     "VISUALIZATION_LINK": "Visualización (Link de imagen)",
     "PLACEHOLDER_LINK": "Ej: https://...",
+    "PREVIEW_TITLE": "Vista previa",
+    "PREVIEW_LOAD_ERROR": "No se pudo cargar la imagen. Compruebe que la URL sea correcta y permita mostrarse aquí.",
     "ATTACH_SAMPLES": "Adjuntar muestras",
     "ERRORS": {
       "REQUIRED": "Este campo es obligatorio.",
-      "PATTERN_NAME": "No se permiten números ni caracteres especiales."
+      "PATTERN_NAME": "No se permiten números ni caracteres especiales.",
+      "APERTURE_NEGATIVE": "La apertura no puede ser negativa.",
+      "CUP_VOLUME_NEGATIVE": "El volumen en taza no puede ser negativo.",
+      "FINAL_VOLUME_NEGATIVE": "El volumen final no puede ser negativo."
     },
     "COMMENTS_LABEL": "Comentarios:",
     "NOTES_LABEL": "Notas:",
@@ -1331,7 +1355,8 @@
     "EMPTY_TABLE": "No hay perfiles de tueste registrados.",
     "PLACEHOLDER_CELSIUS": "°C",
     "DELETE_TOOLTIP": "Eliminar perfil",
-    "DUPLICATE_SUFFIX": " (copia)",
+    "DUPLICATE_NAME_PATTERN": "Copia de {{name}}",
+    "DUPLICATE_NAME_DEFAULT": "perfil",
     "HINT": {
       "NEED_LOT": "Registre al menos un lote de café suyo antes de crear un perfil de tueste."
     },
@@ -1373,6 +1398,7 @@
       "UPDATE": "No se pudo actualizar el perfil de tueste.",
       "DELETE": "No se pudo eliminar el perfil.",
       "DUPLICATE": "No se pudo duplicar el perfil.",
+      "DUPLICATE_LIMIT": "Este perfil ya tiene una copia. Solo se permite una copia por perfil.",
       "TOGGLE_FAVORITE": "No se pudo actualizar el favorito.",
       "MISSING_ID": "No se pudo identificar el perfil.",
       "NETWORK": "No hay conexión con el servidor. Revisa tu red e inténtalo de nuevo.",

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { NgIf } from '@angular/common';
-import { TranslatePipe } from '@ngx-translate/core';
+import { TranslatePipe, TranslateService } from '@ngx-translate/core';
 import { MatButton, MatIconButton } from '@angular/material/button';
 import { MatFormField, MatInput, MatPrefix, MatSuffix } from '@angular/material/input';
 import {
@@ -18,11 +18,14 @@ import {
   MatTable,
 } from '@angular/material/table';
 import { MatIconModule } from '@angular/material/icon';
+import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { finalize } from 'rxjs';
 import { ToolbarComponent } from '../../../../public/presentation/components/toolbar/toolbar.component';
 import { MatToolbar } from '@angular/material/toolbar';
 import { AuthService } from '../../../../auth/infrastructure/AuthService';
 import { DefectLibraryApi } from '../../../application/defect-library.api';
 import type { DefectLibraryEntry } from '../../../domain/model/defect-library-entry.entity';
+import { getUserFacingApiMessage } from '../../../../shared/infrastructure/api-error-message';
 
 @Component({
   selector: 'app-defect-library-list',
@@ -52,6 +55,7 @@ import type { DefectLibraryEntry } from '../../../domain/model/defect-library-en
     MatRowDef,
     ToolbarComponent,
     MatToolbar,
+    MatSnackBarModule,
   ],
 })
 export class DefectLibraryListComponent implements OnInit {
@@ -60,11 +64,14 @@ export class DefectLibraryListComponent implements OnInit {
   entries: DefectLibraryEntry[] = [];
   filteredEntries: DefectLibraryEntry[] = [];
   displayedColumns: string[] = ['peso', 'cafe', 'defecto', 'porcentaje', 'acciones'];
+  deletingId: number | null = null;
 
   constructor(
     private readonly defectLibraryApi: DefectLibraryApi,
     private readonly router: Router,
     private readonly authService: AuthService,
+    private readonly translate: TranslateService,
+    private readonly snackBar: MatSnackBar,
   ) {}
 
   ngOnInit(): void {
@@ -108,11 +115,44 @@ export class DefectLibraryListComponent implements OnInit {
     void this.router.navigate(['/file', id]);
   }
 
+  goToEdit(id: number): void {
+    void this.router.navigate(['/edit-defect', id]);
+  }
+
+  confirmDelete(row: DefectLibraryEntry): void {
+    if (!row.id || row.id <= 0) {
+      return;
+    }
+    const msg = this.translate.instant('DEFECT_BC.LIST.DELETE_CONFIRM', { name: row.name });
+    if (!window.confirm(msg)) {
+      return;
+    }
+    this.deletingId = row.id;
+    this.defectLibraryApi
+      .delete(row.id)
+      .pipe(finalize(() => (this.deletingId = null)))
+      .subscribe({
+        next: () => {
+          this.snackBar.open(this.translate.instant('DEFECT_BC.LIST.DELETE_SUCCESS'), undefined, {
+            duration: 4000,
+          });
+          this.load();
+        },
+        error: (err: unknown) => {
+          const text = getUserFacingApiMessage(
+            err,
+            this.translate.instant('DEFECT_BC.ERRORS.DELETE'),
+            this.translate.instant('DEFECT_BC.ERRORS.UNAUTHORIZED'),
+          );
+          this.snackBar.open(text, undefined, { duration: 6000 });
+        },
+      });
+  }
+
   goToNew(): void {
     void this.router.navigate(['/new-defect']);
   }
 
-  
   goToHome(): void {
     const user = this.authService.getCurrentUser();
     if (!user) {

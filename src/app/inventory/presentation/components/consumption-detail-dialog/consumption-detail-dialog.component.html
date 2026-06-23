@@ -27,12 +27,12 @@
 
       <div class="detail-item">
         <span class="detail-label">{{ 'INVENTORY.CONSUMPTION_DETAIL.CONSUMPTION' | translate }}:</span>
-        <span class="detail-value">{{ data.consumptionKg }} {{ 'COMMON.KG' | translate }}</span>
+        <span class="detail-value">{{ data.consumptionKg | number:'1.0-2' }} {{ 'COMMON.KG' | translate }}</span>
       </div>
 
       <div class="detail-item" *ngIf="data.currentLotStockKg != null">
         <span class="detail-label">{{ 'INVENTORY.CONSUMPTION_DETAIL.CURRENT_STOCK' | translate }}:</span>
-        <span class="detail-value">{{ data.currentLotStockKg }} {{ 'COMMON.KG' | translate }}</span>
+        <span class="detail-value">{{ data.currentLotStockKg | number:'1.0-2' }} {{ 'COMMON.KG' | translate }}</span>
       </div>
 
       <div class="detail-item">
