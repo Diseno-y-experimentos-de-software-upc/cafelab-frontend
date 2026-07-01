@@ -5,7 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
-import { TranslateModule } from '@ngx-translate/core';   // ← agregar arriba
+import { TranslateModule } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-create-portfolio-dialog',
@@ -25,7 +25,7 @@ import { TranslateModule } from '@ngx-translate/core';   // ← agregar arriba
 export class CreatePortfolioDialogComponent implements OnInit {
   portfolioName: string = '';
   isEditMode: boolean = false;
-  dialogTitle: string = 'Nuevo Portafolio';
+  dialogTitle: string = 'portfolio.create';
 
   constructor(
     private dialogRef: MatDialogRef<CreatePortfolioDialogComponent>,
@@ -36,7 +36,7 @@ export class CreatePortfolioDialogComponent implements OnInit {
     if (this.data && this.data.name) {
       this.portfolioName = this.data.name;
       this.isEditMode = true;
-      this.dialogTitle = 'Editar Portafolio';
+      this.dialogTitle = 'portfolio.edit';
     }
   }
 

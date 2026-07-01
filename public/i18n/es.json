@@ -1228,6 +1228,11 @@
       "EQUIPMENT": "Equipo",
       "APERTURE": "Apertura"
     },
+    "EQUIPMENT_OPTIONS": {
+      "Maquina Espresso": "Maquina Espresso",
+      "V60": "V60",
+      "Chemex": "Chemex"
+    },
     "REGISTER": "Registrar",
     "NO_DATA": "No hay calibraciones registradas",
     "EDIT_TITLE": "Editar Calibracion",
