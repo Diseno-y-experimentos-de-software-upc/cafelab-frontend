@@ -488,6 +488,12 @@
       "MESSAGE": "¿Está seguro de que desea eliminar el lote '{{lotName}}'? Esta acción no se puede deshacer.",
       "CONFIRM": "Eliminar",
       "CANCEL": "Cancelar"
+    },
+    "SUCCESS_MODAL": {
+      "TITLE": "¡Envío exitoso!",
+      "MESSAGE": "Tu mensaje ha sido enviado correctamente.",
+      "CLOSE": "Cerrar"
+
     }
   },
   "profile": {

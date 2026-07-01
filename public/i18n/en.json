@@ -486,6 +486,11 @@
       "MESSAGE": "Are you sure you want to delete the lot '{{lotName}}'? This action cannot be undone.",
       "CONFIRM": "Delete",
       "CANCEL": "Cancel"
+    },
+    "SUCCESS_MODAL": {
+      "TITLE": "Submission Successful!",
+      "MESSAGE": "Your message has been sent successfully.",
+      "CLOSE": "Close"
     }
   },
   "profile": {
