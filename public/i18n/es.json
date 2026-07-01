@@ -403,7 +403,8 @@
         "specialties": "Especialidades",
         "user_id": "ID de Usuario"
       },
-      "add_specialty_placeholder": "Agregar Especialidad"
+      "add_specialty_placeholder": "Agregar Especialidad",
+      "delete_supplier": "Eliminar proveedor"
     }
   },
   "BREADCRUMB": {
