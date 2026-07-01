@@ -27,7 +27,7 @@
       </ng-container>
       <ng-container matColumnDef="equipo">
         <th mat-header-cell *matHeaderCellDef> {{ 'CALIBRATIONS.TABLE.EQUIPMENT' | translate }} </th>
-        <td mat-cell *matCellDef="let row"> {{ row.equipment }} </td>
+        <td mat-cell *matCellDef="let row"> {{ 'CALIBRATIONS.EQUIPMENT_OPTIONS.' + row.equipment | translate }} </td>
       </ng-container>
       <ng-container matColumnDef="apertura">
         <th mat-header-cell *matHeaderCellDef> {{ 'CALIBRATIONS.TABLE.APERTURE' | translate }} </th>

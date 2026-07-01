@@ -53,7 +53,8 @@ export class LotListComponent implements OnInit {
     'Rainforest Alliance',
   ] as const;
 
-  coffeeTypeLabelKey(value: string): string {
+  coffeeTypeLabelKey(value: string | undefined | null): string {
+    if (!value) return '';
     const m: Record<string, string> = {
       Arábica: 'COFFEE_LOT_BC.OPTIONS.COFFEE_TYPE.ARABICA',
       Robusta: 'COFFEE_LOT_BC.OPTIONS.COFFEE_TYPE.ROBUSTA',

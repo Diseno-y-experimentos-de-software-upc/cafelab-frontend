@@ -259,6 +259,15 @@ export class RegisterConsumptionDialogComponent implements OnInit {
     return lot ? lot.lot_name : '';
   }
 
+    coffeeTypeLabelKey(type: string): string {
+    const m: Record<string, string> = {
+      Arábica: 'COFFEE_LOT_BC.OPTIONS.COFFEE_TYPE.ARABICA',
+      Robusta: 'COFFEE_LOT_BC.OPTIONS.COFFEE_TYPE.ROBUSTA',
+      Mezcla: 'COFFEE_LOT_BC.OPTIONS.COFFEE_TYPE.BLEND',
+    };
+    return m[type] ?? type;
+  }
+
   private dateRangeValidation(control: any) {
     const value = control.value;
 
