@@ -69,7 +69,7 @@
                 </div>
                 <div class="info-item" *ngIf="recipe.grindSize">
                   <span class="label">{{ 'recipes.creation.molienda' | translate }}:</span>
-                  <span>{{ recipe.grindSize }}</span>
+                  <span>{{ grindLabelKey(recipe.grindSize) | translate }}</span>
                 </div>
                 <div class="info-item" *ngIf="recipe.ratio">
                   <span class="label">{{ 'recipes.creation.ratio' | translate }}:</span>

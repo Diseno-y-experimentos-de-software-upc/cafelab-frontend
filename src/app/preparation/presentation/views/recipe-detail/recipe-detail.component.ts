@@ -204,6 +204,17 @@ export class RecipeDetailComponent implements OnInit {
         void this.router.navigate(['/']);
     }
   }
+
+    grindLabelKey(value: string): string {
+    const m: Record<string, string> = {
+      'Muy fino': 'recipes.creation.grind_options.very_fine',
+      'Fino': 'recipes.creation.grind_options.fine',
+      'Medio': 'recipes.creation.grind_options.medium',
+      'Grueso': 'recipes.creation.grind_options.coarse',
+    };
+    return m[value] ?? value;
+  }
+      
 }
 
 @Component({
