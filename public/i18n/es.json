@@ -1415,5 +1415,22 @@
         "DARK": "Oscuro"
       }
     }
+  },
+  "LOT_ECONOMIC_VIEW": {
+    "TITLE": "Análisis económico por lote",
+    "VIEW_ACTION": "Ver análisis económico",
+    "SELECT_LOT": "Seleccionar lote",
+    "SELECT_PLACEHOLDER": "— Elija un lote —",
+    "INCOMPLETE_DATA": "Faltan datos para el análisis económico completo del lote",
+    "LOT_SUMMARY": "Resumen del lote",
+    "LOT_NAME": "Nombre",
+    "COFFEE_TYPE": "Tipo de café",
+    "ORIGIN": "Origen",
+    "STATUS": "Estado",
+    "AVAILABLE_STOCK": "Stock disponible",
+    "ECONOMIC_INDICATORS": "Indicadores económicos",
+    "NO_COSTS": "Sin registro de costos de producción para este lote",
+    "LOAD_ERROR": "No se pudo cargar la información del lote",
+    "CLOSE": "Cerrar"
   }
 }

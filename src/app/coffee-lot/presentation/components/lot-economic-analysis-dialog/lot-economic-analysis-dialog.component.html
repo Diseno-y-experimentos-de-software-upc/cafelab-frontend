@@ -1,0 +1,76 @@
+<div class="lot-economic-dialog">
+  <h2 mat-dialog-title class="dialog-title">
+    {{ 'LOT_ECONOMIC_VIEW.TITLE' | translate }}
+    <span *ngIf="viewData?.lot as lot" class="lot-name">— {{ lot.lot_name }}</span>
+  </h2>
+
+  <mat-dialog-content class="dialog-content">
+    <mat-progress-bar *ngIf="loading" mode="indeterminate"></mat-progress-bar>
+
+    <p *ngIf="loadError" class="error-message">{{ 'LOT_ECONOMIC_VIEW.LOAD_ERROR' | translate }}</p>
+
+    <ng-container *ngIf="viewData as data">
+      <div *ngIf="data.showIncompleteWarning" class="warning-banner" role="alert">
+        {{ 'LOT_ECONOMIC_VIEW.INCOMPLETE_DATA' | translate }}
+      </div>
+
+      <mat-card class="summary-card">
+        <mat-card-content>
+          <h3>{{ 'LOT_ECONOMIC_VIEW.LOT_SUMMARY' | translate }}</h3>
+          <div class="summary-grid">
+            <div>
+              <span class="label">{{ 'LOT_ECONOMIC_VIEW.LOT_NAME' | translate }}</span>
+              <span class="value">{{ data.lot.lot_name }}</span>
+            </div>
+            <div>
+              <span class="label">{{ 'LOT_ECONOMIC_VIEW.COFFEE_TYPE' | translate }}</span>
+              <span class="value">{{ data.lot.coffee_type }}</span>
+            </div>
+            <div>
+              <span class="label">{{ 'LOT_ECONOMIC_VIEW.ORIGIN' | translate }}</span>
+              <span class="value">{{ data.lot.origin || ('COMMON.NOT_AVAILABLE' | translate) }}</span>
+            </div>
+            <div>
+              <span class="label">{{ 'LOT_ECONOMIC_VIEW.STATUS' | translate }}</span>
+              <span class="value">{{ getStatusText(data.lot.status) }}</span>
+            </div>
+          </div>
+        </mat-card-content>
+      </mat-card>
+
+      <mat-card class="stock-card">
+        <mat-card-content>
+          <h3>{{ 'LOT_ECONOMIC_VIEW.AVAILABLE_STOCK' | translate }}</h3>
+          <p class="stock-value">
+            {{ data.lot.weight | number:'1.0-2' }} {{ 'COMMON.KG' | translate }}
+          </p>
+        </mat-card-content>
+      </mat-card>
+
+      <div *ngIf="data.activeCost as cost" class="indicators-section">
+        <h3>{{ 'LOT_ECONOMIC_VIEW.ECONOMIC_INDICATORS' | translate }}</h3>
+        <app-metrics-card
+          [costPerKg]="cost.costPerKg"
+          [potentialMargin]="cost.potentialMargin"
+          [suggestedPrice]="cost.suggestedPrice"
+          [currencySymbol]="currencySymbol"
+        ></app-metrics-card>
+      </div>
+
+      <div *ngIf="!data.activeCost" class="empty-hint">
+        {{ 'LOT_ECONOMIC_VIEW.NO_COSTS' | translate }}
+      </div>
+
+      <app-consumption-table
+        [consumptionEntries]="data.movements"
+        [lots]="selectedLots"
+      ></app-consumption-table>
+    </ng-container>
+  </mat-dialog-content>
+
+  <mat-dialog-actions align="center" class="dialog-actions">
+    <button mat-button type="button" (click)="close()" class="close-button">
+      {{ 'LOT_ECONOMIC_VIEW.CLOSE' | translate }}
+    </button>
+  </mat-dialog-actions>
+</div>

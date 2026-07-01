@@ -1,0 +1,97 @@
+.lot-economic-dialog {
+  font-family: 'Nunito', Arial, sans-serif;
+}
+
+.dialog-title {
+  font-weight: bold;
+  color: #414535;
+  text-align: center;
+  margin: 0;
+  padding-bottom: 0.5rem;
+}
+
+.lot-name {
+  font-weight: 600;
+}
+
+.dialog-content {
+  min-width: min(720px, 90vw);
+  max-height: 75vh;
+  overflow-y: auto;
+  padding-top: 0.5rem;
+}
+
+.warning-banner {
+  background-color: #fff3cd;
+  border: 1px solid #ffc107;
+  color: #664d03;
+  padding: 0.75rem 1rem;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.error-message {
+  color: #b00020;
+  text-align: center;
+  margin: 1rem 0;
+}
+
+.summary-card,
+.stock-card {
+  margin-bottom: 1rem;
+  border-radius: 8px !important;
+}
+
+.summary-card h3,
+.stock-card h3,
+.indicators-section h3 {
+  color: #414535;
+  margin: 0 0 0.75rem;
+  font-size: 1.05rem;
+}
+
+.summary-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 0.75rem;
+}
+
+.summary-grid .label {
+  display: block;
+  font-size: 0.85rem;
+  color: #666;
+  margin-bottom: 0.25rem;
+}
+
+.summary-grid .value {
+  font-weight: 600;
+  color: #414535;
+}
+
+.stock-value {
+  font-size: 1.5rem;
+  font-weight: bold;
+  color: #414535;
+  margin: 0;
+}
+
+.indicators-section {
+  margin-bottom: 1rem;
+}
+
+.empty-hint {
+  color: #666;
+  font-style: italic;
+  margin-bottom: 1rem;
+  text-align: center;
+}
+
+.dialog-actions {
+  padding-top: 0.5rem;
+}
+
+.close-button {
+  color: #414535;
+  font-weight: 600;
+}

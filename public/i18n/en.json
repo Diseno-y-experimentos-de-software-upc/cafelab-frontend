@@ -1413,5 +1413,22 @@
         "DARK": "Dark"
       }
     }
+  },
+  "LOT_ECONOMIC_VIEW": {
+    "TITLE": "Lot economic analysis",
+    "VIEW_ACTION": "View economic analysis",
+    "SELECT_LOT": "Select lot",
+    "SELECT_PLACEHOLDER": "— Choose a lot —",
+    "INCOMPLETE_DATA": "Missing data for a complete economic analysis of this lot",
+    "LOT_SUMMARY": "Lot summary",
+    "LOT_NAME": "Name",
+    "COFFEE_TYPE": "Coffee type",
+    "ORIGIN": "Origin",
+    "STATUS": "Status",
+    "AVAILABLE_STOCK": "Available stock",
+    "ECONOMIC_INDICATORS": "Economic indicators",
+    "NO_COSTS": "No production cost record for this lot",
+    "LOAD_ERROR": "Could not load lot information",
+    "CLOSE": "Close"
   }
 }

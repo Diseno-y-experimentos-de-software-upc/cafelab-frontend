@@ -24,4 +24,8 @@ export class InventoryApi {
   delete(id: number): Observable<void> {
     return this.inventoryApiEndpoint.delete(id);
   }
+
+  getByCoffeeLotId(coffeeLotId: number): Observable<InventoryEntry[]> {
+    return this.inventoryApiEndpoint.getByCoffeeLotId(coffeeLotId);
+  }
 }
