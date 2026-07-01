@@ -72,4 +72,16 @@ export class InventoryApiEndpoint extends BaseApiEndpoint<
         catchError(this.handleError(this.translate.instant('INVENTORY_BC.ERRORS.DELETE'))),
       );
   }
+
+  getByCoffeeLotId(coffeeLotId: number): Observable<InventoryEntry[]> {
+    return this.http
+      .get<InventoryEntryResource[]>(
+        `${this.endpointUrl}/coffee-lot/${coffeeLotId}`,
+        this.httpOptions,
+      )
+      .pipe(
+        map((arr) => arr.map((r) => this.assembler.toEntityFromResource(r))),
+        catchError(this.handleError(this.translate.instant('INVENTORY_BC.ERRORS.LOAD'))),
+      );
+  }
 }

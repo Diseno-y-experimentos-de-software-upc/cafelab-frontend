@@ -35,12 +35,12 @@
         <th>{{ 'TABLE.HEADER.ALTITUDE' | translate }}</th>
         <th>{{ 'TABLE.HEADER.SUPPLIER' | translate }}</th>
         <th>{{ 'FORM.LABEL.STATUS' | translate }}</th>
-        <th colspan="3">{{ 'TABLE.HEADER.ACTIONS' | translate }}</th>
+        <th colspan="4">{{ 'TABLE.HEADER.ACTIONS' | translate }}</th>
       </tr>
       </thead>
       <tbody>
       <tr *ngIf="lots.length === 0">
-        <td colspan="8">{{ 'TABLE.NO_LOTS' | translate }}</td>
+        <td colspan="9">{{ 'TABLE.NO_LOTS' | translate }}</td>
       </tr>
       <tr *ngFor="let lot of lots">
         <td>{{ lot.lot_name }}</td>
@@ -51,6 +51,15 @@
         <td class="action-cell">
           <button class="action-button" (click)="viewLotDetails(lot)" [title]="'BUTTON.VIEW' | translate">
             <i class="material-icons">search</i>
+          </button>
+        </td>
+        <td class="action-cell">
+          <button
+            class="action-button"
+            (click)="openEconomicAnalysis(lot)"
+            [title]="'LOT_ECONOMIC_VIEW.VIEW_ACTION' | translate"
+          >
+            <i class="material-icons">analytics</i>
           </button>
         </td>
         <td class="action-cell">
