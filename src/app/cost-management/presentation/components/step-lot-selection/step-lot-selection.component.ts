@@ -27,4 +27,13 @@ export class StepLotSelectionComponent {
   @Input({ required: true }) formGroup!: FormGroup;
   @Input() lots: CoffeeLot[] = [];
   @Input() progressValue = 0;
+
+  coffeeTypeLabelKey(value: string): string {
+    const m: Record<string, string> = {
+      Arábica: 'COFFEE_LOT_BC.OPTIONS.COFFEE_TYPE.ARABICA',
+      Robusta: 'COFFEE_LOT_BC.OPTIONS.COFFEE_TYPE.ROBUSTA',
+      Mezcla: 'COFFEE_LOT_BC.OPTIONS.COFFEE_TYPE.BLEND',
+    };
+    return m[value] ?? value;
+  }
 }
