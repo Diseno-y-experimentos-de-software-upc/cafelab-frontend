@@ -12,6 +12,8 @@ export interface SupplierResource extends BaseResource {
   phone: number;
   location: string;
   specialties: string[];
+  contactPerson?: string;
+  webLink?: string;
 }
 
 export interface CreateSupplierResource {
@@ -20,6 +22,8 @@ export interface CreateSupplierResource {
   phone: number;
   location: string;
   specialties: string[];
+  contactPerson?: string;
+  webLink?: string;
 }
 
 export interface UpdateSupplierResource {
@@ -28,6 +32,8 @@ export interface UpdateSupplierResource {
   phone: number;
   location: string;
   specialties: string[];
+  contactPerson?: string;
+  webLink?: string;
 }
 
 export interface MessageResource {

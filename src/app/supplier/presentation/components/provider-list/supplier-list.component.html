@@ -106,6 +106,19 @@
       <p>{{ selectedSupplier?.specialties?.join(', ') || ( 'supply.suppliers.no_specialties' | translate ) }}</p>
     </div>
 
+    <div class="detail-group">
+      <label>{{ 'supply.suppliers.columns.contact_person' | translate }}:</label>
+      <p>{{ selectedSupplier?.contactPerson || ( 'supply.suppliers.not_provided' | translate ) }}</p>
+    </div>
+
+    <div class="detail-group">
+      <label>{{ 'supply.suppliers.columns.web_link' | translate }}:</label>
+      <p *ngIf="selectedSupplier?.webLink; else noWebLink">
+        <a [href]="selectedSupplier?.webLink" target="_blank" rel="noopener noreferrer">{{ selectedSupplier?.webLink }}</a>
+      </p>
+      <ng-template #noWebLink><p>{{ 'supply.suppliers.not_provided' | translate }}</p></ng-template>
+    </div>
+
   </div>
 
   <div *ngIf="showRegisterModal" class="modal-overlay">
@@ -172,6 +185,32 @@
             (ngModelChange)="clearRegisterFieldError('location')"
           />
           <div *ngIf="registerFieldErrors['location']" class="field-error">{{ registerFieldErrors['location'] }}</div>
+        </div>
+        <div class="form-group">
+          <label for="contactPerson">{{ 'supply.suppliers.columns.contact_person' | translate }} ({{ 'supply.suppliers.optional' | translate }})</label>
+          <input
+            type="text"
+            id="contactPerson"
+            [(ngModel)]="newSupplier.contactPerson"
+            name="contactPerson"
+            [placeholder]="'supply.suppliers.contact_person_placeholder' | translate"
+            [class.input-invalid]="!!registerFieldErrors['contactPerson']"
+            (ngModelChange)="clearRegisterFieldError('contactPerson')"
+          />
+          <div *ngIf="registerFieldErrors['contactPerson']" class="field-error">{{ registerFieldErrors['contactPerson'] }}</div>
+        </div>
+        <div class="form-group">
+          <label for="webLink">{{ 'supply.suppliers.columns.web_link' | translate }} ({{ 'supply.suppliers.optional' | translate }})</label>
+          <input
+            type="url"
+            id="webLink"
+            [(ngModel)]="newSupplier.webLink"
+            name="webLink"
+            [placeholder]="'supply.suppliers.web_link_placeholder' | translate"
+            [class.input-invalid]="!!registerFieldErrors['webLink']"
+            (ngModelChange)="clearRegisterFieldError('webLink')"
+          />
+          <div *ngIf="registerFieldErrors['webLink']" class="field-error">{{ registerFieldErrors['webLink'] }}</div>
         </div>
         <div class="form-group">
           <label>{{ 'supply.suppliers.columns.specialties' | translate }} ({{ 'supply.suppliers.specialties_hint' | translate }} - máx. 4):</label>
@@ -257,6 +296,32 @@
             (ngModelChange)="clearEditFieldError('location')"
           />
           <div *ngIf="editFieldErrors['location']" class="field-error">{{ editFieldErrors['location'] }}</div>
+        </div>
+        <div class="form-group">
+          <label for="edit-contactPerson">{{ 'supply.suppliers.columns.contact_person' | translate }} ({{ 'supply.suppliers.optional' | translate }})</label>
+          <input
+            type="text"
+            id="edit-contactPerson"
+            [(ngModel)]="editingSupplier.contactPerson"
+            name="editContactPerson"
+            [placeholder]="'supply.suppliers.contact_person_placeholder' | translate"
+            [class.input-invalid]="!!editFieldErrors['contactPerson']"
+            (ngModelChange)="clearEditFieldError('contactPerson')"
+          />
+          <div *ngIf="editFieldErrors['contactPerson']" class="field-error">{{ editFieldErrors['contactPerson'] }}</div>
+        </div>
+        <div class="form-group">
+          <label for="edit-webLink">{{ 'supply.suppliers.columns.web_link' | translate }} ({{ 'supply.suppliers.optional' | translate }})</label>
+          <input
+            type="url"
+            id="edit-webLink"
+            [(ngModel)]="editingSupplier.webLink"
+            name="editWebLink"
+            [placeholder]="'supply.suppliers.web_link_placeholder' | translate"
+            [class.input-invalid]="!!editFieldErrors['webLink']"
+            (ngModelChange)="clearEditFieldError('webLink')"
+          />
+          <div *ngIf="editFieldErrors['webLink']" class="field-error">{{ editFieldErrors['webLink'] }}</div>
         </div>
         <div class="form-group">
           <label>{{ 'supply.suppliers.columns.specialties' | translate }} (máx. 4):</label>
