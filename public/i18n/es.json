@@ -493,7 +493,6 @@
       "TITLE": "¡Envío exitoso!",
       "MESSAGE": "Tu mensaje ha sido enviado correctamente.",
       "CLOSE": "Cerrar"
-
     }
   },
   "profile": {
@@ -592,7 +591,8 @@
       "error_deleting": "Error al eliminar el portafolio"
     },
     "delete_confirmation_title": "Eliminar Portafolio",
-    "delete_confirmation_message": "¿Estás seguro que deseas eliminar el portafolio '{{name}}'? Esta acción no se puede deshacer."
+    "delete_confirmation_message": "¿Estás seguro que deseas eliminar el portafolio '{{name}}'? Esta acción no se puede deshacer.",
+    "name_portfolio": "Nombre de Portafolio"
   },
   "recipes": {
     "title": "Bebidas sin portafolio asociado",

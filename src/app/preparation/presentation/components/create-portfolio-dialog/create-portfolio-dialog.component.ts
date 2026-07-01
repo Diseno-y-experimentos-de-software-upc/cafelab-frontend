@@ -5,6 +5,7 @@ import { MatButtonModule } from '@angular/material/button';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
 import { FormsModule } from '@angular/forms';
+import { TranslateModule } from '@ngx-translate/core';   // ← agregar arriba
 
 @Component({
   selector: 'app-create-portfolio-dialog',
@@ -15,7 +16,8 @@ import { FormsModule } from '@angular/forms';
     MatButtonModule,
     MatFormFieldModule,
     MatInputModule,
-    FormsModule
+    FormsModule,
+    TranslateModule
   ],
   templateUrl: './create-portfolio-dialog.component.html',
   styleUrls: ['./create-portfolio-dialog.component.css']

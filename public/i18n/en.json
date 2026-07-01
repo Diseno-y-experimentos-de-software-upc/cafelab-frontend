@@ -589,7 +589,8 @@
       "error_deleting": "Error deleting portfolio"
     },
     "delete_confirmation_title": "Delete Portfolio",
-    "delete_confirmation_message": "Are you sure you want to delete the portfolio '{{name}}'? This action cannot be undone."
+    "delete_confirmation_message": "Are you sure you want to delete the portfolio '{{name}}'? This action cannot be undone.",
+    "name_portfolio": "Portfolio Name"
   },
   "recipes": {
     "title": "Unassigned Drinks",

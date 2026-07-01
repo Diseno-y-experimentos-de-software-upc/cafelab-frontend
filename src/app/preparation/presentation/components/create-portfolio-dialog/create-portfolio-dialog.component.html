@@ -1,13 +1,13 @@
 <h2 mat-dialog-title>{{ dialogTitle }}</h2>
 <mat-dialog-content>
   <mat-form-field appearance="outline" class="full-width">
-    <mat-label>Nombre de Portafolio</mat-label>
+    <mat-label>{{ 'portfolio.name_portfolio' }}</mat-label>
     <input matInput [(ngModel)]="portfolioName" required>
   </mat-form-field>
 </mat-dialog-content>
 <mat-dialog-actions align="end">
-  <button mat-button (click)="onCancel()">Cancelar</button>
+  <button mat-button (click)="onCancel()">{{ 'portfolio.cancel_button' }}</button>
   <button mat-raised-button color="primary" (click)="onCreate()" [disabled]="!portfolioName">
-    {{ isEditMode ? 'Guardar' : 'Crear' }}
+  {{ (isEditMode ? 'portfolio.actions.save' : 'portfolio.actions.create') | translate }}
   </button>
 </mat-dialog-actions>
