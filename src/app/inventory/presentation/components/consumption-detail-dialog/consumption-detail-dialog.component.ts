@@ -12,7 +12,8 @@ interface ConsumptionDetailData {
   lotName: string;
   consumptionKg: number;
   lotId: number;
-  finalProduct?: string;
+  consumptionReason?: string;
+  usageNotes?: string | null;
   coffeeType?: string;
   status?: string;
   currentLotStockKg?: number | null;

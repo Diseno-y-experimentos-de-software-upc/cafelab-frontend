@@ -15,7 +15,22 @@ export class InventoryEntryAssembler
       InventoryEntryListResponse
     >
 {
+  private readonly allowedReasons = ['bar', 'retail', 'samples', 'other'];
+
+  private toLocalIsoString(value: string): string {
+    const date = new Date(value);
+    if (!Number.isFinite(date.getTime())) {
+      return value;
+    }
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
+  }
+
   toEntityFromResource(resource: InventoryEntryResource): InventoryEntry {
+    const consumptionReason = resource.consumptionReason || 'other';
+    const normalizedReason = this.allowedReasons.includes(consumptionReason)
+      ? consumptionReason
+      : 'other';
     return {
       id: resource.id,
       userId: resource.userId,
@@ -25,7 +40,8 @@ export class InventoryEntryAssembler
         typeof resource.dateUsed === 'string'
           ? resource.dateUsed
           : String(resource.dateUsed),
-      finalProduct: resource.finalProduct ?? '',
+      consumptionReason: normalizedReason as InventoryEntry['consumptionReason'],
+      usageNotes: resource.usageNotes ?? '',
     };
   }
 
@@ -36,7 +52,8 @@ export class InventoryEntryAssembler
       coffeeLotId: entity.coffeeLotId,
       quantityUsed: entity.quantityUsed,
       dateUsed: entity.dateUsed,
-      finalProduct: entity.finalProduct,
+      consumptionReason: entity.consumptionReason,
+      usageNotes: entity.usageNotes,
     };
   }
 
@@ -45,12 +62,13 @@ export class InventoryEntryAssembler
   }
 
   toCreateResource(entity: InventoryEntry): CreateInventoryEntryBody {
-    const iso = new Date(entity.dateUsed).toISOString();
+    const usageNotes = entity.usageNotes?.trim();
     return {
       coffeeLotId: Number(entity.coffeeLotId),
       quantityUsed: Number(entity.quantityUsed),
-      dateUsed: iso.slice(0, 19),
-      finalProduct: entity.finalProduct.trim(),
+      dateUsed: this.toLocalIsoString(entity.dateUsed),
+      consumptionReason: entity.consumptionReason,
+      ...(usageNotes ? { usageNotes } : {}),
     };
   }
 
@@ -59,7 +77,8 @@ export class InventoryEntryAssembler
       coffeeLotId: Number(entity.coffeeLotId),
       quantityUsed: Number(entity.quantityUsed),
       dateUsed: this.toCreateResource(entity).dateUsed,
-      finalProduct: entity.finalProduct.trim(),
+      consumptionReason: entity.consumptionReason,
+      ...(entity.usageNotes?.trim() ? { usageNotes: entity.usageNotes.trim() } : {}),
     };
   }
 }
