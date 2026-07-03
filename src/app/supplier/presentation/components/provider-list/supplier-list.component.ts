@@ -38,6 +38,8 @@ export class SupplierListComponent implements OnInit {
     location: '',
     specialties: [],
     userId: 0,
+    contactPerson: '',
+    webLink: '',
   };
 
   editingSupplier: Supplier = {
@@ -48,6 +50,8 @@ export class SupplierListComponent implements OnInit {
     location: '',
     specialties: [],
     userId: 0,
+    contactPerson: '',
+    webLink: '',
   };
 
   selectedSupplier: Supplier | null = null;
@@ -386,6 +390,8 @@ export class SupplierListComponent implements OnInit {
       location: '',
       specialties: [],
       userId: 0,
+      contactPerson: '',
+      webLink: '',
     };
 
     this.newSpecialties = [];
@@ -503,7 +509,7 @@ export class SupplierListComponent implements OnInit {
     mode: 'register' | 'edit',
   ): boolean {
     const target = mode === 'register' ? this.registerFieldErrors : this.editFieldErrors;
-    (['name', 'email', 'phone', 'location'] as const).forEach((k) => delete target[k]);
+    (['name', 'email', 'phone', 'location', 'contactPerson', 'webLink'] as const).forEach((k) => delete target[k]);
     delete target['specialties'];
 
     let ok = true;
@@ -587,6 +593,32 @@ export class SupplierListComponent implements OnInit {
       ok = false;
     }
 
+    // Campos opcionales TUS01: solo se validan si tienen valor
+    const contactPerson = (model.contactPerson ?? '').trim();
+    if (contactPerson) {
+      if (contactPerson.length < 2) {
+        target['contactPerson'] = t('SUPPLIER_BC.VALIDATION.CONTACT_PERSON_MIN_LENGTH');
+        ok = false;
+      } else if (contactPerson.length > 100) {
+        target['contactPerson'] = t('SUPPLIER_BC.VALIDATION.CONTACT_PERSON_MAX_LENGTH');
+        ok = false;
+      } else if (!/^[A-Za-zÁÉÍÓÚáéíóúÑñÜü\s.]+$/.test(contactPerson)) {
+        target['contactPerson'] = t('SUPPLIER_BC.VALIDATION.CONTACT_PERSON_INVALID_CHARACTERS');
+        ok = false;
+      }
+    }
+
+    const webLink = (model.webLink ?? '').trim();
+    if (webLink) {
+      if (webLink.length > 200) {
+        target['webLink'] = t('SUPPLIER_BC.VALIDATION.WEB_LINK_MAX_LENGTH');
+        ok = false;
+      } else if (!/^https?:\/\/[\w.-]+(:\d+)?(\/\S*)?$/.test(webLink)) {
+        target['webLink'] = t('SUPPLIER_BC.VALIDATION.WEB_LINK_INVALID');
+        ok = false;
+      }
+    }
+
     return ok;
   }
 
@@ -666,6 +698,8 @@ export class SupplierListComponent implements OnInit {
       'location',
       'specialties',
       'userId',
+      'contactPerson',
+      'webLink',
     ]);
     return allowed.has(leaf) ? leaf : null;
   }

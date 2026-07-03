@@ -6,4 +6,6 @@ export interface Supplier {
   phone: number;
   location: string;
   specialties: string[];
+  contactPerson?: string;
+  webLink?: string;
 }

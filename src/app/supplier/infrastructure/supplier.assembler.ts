@@ -19,6 +19,8 @@ export class SupplierAssembler
       phone: Number(resource.phone),
       location: resource.location ?? '',
       specialties: resource.specialties ? [...resource.specialties] : [],
+      contactPerson: resource.contactPerson ?? '',
+      webLink: resource.webLink ?? '',
     };
   }
 
@@ -31,6 +33,8 @@ export class SupplierAssembler
       phone: Number(entity.phone),
       location: entity.location,
       specialties: entity.specialties ?? [],
+      contactPerson: entity.contactPerson ?? '',
+      webLink: entity.webLink ?? '',
     };
   }
 
@@ -45,6 +49,8 @@ export class SupplierAssembler
       phone: Number(entity.phone),
       location: entity.location.trim(),
       specialties: entity.specialties ?? [],
+      contactPerson: entity.contactPerson?.trim() || undefined,
+      webLink: entity.webLink?.trim() || undefined,
     };
   }
 
@@ -55,6 +61,8 @@ export class SupplierAssembler
       phone: Number(entity.phone),
       location: entity.location.trim(),
       specialties: entity.specialties ?? [],
+      contactPerson: entity.contactPerson?.trim() || undefined,
+      webLink: entity.webLink?.trim() || undefined,
     };
   }
 }

@@ -417,12 +417,18 @@
       },
       "no_specialties": "N/A",
       "specialties_hint": "separadas por coma",
+      "optional": "opcional",
+      "not_provided": "No especificado",
+      "contact_person_placeholder": "Ej: María López",
+      "web_link_placeholder": "https://ejemplo.com",
       "columns": {
         "name": "Nombre",
         "email": "Correo Electrónico",
         "phone": "Teléfono",
         "location": "Ubicación",
         "specialties": "Especialidades",
+        "contact_person": "Persona de contacto",
+        "web_link": "Enlace web",
         "user_id": "ID de Usuario"
       },
       "add_specialty_placeholder": "Agregar Especialidad",
@@ -1334,7 +1340,12 @@
       "SPECIALTY_MAX_LENGTH": "Cada especialidad no puede tener más de 100 caracteres.",
       "SPECIALTY_ONLY_NUMBERS": "Una especialidad no puede contener solo números.",
       "SPECIALTY_ONLY_PUNCTUATION": "Una especialidad no puede contener solo comas, puntos o punto y coma.",
-      "SPECIALTY_INVALID_CHARACTERS": "Una especialidad solo puede contener letras, espacios y tildes."
+      "SPECIALTY_INVALID_CHARACTERS": "Una especialidad solo puede contener letras, espacios y tildes.",
+      "CONTACT_PERSON_MIN_LENGTH": "La persona de contacto debe tener al menos 2 caracteres.",
+      "CONTACT_PERSON_MAX_LENGTH": "La persona de contacto no puede tener más de 100 caracteres.",
+      "CONTACT_PERSON_INVALID_CHARACTERS": "La persona de contacto solo puede contener letras, espacios, tildes y puntos.",
+      "WEB_LINK_MAX_LENGTH": "El enlace web no puede tener más de 200 caracteres.",
+      "WEB_LINK_INVALID": "El enlace web debe ser una URL http o https válida."
     },
     "CONFIRM_DELETE": "¿Está seguro de que desea eliminar este proveedor?",
     "ERRORS": {
