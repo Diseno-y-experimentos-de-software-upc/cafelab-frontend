@@ -8,18 +8,22 @@
           <th>{{ 'INVENTORY.CONSUMPTION_TABLE.DATE' | translate }}</th>
           <th>{{ 'INVENTORY.CONSUMPTION_TABLE.LOT' | translate }}</th>
           <th>{{ 'INVENTORY.CONSUMPTION_TABLE.CONSUMPTION' | translate }}</th>
+          <th>{{ 'INVENTORY.CONSUMPTION_TABLE.CONSUMPTION_REASON' | translate }}</th>
+          <th>{{ 'INVENTORY.CONSUMPTION_TABLE.USAGE_NOTES' | translate }}</th>
           <th>{{ 'INVENTORY.CONSUMPTION_TABLE.CURRENT_STOCK' | translate }}</th>
           <th>{{ 'INVENTORY.CONSUMPTION_TABLE.ACTIONS' | translate }}</th>
         </tr>
       </thead>
       <tbody>
         <tr *ngIf="tableData.length === 0">
-          <td colspan="5" class="empty-message">{{ 'INVENTORY.CONSUMPTION_TABLE.NO_DATA' | translate }}</td>
+          <td colspan="7" class="empty-message">{{ 'INVENTORY.CONSUMPTION_TABLE.NO_DATA' | translate }}</td>
         </tr>
         <tr *ngFor="let item of tableData">
           <td>{{ item.date }}</td>
           <td>{{ item.lotName }}</td>
           <td>{{ item.consumptionKg | number:'1.0-2' }} {{ 'COMMON.KG' | translate }}</td>
+          <td>{{ item.consumptionReason }}</td>
+          <td class="notes-cell">{{ item.usageNotes || ('COMMON.NOT_AVAILABLE' | translate) }}</td>
           <td>
             <ng-container *ngIf="item.currentLotStockKg != null; else stockNa">
               {{ item.currentLotStockKg | number:'1.0-2' }} {{ 'COMMON.KG' | translate }}

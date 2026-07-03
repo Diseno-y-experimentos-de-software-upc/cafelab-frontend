@@ -1,23 +1,21 @@
 import { Component, Inject, OnInit } from '@angular/core';
-import { AbstractControl, FormBuilder, FormGroup, ValidationErrors, Validators, ReactiveFormsModule } from '@angular/forms';
-import { MatDialogRef, MAT_DIALOG_DATA } from '@angular/material/dialog';
+import { AbstractControl, FormBuilder, FormGroup, ReactiveFormsModule, ValidationErrors, Validators } from '@angular/forms';
 import { CommonModule } from '@angular/common';
+import { MatButtonModule } from '@angular/material/button';
+import { MatCheckbox } from '@angular/material/checkbox';
+import { MatNativeDateModule, provideNativeDateAdapter } from '@angular/material/core';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { MAT_DIALOG_DATA, MatDialogActions, MatDialogContent, MatDialogRef, MatDialogTitle } from '@angular/material/dialog';
 import { MatFormFieldModule } from '@angular/material/form-field';
 import { MatInputModule } from '@angular/material/input';
-import { MatDialogActions, MatDialogContent, MatDialogTitle } from '@angular/material/dialog';
-import { MatButtonModule } from '@angular/material/button';
 import { MatSelectModule } from '@angular/material/select';
-import { MatDatepickerModule } from '@angular/material/datepicker';
-import { MatNativeDateModule } from '@angular/material/core';
-import { InventoryApi } from '../../../application/inventory.api';
-import { InventoryEntry } from '../../../domain/model/inventory-entry.entity';
-import { CoffeeLot } from '../../../../coffee-lot/domain/model/coffee-lot.entity';
-import { CoffeeLotApi } from '../../../../coffee-lot/application/coffee-lot.api';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
-import { provideNativeDateAdapter } from '@angular/material/core';
-import {MatCheckbox} from '@angular/material/checkbox';
+import { CoffeeLotApi } from '../../../../coffee-lot/application/coffee-lot.api';
+import { CoffeeLot } from '../../../../coffee-lot/domain/model/coffee-lot.entity';
+import { InventoryApi } from '../../../application/inventory.api';
+import { InventoryEntry } from '../../../domain/model/inventory-entry.entity';
 
 interface ConsumptionSummary {
   lotName: string;
@@ -30,9 +28,10 @@ interface ConsumptionSummary {
 interface PreviousConsumption {
   date: string;
   quantity: number;
+  consumptionReason: string;
 }
 
-
+type ConsumptionReason = InventoryEntry['consumptionReason'];
 
 @Component({
   selector: 'app-register-consumption-dialog',
@@ -52,11 +51,9 @@ interface PreviousConsumption {
     MatDialogTitle,
     MatButtonModule,
     TranslateModule,
-    MatCheckbox
+    MatCheckbox,
   ],
-  providers: [
-    [provideNativeDateAdapter()],
-  ]
+  providers: [[provideNativeDateAdapter()]],
 })
 export class RegisterConsumptionDialogComponent implements OnInit {
   private static maxTwoDecimalsValidator(control: AbstractControl): ValidationErrors | null {
@@ -83,6 +80,12 @@ export class RegisterConsumptionDialogComponent implements OnInit {
   previousConsumptions: PreviousConsumption[] = [];
   loading = false;
   error: string | null = null;
+  readonly consumptionReasonOptions: Array<{ value: ConsumptionReason; labelKey: string }> = [
+    { value: 'bar', labelKey: 'INVENTORY.CONSUMPTION_REASON.BAR' },
+    { value: 'retail', labelKey: 'INVENTORY.CONSUMPTION_REASON.RETAIL' },
+    { value: 'samples', labelKey: 'INVENTORY.CONSUMPTION_REASON.SAMPLES' },
+    { value: 'other', labelKey: 'INVENTORY.CONSUMPTION_REASON.OTHER' },
+  ];
 
   minDate = new Date();
   maxDate = new Date(new Date().setFullYear(new Date().getFullYear() + 5));
@@ -101,25 +104,23 @@ export class RegisterConsumptionDialogComponent implements OnInit {
     private translate: TranslateService,
   ) {
     this.form = this.fb.group({
-      date: [new Date(),
-        [
-        Validators.required,
-        this.dateRangeValidation
-        ]
-      ],
+      date: [new Date(), [Validators.required, this.dateRangeValidation]],
       lotId: ['', Validators.required],
-      finalProduct: ['',
+      finalProduct: [
+        '',
         [
-        Validators.required,
-        Validators.maxLength(100),
-        Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9 .,-]+$/)
-        ]
+          Validators.required,
+          Validators.maxLength(100),
+          Validators.pattern(/^[A-Za-zÃÃ‰ÃÃ“ÃšÃ¡Ã©Ã­Ã³ÃºÃ‘Ã±0-9 .,-]+$/),
+        ],
       ],
+      consumptionReason: ['', Validators.required],
+      usageNotes: ['', Validators.maxLength(1000)],
       consumptionKg: [
         null,
         [Validators.required, Validators.min(0.01), RegisterConsumptionDialogComponent.maxTwoDecimalsValidator],
       ],
-      noEdit: [false, Validators.requiredTrue]
+      noEdit: [false, Validators.requiredTrue],
     });
 
     this.form.valueChanges.subscribe(() => this.updateSummary());
@@ -205,38 +206,51 @@ export class RegisterConsumptionDialogComponent implements OnInit {
         this.previousConsumptions = lotEntries.map((entry) => ({
           date: new Date(entry.dateUsed).toLocaleDateString(),
           quantity: entry.quantityUsed,
+          consumptionReason: this.consumptionReasonLabel(entry.consumptionReason),
         }));
       });
   }
 
   submit(): void {
-    if (this.form.valid) {
-      const formValue = this.form.value;
-      const coffeeLotId = Number(formValue.lotId);
-
-      if (!coffeeLotId || coffeeLotId <= 0) {
-        this.error = this.translate.instant('INVENTORY.ERRORS.SELECT_VALID_LOT');
-        return;
-      }
-
-      const qty = Math.round(Number(formValue.consumptionKg) * 100) / 100;
-      const lot = this.availableLots.find((l) => Number(l.id) === coffeeLotId);
-      if (lot && qty > lot.weight) {
-        this.error = this.translate.instant('INVENTORY.ERRORS.QUANTITY_EXCEEDS_STOCK');
-        return;
-      }
-
-      const payload: InventoryEntry = {
-        id: 0,
-        userId: 0,
-        coffeeLotId,
-        quantityUsed: qty,
-        dateUsed: (formValue.date as Date).toISOString(),
-        finalProduct: String(formValue.finalProduct).trim(),
-      };
-
-      this.dialogRef.close(payload);
+    if (!this.form.valid) {
+      return;
     }
+
+    const formValue = this.form.value;
+    const coffeeLotId = Number(formValue.lotId);
+    if (!coffeeLotId || coffeeLotId <= 0) {
+      this.error = this.translate.instant('INVENTORY.ERRORS.SELECT_VALID_LOT');
+      return;
+    }
+
+    const qty = Math.round(Number(formValue.consumptionKg) * 100) / 100;
+    const finalProduct = String(formValue.finalProduct ?? '').trim();
+    const consumptionReason = formValue.consumptionReason as ConsumptionReason;
+    const usageNotes = String(formValue.usageNotes ?? '').trim();
+    const lot = this.availableLots.find((l) => Number(l.id) === coffeeLotId);
+
+    if (lot && qty > lot.weight) {
+      this.error = this.translate.instant('INVENTORY.ERRORS.QUANTITY_EXCEEDS_STOCK');
+      return;
+    }
+
+    if (!this.consumptionReasonOptions.some((option) => option.value === consumptionReason)) {
+      this.error = this.translate.instant('INVENTORY.ERRORS.SELECT_CONSUMPTION_REASON');
+      return;
+    }
+
+    const payload: InventoryEntry = {
+      id: 0,
+      userId: 0,
+      coffeeLotId,
+      quantityUsed: qty,
+      dateUsed: (formValue.date as Date).toISOString(),
+      finalProduct,
+      consumptionReason,
+      usageNotes,
+    };
+
+    this.dialogRef.close(payload);
   }
 
   cancel(): void {
@@ -259,28 +273,33 @@ export class RegisterConsumptionDialogComponent implements OnInit {
     return lot ? lot.lot_name : '';
   }
 
-    coffeeTypeLabelKey(type: string): string {
+  consumptionReasonLabel(value: string | null | undefined): string {
+    const option = this.consumptionReasonOptions.find((item) => item.value === value);
+    return option
+      ? this.translate.instant(option.labelKey)
+      : this.translate.instant('COMMON.NOT_AVAILABLE');
+  }
+  coffeeTypeLabelKey(type: string): string {
     const m: Record<string, string> = {
-      Arábica: 'COFFEE_LOT_BC.OPTIONS.COFFEE_TYPE.ARABICA',
+      ArÃ¡bica: 'COFFEE_LOT_BC.OPTIONS.COFFEE_TYPE.ARABICA',
       Robusta: 'COFFEE_LOT_BC.OPTIONS.COFFEE_TYPE.ROBUSTA',
       Mezcla: 'COFFEE_LOT_BC.OPTIONS.COFFEE_TYPE.BLEND',
     };
     return m[type] ?? type;
   }
 
-  private dateRangeValidation(control: any) {
+  private dateRangeValidation(control: AbstractControl): ValidationErrors | null {
     const value = control.value;
-
-    if (!value) return null;
+    if (!value) {
+      return null;
+    }
 
     const selectedDate = new Date(value);
     const today = new Date();
-
     today.setHours(0, 0, 0, 0);
 
     const maxDate = new Date(today);
     maxDate.setFullYear(today.getFullYear() + 5);
-
     selectedDate.setHours(0, 0, 0, 0);
 
     if (selectedDate < today || selectedDate > maxDate) {
@@ -289,5 +308,4 @@ export class RegisterConsumptionDialogComponent implements OnInit {
 
     return null;
   }
-
 }

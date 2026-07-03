@@ -14,7 +14,8 @@ export interface ConsumptionTableItem {
   lotName: string;
   consumptionKg: number;
   lotId: number;
-  finalProduct?: string;
+  consumptionReason: string;
+  usageNotes?: string | null;
   coffeeType?: string;
   status?: string;
   
@@ -61,8 +62,8 @@ export class ConsumptionTableComponent implements OnChanges {
               }),
           consumptionKg: entry.quantityUsed,
           lotId: entry.coffeeLotId,
-          finalProduct:
-            entry.finalProduct || this.translate.instant('COMMON.NOT_AVAILABLE'),
+          consumptionReason: this.consumptionReasonLabel(entry.consumptionReason),
+          usageNotes: entry.usageNotes?.trim(),
           coffeeType: lot
             ? lot.coffee_type
             : this.translate.instant('COMMON.NOT_AVAILABLE'),
@@ -81,5 +82,17 @@ export class ConsumptionTableComponent implements OnChanges {
       width: '500px',
       data: item,
     });
+  }
+
+  private consumptionReasonLabel(value: string | null | undefined): string {
+    const labels: Record<string, string> = {
+      bar: 'INVENTORY.CONSUMPTION_REASON.BAR',
+      retail: 'INVENTORY.CONSUMPTION_REASON.RETAIL',
+      samples: 'INVENTORY.CONSUMPTION_REASON.SAMPLES',
+      other: 'INVENTORY.CONSUMPTION_REASON.OTHER',
+    };
+    return value && labels[value]
+      ? this.translate.instant(labels[value])
+      : this.translate.instant('COMMON.NOT_AVAILABLE');
   }
 }

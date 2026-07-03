@@ -56,6 +56,12 @@
   width: 50px;
 }
 
+.notes-cell {
+  max-width: 240px;
+  white-space: normal;
+  word-break: break-word;
+}
+
 .view-button {
   background: none;
   border: none;

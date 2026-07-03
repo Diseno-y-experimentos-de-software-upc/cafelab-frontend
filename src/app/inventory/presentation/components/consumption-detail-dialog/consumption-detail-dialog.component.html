@@ -21,8 +21,13 @@
       </div>
 
       <div class="detail-item">
-        <span class="detail-label">{{ 'INVENTORY.CONSUMPTION_DETAIL.FINAL_PRODUCT' | translate }}:</span>
-        <span class="detail-value">{{ data.finalProduct || ('COMMON.NOT_AVAILABLE' | translate) }}</span>
+        <span class="detail-label">{{ 'INVENTORY.CONSUMPTION_DETAIL.CONSUMPTION_REASON' | translate }}:</span>
+        <span class="detail-value">{{ data.consumptionReason || ('COMMON.NOT_AVAILABLE' | translate) }}</span>
+      </div>
+
+      <div class="detail-item" *ngIf="data.usageNotes">
+        <span class="detail-label">{{ 'INVENTORY.CONSUMPTION_DETAIL.USAGE_NOTES' | translate }}:</span>
+        <span class="detail-value">{{ data.usageNotes }}</span>
       </div>
 
       <div class="detail-item">

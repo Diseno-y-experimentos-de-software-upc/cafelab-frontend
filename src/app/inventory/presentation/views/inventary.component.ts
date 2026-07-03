@@ -21,6 +21,8 @@ import { forkJoin, of } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { InventoryEntry } from '../../domain/model/inventory-entry.entity';
 import { Router } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
+import { API_ERROR_UNAUTHORIZED, getUserFacingApiMessage } from '../../../shared/infrastructure/api-error-message';
 
 interface CoffeeTypeMetrics {
   totalKg: number;
@@ -300,7 +302,7 @@ export class InventaryComponent implements OnInit {
           },
           error: (err) => {
             console.error('Error al registrar consumo:', err);
-            this.error = this.translate.instant('INVENTORY.ERRORS.REGISTER_CONSUMPTION');
+            this.error = this.resolveCreateConsumptionError(err);
           }
         });
       }
@@ -314,9 +316,47 @@ export class InventaryComponent implements OnInit {
     return (
       entry.coffeeLotId > 0 &&
       entry.quantityUsed > 0 &&
-      (entry.finalProduct?.trim().length ?? 0) > 0 &&
+      ['bar', 'retail', 'samples', 'other'].includes(entry.consumptionReason) &&
+      (entry.usageNotes?.length ?? 0) <= 1000 &&
       lotExists
     );
+  }
+
+  private resolveCreateConsumptionError(error: unknown): string {
+    const fallback = this.translate.instant('INVENTORY.ERRORS.REGISTER_CONSUMPTION');
+    const message = getUserFacingApiMessage(
+      error,
+      fallback,
+      this.translate.instant('INVENTORY.ERRORS.UNAUTHORIZED'),
+    );
+    const normalized = message.toLowerCase();
+
+    if (error instanceof HttpErrorResponse) {
+      if (error.status === 400) {
+        return this.translate.instant('INVENTORY.ERRORS.BACKEND_VALIDATION');
+      }
+      if (error.status === 401) {
+        return this.translate.instant('INVENTORY.ERRORS.UNAUTHORIZED');
+      }
+      if (error.status === 403) {
+        return this.translate.instant('INVENTORY.ERRORS.FORBIDDEN_LOT');
+      }
+    }
+
+    if (error instanceof Error && error.message === API_ERROR_UNAUTHORIZED) {
+      return this.translate.instant('INVENTORY.ERRORS.UNAUTHORIZED');
+    }
+    if (normalized.includes('stock') || normalized.includes('insuficiente')) {
+      return this.translate.instant('INVENTORY.ERRORS.INSUFFICIENT_STOCK');
+    }
+    if (normalized.includes('forbidden') || normalized.includes('403') || normalized.includes('pertenece')) {
+      return this.translate.instant('INVENTORY.ERRORS.FORBIDDEN_LOT');
+    }
+    if (normalized.includes('validation') || normalized.includes('validaci')) {
+      return this.translate.instant('INVENTORY.ERRORS.BACKEND_VALIDATION');
+    }
+
+    return message;
   }
 
   goToDashboard(): void {

@@ -17,13 +17,13 @@
       <div class="form-column">
         <mat-form-field appearance="outline" class="full-width">
           <mat-label>{{ 'INVENTORY.CONSUMPTION_DIALOG.DATE' | translate }}</mat-label>
-        <input matInput [matDatepicker]="picker" formControlName="date" [min]="minDate" [max]="maxDate" required>
+          <input matInput [matDatepicker]="picker" formControlName="date" [min]="minDate" [max]="maxDate" required>
 
           <mat-datepicker-toggle matSuffix [for]="picker"></mat-datepicker-toggle>
           <mat-datepicker #picker></mat-datepicker>
 
           <mat-error *ngIf="form.get('date')?.hasError('invalidDateRange')">
-            Fecha inválida.
+            {{ 'INVENTORY.ERRORS.INVALID_DATE_RANGE' | translate }}
           </mat-error>
         </mat-form-field>
 
@@ -45,13 +45,39 @@
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">
+          <mat-label>{{ 'INVENTORY.CONSUMPTION_DIALOG.CONSUMPTION_REASON' | translate }}</mat-label>
+          <mat-select formControlName="consumptionReason" required>
+            <mat-option *ngFor="let option of consumptionReasonOptions" [value]="option.value">
+              {{ option.labelKey | translate }}
+            </mat-option>
+          </mat-select>
+          <mat-error *ngIf="form.get('consumptionReason')?.hasError('required')">
+            {{ 'INVENTORY.ERRORS.SELECT_CONSUMPTION_REASON' | translate }}
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
+          <mat-label>{{ 'INVENTORY.CONSUMPTION_DIALOG.USAGE_NOTES' | translate }}</mat-label>
+          <textarea matInput formControlName="usageNotes" rows="4" maxlength="1000"></textarea>
+          <mat-hint align="end">{{ form.get('usageNotes')?.value?.length || 0 }}/1000</mat-hint>
+          <mat-error *ngIf="form.get('usageNotes')?.hasError('maxlength')">
+            {{ 'INVENTORY.ERRORS.NOTES_MAX_LENGTH' | translate }}
+          </mat-error>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width">
           <mat-label>{{ 'INVENTORY.CONSUMPTION_DIALOG.CONSUMPTION_KG' | translate }}</mat-label>
           <input matInput type="number" formControlName="consumptionKg" min="0.01" step="0.01" required>
+          <mat-error *ngIf="form.get('consumptionKg')?.hasError('required')">
+            {{ 'INVENTORY.ERRORS.QUANTITY_REQUIRED' | translate }}
+          </mat-error>
+          <mat-error *ngIf="form.get('consumptionKg')?.hasError('min')">
+            {{ 'INVENTORY.ERRORS.QUANTITY_POSITIVE' | translate }}
+          </mat-error>
           <mat-error *ngIf="form.get('consumptionKg')?.hasError('maxDecimals')">
             {{ 'INVENTORY.ERRORS.CONSUMPTION_DECIMALS' | translate }}
           </mat-error>
         </mat-form-field>
-
       </div>
 
       <div class="summary-column">
@@ -88,7 +114,7 @@
 
         <div class="movements-box" *ngIf="previousConsumptions.length > 0">
           <div class="movement-item" *ngFor="let consumption of previousConsumptions">
-            <span class="movement-date">{{ consumption.date }}</span>
+            <span class="movement-date">{{ consumption.date }} - {{ consumption.consumptionReason }}</span>
             <span class="movement-quantity">{{ consumption.quantity | number:'1.0-2' }} {{ 'COMMON.KG' | translate }}</span>
           </div>
         </div>
@@ -97,15 +123,14 @@
           <p>{{ 'INVENTORY.CONSUMPTION_DIALOG.NO_PREVIOUS_MOVEMENTS' | translate }}</p>
         </div>
       </div>
-
     </div>
 
     <div class="confirmation-warning">
-    <mat-checkbox type="checkbox" formControlName="noEdit" class="confirmation-checkbox">
-      <span class="warning-text">
-      {{  'INVENTORY.CONSUMPTION_DIALOG.CONFIRMATION_WARNING' | translate }}
+      <mat-checkbox type="checkbox" formControlName="noEdit" class="confirmation-checkbox">
+        <span class="warning-text">
+          {{ 'INVENTORY.CONSUMPTION_DIALOG.NO_EDIT_WARNING' | translate }}
         </span>
-    </mat-checkbox>
+      </mat-checkbox>
     </div>
   </mat-dialog-content>
 
