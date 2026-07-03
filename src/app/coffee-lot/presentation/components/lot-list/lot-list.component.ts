@@ -13,11 +13,13 @@ import { Supplier } from '../../../../supplier/domain/model/supplier.entity';
 import type { ApiError } from '../../../../shared/infrastructure/base-api-endpoint';
 import { getUserFacingApiMessage } from '../../../../shared/infrastructure/api-error-message';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
+import { MatDialog, MatDialogModule } from '@angular/material/dialog';
+import { LotEconomicAnalysisDialogComponent } from '../lot-economic-analysis-dialog/lot-economic-analysis-dialog.component';
 
 @Component({
   selector: 'app-lot-list',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslateModule, RouterModule, MatSnackBarModule],
+  imports: [CommonModule, FormsModule, TranslateModule, RouterModule, MatSnackBarModule, MatDialogModule],
   templateUrl: './lot-list.component.html',
   styleUrls: ['./lot-list.component.css'],
 })
@@ -51,7 +53,8 @@ export class LotListComponent implements OnInit {
     'Rainforest Alliance',
   ] as const;
 
-  coffeeTypeLabelKey(value: string): string {
+  coffeeTypeLabelKey(value: string | undefined | null): string {
+    if (!value) return '';
     const m: Record<string, string> = {
       Arábica: 'COFFEE_LOT_BC.OPTIONS.COFFEE_TYPE.ARABICA',
       Robusta: 'COFFEE_LOT_BC.OPTIONS.COFFEE_TYPE.ROBUSTA',
@@ -92,6 +95,7 @@ export class LotListComponent implements OnInit {
     private readonly translateService: TranslateService,
     private readonly authService: AuthService,
     private readonly snackBar: MatSnackBar,
+    private readonly dialog: MatDialog,
   ) {}
 
   ngOnInit(): void {
@@ -184,6 +188,20 @@ export class LotListComponent implements OnInit {
     this.selectedLot = { ...lot };
     this.showLotDetails = true;
     this.error = null;
+  }
+
+  openEconomicAnalysis(lot: CoffeeLot): void {
+    if (!lot.id) {
+      this.error = this.translateService.instant('COFFEE_LOT_BC.ERRORS.MISSING_ID');
+      return;
+    }
+    this.dialog.open(LotEconomicAnalysisDialogComponent, {
+      width: '800px',
+      maxWidth: '95vw',
+      maxHeight: '90vh',
+      autoFocus: false,
+      data: { lotId: lot.id },
+    });
   }
 
   closeLotDetails(): void {

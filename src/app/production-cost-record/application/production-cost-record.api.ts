@@ -38,4 +38,8 @@ export class ProductionCostRecordApi {
   annull(id: number, body: AnnullProductionCostRecordBody): Observable<ProductionCostRecord> {
     return this.endpoint.annullWithBody(id, body);
   }
+
+  getByCoffeeLotId(coffeeLotId: number): Observable<ProductionCostRecord[]> {
+    return this.endpoint.getByCoffeeLotId(coffeeLotId);
+  }
 }

@@ -106,6 +106,14 @@ export class RegisterConsumptionDialogComponent implements OnInit {
     this.form = this.fb.group({
       date: [new Date(), [Validators.required, this.dateRangeValidation]],
       lotId: ['', Validators.required],
+      finalProduct: [
+        '',
+        [
+          Validators.required,
+          Validators.maxLength(100),
+          Validators.pattern(/^[A-Za-zÃÃ‰ÃÃ“ÃšÃ¡Ã©Ã­Ã³ÃºÃ‘Ã±0-9 .,-]+$/),
+        ],
+      ],
       consumptionReason: ['', Validators.required],
       usageNotes: ['', Validators.maxLength(1000)],
       consumptionKg: [
@@ -216,6 +224,7 @@ export class RegisterConsumptionDialogComponent implements OnInit {
     }
 
     const qty = Math.round(Number(formValue.consumptionKg) * 100) / 100;
+    const finalProduct = String(formValue.finalProduct ?? '').trim();
     const consumptionReason = formValue.consumptionReason as ConsumptionReason;
     const usageNotes = String(formValue.usageNotes ?? '').trim();
     const lot = this.availableLots.find((l) => Number(l.id) === coffeeLotId);
@@ -236,6 +245,7 @@ export class RegisterConsumptionDialogComponent implements OnInit {
       coffeeLotId,
       quantityUsed: qty,
       dateUsed: (formValue.date as Date).toISOString(),
+      finalProduct,
       consumptionReason,
       usageNotes,
     };
@@ -268,6 +278,14 @@ export class RegisterConsumptionDialogComponent implements OnInit {
     return option
       ? this.translate.instant(option.labelKey)
       : this.translate.instant('COMMON.NOT_AVAILABLE');
+  }
+  coffeeTypeLabelKey(type: string): string {
+    const m: Record<string, string> = {
+      ArÃ¡bica: 'COFFEE_LOT_BC.OPTIONS.COFFEE_TYPE.ARABICA',
+      Robusta: 'COFFEE_LOT_BC.OPTIONS.COFFEE_TYPE.ROBUSTA',
+      Mezcla: 'COFFEE_LOT_BC.OPTIONS.COFFEE_TYPE.BLEND',
+    };
+    return m[type] ?? type;
   }
 
   private dateRangeValidation(control: AbstractControl): ValidationErrors | null {

@@ -35,22 +35,31 @@
         <th>{{ 'TABLE.HEADER.ALTITUDE' | translate }}</th>
         <th>{{ 'TABLE.HEADER.SUPPLIER' | translate }}</th>
         <th>{{ 'FORM.LABEL.STATUS' | translate }}</th>
-        <th colspan="3">{{ 'TABLE.HEADER.ACTIONS' | translate }}</th>
+        <th colspan="4">{{ 'TABLE.HEADER.ACTIONS' | translate }}</th>
       </tr>
       </thead>
       <tbody>
       <tr *ngIf="lots.length === 0">
-        <td colspan="8">{{ 'TABLE.NO_LOTS' | translate }}</td>
+        <td colspan="9">{{ 'TABLE.NO_LOTS' | translate }}</td>
       </tr>
       <tr *ngFor="let lot of lots">
         <td>{{ lot.lot_name }}</td>
-        <td>{{ lot.coffee_type }}</td>
+        <td>{{ coffeeTypeLabelKey(lot.coffee_type) | translate }}</td>
         <td>{{ lot.altitude }}</td>
         <td>{{ getSupplierName(lot.supplier_id) }}</td>
         <td>{{ getStatusText(lot.status) }}</td>
         <td class="action-cell">
           <button class="action-button" (click)="viewLotDetails(lot)" [title]="'BUTTON.VIEW' | translate">
             <i class="material-icons">search</i>
+          </button>
+        </td>
+        <td class="action-cell">
+          <button
+            class="action-button"
+            (click)="openEconomicAnalysis(lot)"
+            [title]="'LOT_ECONOMIC_VIEW.VIEW_ACTION' | translate"
+          >
+            <i class="material-icons">analytics</i>
           </button>
         </td>
         <td class="action-cell">
@@ -164,7 +173,7 @@
             </select>
             <button  class="btn-addC" type="button" (click)="addCertification(newCertification)">{{ 'BUTTON.ADD' | translate }}</button>
             <div *ngFor="let cert of newLot.certifications; let i = index">
-              {{ cert }}
+              {{ certificationLabelKey(cert) | translate }}
               <button  class="btn-deleteC" type="button" (click)="removeCertification(i)">{{ 'BUTTON.REMOVE' | translate }}</button>
             </div>
           </div>
@@ -194,7 +203,7 @@
 
       <div class="detail-group">
         <label>{{ 'FORM.LABEL.COFFEE_TYPE' | translate }}:</label>
-        <p>{{ selectedLot?.coffee_type }}</p>
+        <p>{{ coffeeTypeLabelKey(selectedLot?.coffee_type) | translate }}</p>
       </div>
 
       <div class="detail-group">
@@ -233,7 +242,7 @@
       <h3>{{ 'FORM.LABEL.CERTIFICATIONS' | translate }}:</h3>
       <ul class="certifications-list">
         <li *ngFor="let cert of selectedLot?.certifications">
-          {{ cert }}
+          {{ certificationLabelKey(cert) | translate }}
         </li>
         <li *ngIf="!selectedLot?.certifications?.length">{{ 'FORM.LABEL.NO_CERTIFICATIONS' | translate }}</li>
       </ul>
@@ -329,7 +338,7 @@
             </select>
             <button class="add-certification" type="button" (click)="addCertificationToEdit(newCertification)">{{ 'BUTTON.ADD' | translate }}</button>
             <div *ngFor="let cert of editingLot.certifications; let i = index">
-              {{ cert }}
+              {{ certificationLabelKey(cert) | translate }}
               <button class="delete-certification"  type="button" (click)="removeCertificationFromEdit(i)">{{ 'BUTTON.REMOVE' | translate }}</button>
             </div>
           </div>

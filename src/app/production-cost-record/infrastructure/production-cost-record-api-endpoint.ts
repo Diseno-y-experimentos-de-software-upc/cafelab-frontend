@@ -88,4 +88,16 @@ export class ProductionCostRecordApiEndpoint extends BaseApiEndpoint<
         catchError(this.handleError(this.translate.instant('COST_RECORDS.ERRORS.ANNULL'))),
       );
   }
+
+  getByCoffeeLotId(coffeeLotId: number): Observable<ProductionCostRecord[]> {
+    return this.http
+      .get<ProductionCostRecordResource[]>(
+        `${this.endpointUrl}/coffee-lot/${coffeeLotId}`,
+        this.httpOptions,
+      )
+      .pipe(
+        map((arr) => arr.map((r) => this.assembler.toEntityFromResource(r))),
+        catchError(this.handleError(this.translate.instant('COST_RECORDS.ERRORS.LOAD'))),
+      );
+  }
 }

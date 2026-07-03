@@ -31,9 +31,17 @@
           <mat-label>{{ 'INVENTORY.CONSUMPTION_DIALOG.LOT' | translate }}</mat-label>
           <mat-select formControlName="lotId" required>
             <mat-option *ngFor="let lot of availableLots" [value]="lot.id || 0" [disabled]="!lot.id">
-              {{ lot.lot_name }} ({{ lot.coffee_type }})
+              {{ lot.lot_name }} ({{ coffeeTypeLabelKey(lot.coffee_type) | translate }})
             </mat-option>
           </mat-select>
+        </mat-form-field>
+
+        <mat-form-field appearance="outline" class="full-width" [class.force-error]="form.get('finalProduct')?.invalid && form.get('finalProduct')?.dirty">
+          <mat-label>{{ 'INVENTORY.CONSUMPTION_DIALOG.FINAL_PRODUCT' | translate }}</mat-label>
+          <input matInput formControlName="finalProduct" required>
+          <mat-error *ngIf="form.get('finalProduct')?.hasError('pattern')">
+            {{ 'INVENTORY.CONSUMPTION_DIALOG.FINAL_PRODUCT_PATTERN_ERROR' | translate }}
+          </mat-error>
         </mat-form-field>
 
         <mat-form-field appearance="outline" class="full-width">

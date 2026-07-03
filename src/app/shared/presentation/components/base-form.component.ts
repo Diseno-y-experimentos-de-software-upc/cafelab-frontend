@@ -1,6 +1,10 @@
+import { inject } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import { TranslateService } from '@ngx-translate/core';
 
 export abstract class BaseFormComponent {
+  private readonly formTranslate = inject(TranslateService);
+
   isInvalidControl(form: FormGroup, controlName: string): boolean {
     const c = form.get(controlName);
     if (!c) return false;
@@ -11,20 +15,20 @@ export abstract class BaseFormComponent {
     const c = form.get(controlName);
     if (!c?.errors || !(c.dirty || c.touched)) return '';
     const e = c.errors;
-    if (e['required']) return 'Campo obligatorio';
-    if (e['email']) return 'Email inválido';
+    if (e['required']) return this.formTranslate.instant('FORM_VALIDATION.REQUIRED');
+    if (e['email']) return this.formTranslate.instant('FORM_VALIDATION.EMAIL');
     if (e['minlength'])
-      return `Mínimo ${e['minlength'].requiredLength} caracteres`;
+      return this.formTranslate.instant('FORM_VALIDATION.MINLENGTH', { n: e['minlength'].requiredLength });
     if (e['maxlength'])
-      return `Máximo ${e['maxlength'].requiredLength} caracteres`;
-    if (e['min']) return `Valor mínimo: ${e['min'].min}`;
-    if (e['max']) return `Valor máximo: ${e['max'].max}`;
+      return this.formTranslate.instant('FORM_VALIDATION.MAXLENGTH', { n: e['maxlength'].requiredLength });
+    if (e['min']) return this.formTranslate.instant('FORM_VALIDATION.MIN', { n: e['min'].min });
+    if (e['max']) return this.formTranslate.instant('FORM_VALIDATION.MAX', { n: e['max'].max });
     if (e['pattern']) {
       if (controlName === 'password' || controlName === 'newPassword') {
-        return 'Debe tener mínimo 8 caracteres, una mayúscula, una minúscula, un número y un carácter especial (@$!%*?&_-#)';
+        return this.formTranslate.instant('FORM_VALIDATION.PASSWORD_PATTERN');
       }
-      return 'Formato inválido';
+      return this.formTranslate.instant('FORM_VALIDATION.PATTERN');
     }
-    return 'Valor inválido';
+    return this.formTranslate.instant('FORM_VALIDATION.INVALID');
   }
 }
