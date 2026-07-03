@@ -11,6 +11,8 @@ export interface CuppingSessionEntry extends BaseEntity {
   favorite: boolean;
   resultsJson: string | null;
   roastStyleNotes: string | null;
+  coffeeLotId: number | null;
+  roastProfileId: number | null;
 }
 
 export interface CuppingSensoryScores {

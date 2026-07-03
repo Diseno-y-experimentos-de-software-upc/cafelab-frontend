@@ -12,6 +12,8 @@ export interface CuppingSessionResource extends BaseResource {
   favorite: boolean;
   resultsJson: string | null;
   roastStyleNotes: string | null;
+  coffeeLotId: number | null;
+  roastProfileId: number | null;
 }
 
 export interface CreateCuppingSessionBody {
@@ -23,6 +25,8 @@ export interface CreateCuppingSessionBody {
   favorite?: boolean;
   resultsJson?: string | null;
   roastStyleNotes?: string | null;
+  coffeeLotId?: number | null;
+  roastProfileId?: number | null;
 }
 
 export interface UpdateCuppingSessionBody {
@@ -34,4 +38,6 @@ export interface UpdateCuppingSessionBody {
   favorite: boolean;
   resultsJson?: string | null;
   roastStyleNotes?: string | null;
+  coffeeLotId?: number | null;
+  roastProfileId?: number | null;
 }

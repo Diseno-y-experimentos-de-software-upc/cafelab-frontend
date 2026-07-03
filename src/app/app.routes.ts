@@ -15,6 +15,7 @@ import { PageNotFoundComponent } from './public/presentation/views/page-not-foun
 import { ConfirmPlanComponent } from './subscription/presentation/components/confirm-plan/confirm-plan.component';
 import { RoastingPageComponent } from './roasting/presentation/views/roasting-page/roasting-page.component';
 import { RoastProfileComparisonComponent } from './roasting/presentation/components/roast-profile-comparison/roast-profile-comparison.component';
+import { RoastFlavorCorrelationComponent } from './roasting/presentation/views/roast-flavor-correlation/roast-flavor-correlation.component';
 import { LotsComponent } from './coffee-lot/presentation/views/lots-page/lots.component';
 import { SupplyPageComponent } from './supplier/presentation/views/supply-page/supply-page.component';
 import { DefectLibraryListComponent } from './defect-library/presentation/components/defect-library-list/defect-library-list.component';
@@ -86,5 +87,6 @@ export const routes: Routes = [
   { path: 'coffee-lots', component: LotsComponent, canActivate: [AuthGuard] },
   { path: 'profiles-roasting', component: RoastingPageComponent, canActivate: [AuthGuard] },
   { path: 'compare-profile', component: RoastProfileComparisonComponent, canActivate: [AuthGuard] },
+  { path: 'roast-flavor-correlation', component: RoastFlavorCorrelationComponent, canActivate: [AuthGuard] },
   { path: '**', component: PageNotFoundComponent },
 ];

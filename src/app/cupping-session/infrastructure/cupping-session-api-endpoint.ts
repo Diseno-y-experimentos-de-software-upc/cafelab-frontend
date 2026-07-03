@@ -41,6 +41,15 @@ export class CuppingSessionApiEndpoint extends BaseApiEndpoint<
     );
   }
 
+  getByCoffeeLot(coffeeLotId: number): Observable<CuppingSessionEntry[]> {
+    return this.http
+      .get<CuppingSessionResource[]>(`${this.endpointUrl}/lot/${coffeeLotId}`, this.httpOptions)
+      .pipe(
+        map((arr) => (Array.isArray(arr) ? arr : []).map((r) => this.assembler.toEntityFromResource(r))),
+        catchError(this.handleError(this.translate.instant('CUPPING_BC.ERRORS.LOAD'))),
+      );
+  }
+
   override getById(id: number): Observable<CuppingSessionEntry> {
     return this.http
       .get<CuppingSessionResource>(`${this.endpointUrl}/${id}`, this.httpOptions)

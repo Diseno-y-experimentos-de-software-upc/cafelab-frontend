@@ -274,6 +274,8 @@ export class SesionesCataComponent implements OnInit {
         favorite: false,
         resultsJson: null,
         roastStyleNotes: nueva.roastStyleNotes ? nueva.roastStyleNotes : null,
+        coffeeLotId: nueva.coffeeLotId,
+        roastProfileId: null,
       };
       this.cuppingSessionApi.create(entity).subscribe({
         next: (creada) => {

@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatDialogModule, MatDialogRef } from '@angular/material/dialog';
 import { MatIconModule } from '@angular/material/icon';
@@ -14,6 +14,8 @@ import {
   dateToIsoLocal,
   isIsoDateStrictlyBeforeToday,
 } from '../../../../cupping-session/domain/local-calendar-date';
+import { CoffeeLotApi } from '../../../../coffee-lot/application/coffee-lot.api';
+import type { CoffeeLot } from '../../../../coffee-lot/domain/model/coffee-lot.entity';
 
 export interface NuevaCataFormResult {
   name: string;
@@ -22,6 +24,7 @@ export interface NuevaCataFormResult {
   processing: string;
   sessionDate: string;
   roastStyleNotes: string;
+  coffeeLotId: number | null;
 }
 
 @Component({
@@ -43,7 +46,7 @@ export interface NuevaCataFormResult {
   templateUrl: './nuevas-cata.component.html',
   styleUrls: ['./nuevas-cata.component.css'],
 })
-export class NuevasCataComponent {
+export class NuevasCataComponent implements OnInit {
   form = {
     name: '',
     origin: '',
@@ -55,7 +58,10 @@ export class NuevasCataComponent {
       return d;
     })(),
     roastStyleNotes: '',
+    coffeeLotId: null as number | null,
   };
+
+  lotes: CoffeeLot[] = [];
 
   readonly textPattern = /^[A-Za-zÁÉÍÓÚáéíóúÑñ\s'-]+$/;
 
@@ -72,7 +78,21 @@ export class NuevasCataComponent {
 
   processingCodes = ['washed', 'natural', 'honey', 'experimental'] as const;
 
-  constructor(private readonly dialogRef: MatDialogRef<NuevasCataComponent, NuevaCataFormResult>) {}
+  constructor(
+    private readonly dialogRef: MatDialogRef<NuevasCataComponent, NuevaCataFormResult>,
+    private readonly coffeeLotApi: CoffeeLotApi,
+  ) {}
+
+  ngOnInit(): void {
+    this.coffeeLotApi.getAll().subscribe({
+      next: (lotes) => {
+        this.lotes = lotes;
+      },
+      error: () => {
+        this.lotes = [];
+      },
+    });
+  }
 
   private isValidText(value: string): boolean {
     return this.textPattern.test(value.trim());
@@ -123,6 +143,7 @@ export class NuevasCataComponent {
       processing: this.form.processing,
       sessionDate: iso,
       roastStyleNotes: this.form.roastStyleNotes.trim(),
+      coffeeLotId: this.form.coffeeLotId,
     };
     this.dialogRef.close(out);
   }
