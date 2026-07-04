@@ -17,6 +17,10 @@ export class CuppingSessionApi {
     return this.endpoint.getById(id);
   }
 
+  getByCoffeeLot(coffeeLotId: number): Observable<CuppingSessionEntry[]> {
+    return this.endpoint.getByCoffeeLot(coffeeLotId);
+  }
+
   create(entity: CuppingSessionEntry): Observable<CuppingSessionEntry> {
     return this.endpoint.create(entity);
   }

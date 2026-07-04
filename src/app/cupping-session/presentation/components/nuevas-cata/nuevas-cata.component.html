@@ -86,6 +86,17 @@
     </mat-form-field>
 
     <mat-form-field appearance="outline">
+      <mat-label>{{ 'CUPPING_SESSIONS.COFFEE_LOT_LABEL' | translate }}</mat-label>
+      <mat-select [(ngModel)]="form.coffeeLotId" name="coffeeLotId">
+        <mat-option [value]="null">{{ 'CUPPING_SESSIONS.COFFEE_LOT_NONE' | translate }}</mat-option>
+        <mat-option *ngFor="let lote of lotes" [value]="lote.id">
+          {{ lote.lot_name }}
+        </mat-option>
+      </mat-select>
+      <mat-hint>{{ 'CUPPING_SESSIONS.COFFEE_LOT_HINT' | translate }}</mat-hint>
+    </mat-form-field>
+
+    <mat-form-field appearance="outline">
       <mat-label>{{ 'CUPPING_SESSIONS.ROAST_STYLE_NOTES_LABEL' | translate }}</mat-label>
       <textarea
         matInput

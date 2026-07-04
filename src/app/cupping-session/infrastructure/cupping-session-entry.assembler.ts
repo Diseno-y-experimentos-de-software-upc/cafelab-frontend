@@ -39,6 +39,8 @@ export class CuppingSessionEntryAssembler
       favorite: Boolean(resource.favorite),
       resultsJson: resource.resultsJson ?? null,
       roastStyleNotes: resource.roastStyleNotes ?? null,
+      coffeeLotId: resource.coffeeLotId ?? null,
+      roastProfileId: resource.roastProfileId ?? null,
     };
   }
 
@@ -54,6 +56,8 @@ export class CuppingSessionEntryAssembler
       favorite: entity.favorite,
       resultsJson: entity.resultsJson,
       roastStyleNotes: entity.roastStyleNotes,
+      coffeeLotId: entity.coffeeLotId,
+      roastProfileId: entity.roastProfileId,
     };
   }
 
@@ -76,6 +80,12 @@ export class CuppingSessionEntryAssembler
     if (entity.roastStyleNotes?.trim()) {
       body.roastStyleNotes = entity.roastStyleNotes.trim();
     }
+    if (entity.coffeeLotId != null) {
+      body.coffeeLotId = entity.coffeeLotId;
+    }
+    if (entity.roastProfileId != null) {
+      body.roastProfileId = entity.roastProfileId;
+    }
     return body;
   }
 
@@ -89,6 +99,8 @@ export class CuppingSessionEntryAssembler
       favorite: entity.favorite,
       resultsJson: entity.resultsJson ?? null,
       roastStyleNotes: entity.roastStyleNotes?.trim() || null,
+      coffeeLotId: entity.coffeeLotId ?? null,
+      roastProfileId: entity.roastProfileId ?? null,
     };
     return body;
   }

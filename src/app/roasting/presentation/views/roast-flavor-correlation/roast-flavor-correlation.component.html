@@ -1,0 +1,100 @@
+<mat-toolbar color="primary">
+  <app-toolbar/>
+</mat-toolbar>
+
+<div class="breadcrumb">
+  <a routerLink="/dashboard/barista">{{ 'breadcrumb.inicio' | translate }}</a> &gt;
+  {{ 'CORRELATION.TITLE' | translate }}
+</div>
+
+<div class="correlation-container">
+  <h1 class="page-title">{{ 'CORRELATION.TITLE' | translate }}</h1>
+  <p class="page-subtitle">{{ 'CORRELATION.SUBTITLE' | translate }}</p>
+
+  <div class="lot-selector">
+    <label for="lot-select">{{ 'CORRELATION.SELECT_LOT' | translate }}</label>
+    <select id="lot-select" [(ngModel)]="selectedLotId" name="lot" (ngModelChange)="onLotChange()">
+      <option [ngValue]="null" disabled>{{ 'CORRELATION.SELECT_LOT_PLACEHOLDER' | translate }}</option>
+      <option *ngFor="let lot of lots" [ngValue]="lot.id">{{ lot.lot_name }}</option>
+    </select>
+  </div>
+
+  <div *ngIf="loading" class="loading-hint">{{ 'CORRELATION.LOADING' | translate }}</div>
+
+  <ng-container *ngIf="selectedLot && !loading">
+    <section class="lot-info-card">
+      <h2>{{ 'CORRELATION.LOT_INFO' | translate }}</h2>
+      <div class="lot-info-grid">
+        <div><span class="info-label">{{ 'CORRELATION.LOT_NAME' | translate }}:</span> {{ selectedLot.lot_name }}</div>
+        <div><span class="info-label">{{ 'CORRELATION.COFFEE_TYPE' | translate }}:</span> {{ selectedLot.coffee_type }}</div>
+        <div><span class="info-label">{{ 'CORRELATION.ORIGIN' | translate }}:</span> {{ selectedLot.origin }}</div>
+        <div><span class="info-label">{{ 'CORRELATION.PROCESSING_METHOD' | translate }}:</span> {{ selectedLot.processing_method }}</div>
+        <div><span class="info-label">{{ 'CORRELATION.ALTITUDE' | translate }}:</span> {{ selectedLot.altitude }} msnm</div>
+        <div><span class="info-label">{{ 'CORRELATION.WEIGHT' | translate }}:</span> {{ selectedLot.weight }} kg</div>
+        <div><span class="info-label">{{ 'CORRELATION.STATUS' | translate }}:</span> {{ selectedLot.status }}</div>
+      </div>
+    </section>
+
+    <div *ngIf="!hasRelatedData" class="empty-state" role="status">
+      {{ 'CORRELATION.NO_RELATED_DATA' | translate }}
+    </div>
+
+    <div *ngIf="hasRelatedData" class="correlation-panels">
+      <section class="panel roast-panel">
+        <h2>{{ 'CORRELATION.ROAST_SECTION' | translate }}</h2>
+
+        <ng-container *ngIf="roastProfiles.length > 0; else noRoast">
+          <div class="curve-wrapper">
+            <canvas #curveCanvas width="640" height="420"></canvas>
+          </div>
+          <ul class="profile-legend">
+            <li *ngFor="let profile of roastProfiles; let i = index">
+              <span class="legend-swatch" [style.background]="curveColor(i)"></span>
+              <span class="legend-name">{{ profile.name }}</span>
+              <span class="legend-detail">
+                {{ profile.type }} · {{ profile.duration }} {{ 'comparison.minutos' | translate }} ·
+                {{ profile.tempStart }}–{{ profile.tempEnd }} {{ 'comparison.gradosCelsius' | translate }}
+              </span>
+            </li>
+          </ul>
+        </ng-container>
+        <ng-template #noRoast>
+          <p class="section-empty">{{ 'CORRELATION.NO_ROAST_DATA' | translate }}</p>
+        </ng-template>
+      </section>
+
+      <section class="panel cupping-panel">
+        <h2>{{ 'CORRELATION.CUPPING_SECTION' | translate }}</h2>
+
+        <ng-container *ngIf="cuppingSessions.length > 0; else noCupping">
+          <div class="session-selector" *ngIf="cuppingSessions.length > 1">
+            <label for="session-select">{{ 'CORRELATION.SELECT_SESSION' | translate }}</label>
+            <select id="session-select" [(ngModel)]="selectedSessionId" name="session">
+              <option *ngFor="let session of cuppingSessions" [ngValue]="session.id">
+                {{ session.name }} ({{ session.sessionDate }})
+              </option>
+            </select>
+          </div>
+
+          <div *ngIf="selectedSession as session" class="session-detail">
+            <div class="session-meta">
+              <div><span class="info-label">{{ 'CORRELATION.SESSION_NAME' | translate }}:</span> {{ session.name }}</div>
+              <div><span class="info-label">{{ 'CORRELATION.SESSION_DATE' | translate }}:</span> {{ session.sessionDate }}</div>
+              <div *ngIf="session.roastStyleNotes">
+                <span class="info-label">{{ 'CORRELATION.SESSION_NOTES' | translate }}:</span> {{ session.roastStyleNotes }}
+              </div>
+            </div>
+            <app-cupping-sensory-radar
+              [scores]="selectedSessionScores"
+              [chartInstanceId]="'correlation-' + session.id"
+              accent="amber"
+            />
+          </div>
+        </ng-container>
+        <ng-template #noCupping>
+          <p class="section-empty">{{ 'CORRELATION.NO_CUPPING_DATA' | translate }}</p>
+        </ng-template>
+      </section>
+    </div>
+  </ng-container>
+</div>
