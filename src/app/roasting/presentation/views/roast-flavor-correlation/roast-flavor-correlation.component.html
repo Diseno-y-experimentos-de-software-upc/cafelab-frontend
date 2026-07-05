@@ -3,7 +3,7 @@
 </mat-toolbar>
 
 <div class="breadcrumb">
-  <a routerLink="/dashboard/barista">{{ 'breadcrumb.inicio' | translate }}</a> &gt;
+  <a (click)="goToHome()">{{ 'breadcrumb.inicio' | translate }}</a> &gt;
   {{ 'CORRELATION.TITLE' | translate }}
 </div>
 

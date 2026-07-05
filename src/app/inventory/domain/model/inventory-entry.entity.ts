@@ -8,6 +8,7 @@ export interface InventoryEntry extends BaseEntity {
   coffeeLotId: number;
   quantityUsed: number;
   dateUsed: string;
+  finalProduct?: string;
   consumptionReason: 'bar' | 'retail' | 'samples' | 'other';
   usageNotes?: string | null;
 }

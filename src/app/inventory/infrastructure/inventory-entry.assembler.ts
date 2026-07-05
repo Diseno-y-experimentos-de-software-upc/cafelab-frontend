@@ -40,6 +40,7 @@ export class InventoryEntryAssembler
         typeof resource.dateUsed === 'string'
           ? resource.dateUsed
           : String(resource.dateUsed),
+      finalProduct: resource.finalProduct,
       consumptionReason: normalizedReason as InventoryEntry['consumptionReason'],
       usageNotes: resource.usageNotes ?? '',
     };
@@ -52,6 +53,7 @@ export class InventoryEntryAssembler
       coffeeLotId: entity.coffeeLotId,
       quantityUsed: entity.quantityUsed,
       dateUsed: entity.dateUsed,
+      finalProduct: entity.finalProduct,
       consumptionReason: entity.consumptionReason,
       usageNotes: entity.usageNotes,
     };
@@ -63,21 +65,25 @@ export class InventoryEntryAssembler
 
   toCreateResource(entity: InventoryEntry): CreateInventoryEntryBody {
     const usageNotes = entity.usageNotes?.trim();
+    const finalProduct = entity.finalProduct?.trim();
     return {
       coffeeLotId: Number(entity.coffeeLotId),
       quantityUsed: Number(entity.quantityUsed),
       dateUsed: this.toLocalIsoString(entity.dateUsed),
       consumptionReason: entity.consumptionReason,
+      ...(finalProduct ? { finalProduct } : {}),
       ...(usageNotes ? { usageNotes } : {}),
     };
   }
 
   toUpdateResource(entity: InventoryEntry): UpdateInventoryEntryBody {
+    const finalProduct = entity.finalProduct?.trim();
     return {
       coffeeLotId: Number(entity.coffeeLotId),
       quantityUsed: Number(entity.quantityUsed),
       dateUsed: this.toCreateResource(entity).dateUsed,
       consumptionReason: entity.consumptionReason,
+      ...(finalProduct ? { finalProduct } : {}),
       ...(entity.usageNotes?.trim() ? { usageNotes: entity.usageNotes.trim() } : {}),
     };
   }

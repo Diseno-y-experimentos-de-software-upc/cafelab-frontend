@@ -6,6 +6,7 @@
 .breadcrumb a {
   color: #618985;
   text-decoration: none;
+  cursor: pointer;
 }
 
 .correlation-container {

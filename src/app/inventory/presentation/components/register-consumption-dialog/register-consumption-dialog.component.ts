@@ -87,8 +87,11 @@ export class RegisterConsumptionDialogComponent implements OnInit {
     { value: 'other', labelKey: 'INVENTORY.CONSUMPTION_REASON.OTHER' },
   ];
 
-  minDate = new Date();
-  maxDate = new Date(new Date().setFullYear(new Date().getFullYear() + 5));
+  readonly today = this.startOfDay(new Date());
+  readonly minDate = this.today;
+  readonly maxDate = this.today;
+  readonly isConsumptionDateAllowed = (date: Date | null): boolean =>
+    !!date && this.startOfDay(date).getTime() === this.today.getTime();
 
   constructor(
     private fb: FormBuilder,
@@ -104,14 +107,14 @@ export class RegisterConsumptionDialogComponent implements OnInit {
     private translate: TranslateService,
   ) {
     this.form = this.fb.group({
-      date: [new Date(), [Validators.required, this.dateRangeValidation]],
+      date: [this.today, [Validators.required, this.todayOnlyValidation.bind(this)]],
       lotId: ['', Validators.required],
       finalProduct: [
         '',
         [
           Validators.required,
           Validators.maxLength(100),
-          Validators.pattern(/^[A-Za-zÃÃ‰ÃÃ“ÃšÃ¡Ã©Ã­Ã³ÃºÃ‘Ã±0-9 .,-]+$/),
+          Validators.pattern(/^[A-Za-zÁÉÍÓÚáéíóúÑñ0-9 .,-]+$/),
         ],
       ],
       consumptionReason: ['', Validators.required],
@@ -244,7 +247,7 @@ export class RegisterConsumptionDialogComponent implements OnInit {
       userId: 0,
       coffeeLotId,
       quantityUsed: qty,
-      dateUsed: (formValue.date as Date).toISOString(),
+      dateUsed: this.toLocalIsoString(this.today),
       finalProduct,
       consumptionReason,
       usageNotes,
@@ -281,31 +284,37 @@ export class RegisterConsumptionDialogComponent implements OnInit {
   }
   coffeeTypeLabelKey(type: string): string {
     const m: Record<string, string> = {
-      ArÃ¡bica: 'COFFEE_LOT_BC.OPTIONS.COFFEE_TYPE.ARABICA',
+      Arábica: 'COFFEE_LOT_BC.OPTIONS.COFFEE_TYPE.ARABICA',
       Robusta: 'COFFEE_LOT_BC.OPTIONS.COFFEE_TYPE.ROBUSTA',
       Mezcla: 'COFFEE_LOT_BC.OPTIONS.COFFEE_TYPE.BLEND',
     };
     return m[type] ?? type;
   }
 
-  private dateRangeValidation(control: AbstractControl): ValidationErrors | null {
+  private startOfDay(value: Date): Date {
+    const date = new Date(value);
+    date.setHours(0, 0, 0, 0);
+    return date;
+  }
+
+  private todayOnlyValidation(control: AbstractControl): ValidationErrors | null {
     const value = control.value;
     if (!value) {
       return null;
     }
 
-    const selectedDate = new Date(value);
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-
-    const maxDate = new Date(today);
-    maxDate.setFullYear(today.getFullYear() + 5);
-    selectedDate.setHours(0, 0, 0, 0);
-
-    if (selectedDate < today || selectedDate > maxDate) {
+    const selectedDate = this.startOfDay(new Date(value));
+    if (selectedDate.getTime() !== this.today.getTime()) {
       return { invalidDateRange: true };
     }
 
     return null;
+  }
+
+  private toLocalIsoString(value: Date): string {
+    const date = this.startOfDay(value);
+    date.setHours(12, 0, 0, 0);
+    const pad = (n: number) => String(n).padStart(2, '0');
+    return `${date.getFullYear()}-${pad(date.getMonth() + 1)}-${pad(date.getDate())}T${pad(date.getHours())}:${pad(date.getMinutes())}:${pad(date.getSeconds())}`;
   }
 }

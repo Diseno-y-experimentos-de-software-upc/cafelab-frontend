@@ -1,11 +1,12 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { RouterLink } from '@angular/router';
+import { Router } from '@angular/router';
 import { MatToolbar } from '@angular/material/toolbar';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { forkJoin } from 'rxjs';
 import { ToolbarComponent } from '../../../../public/presentation/components/toolbar/toolbar.component';
+import { AuthService } from '../../../../auth/infrastructure/AuthService';
 import { CoffeeLotApi } from '../../../../coffee-lot/application/coffee-lot.api';
 import type { CoffeeLot } from '../../../../coffee-lot/domain/model/coffee-lot.entity';
 import { RoastProfileApi } from '../../../application/roast-profile.api';
@@ -29,7 +30,6 @@ import { CuppingSensoryRadarComponent } from '../../../../cupping-session/presen
   imports: [
     CommonModule,
     FormsModule,
-    RouterLink,
     MatToolbar,
     TranslateModule,
     ToolbarComponent,
@@ -58,7 +58,34 @@ export class RoastFlavorCorrelationComponent implements OnInit {
     private readonly roastProfileApi: RoastProfileApi,
     private readonly cuppingSessionApi: CuppingSessionApi,
     private readonly translate: TranslateService,
+    private readonly router: Router,
+    private readonly authService: AuthService,
   ) {}
+
+  goToHome(): void {
+    const user = this.authService.getCurrentUser();
+    if (!user) {
+      void this.router.navigate(['/login']);
+      return;
+    }
+    if (user.home) {
+      void this.router.navigate([user.home]);
+      return;
+    }
+    switch (user.plan) {
+      case 'barista':
+        void this.router.navigate(['/dashboard/barista']);
+        break;
+      case 'owner':
+        void this.router.navigate(['/dashboard/owner']);
+        break;
+      case 'full':
+        void this.router.navigate(['/dashboard/complete']);
+        break;
+      default:
+        void this.router.navigate(['/']);
+    }
+  }
 
   ngOnInit(): void {
     this.coffeeLotApi.getAll().subscribe((lots) => {
