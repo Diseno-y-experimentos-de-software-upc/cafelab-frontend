@@ -27,9 +27,9 @@
         <label for="equipment">{{ 'CALIBRATIONS.EQUIPMENT_LABEL' | translate }}</label>
         <select id="equipment" [(ngModel)]="calibration.equipment" name="equipment" required #equipmentCtrl="ngModel">
           <option value="" disabled selected hidden>--</option>
-          <option value="Maquina Espresso">Maquina Espresso</option>
-          <option value="V60">V60</option>
-          <option value="Chemex">Chemex</option>
+          <option value="Maquina Espresso">{{ 'CALIBRATIONS.EQUIPMENT_OPTIONS.Maquina Espresso' | translate }}</option>
+          <option value="V60">{{ 'CALIBRATIONS.EQUIPMENT_OPTIONS.V60' | translate }}</option>
+          <option value="Chemex">{{ 'CALIBRATIONS.EQUIPMENT_OPTIONS.Chemex' | translate }}</option>
         </select>
         <div *ngIf="calibrationForm.submitted && equipmentCtrl.invalid"
           style="color: red; font-size: 12px; margin-top: -10px; margin-bottom: 10px;">

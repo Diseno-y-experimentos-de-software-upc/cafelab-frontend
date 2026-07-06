@@ -23,7 +23,8 @@ import { getUserFacingApiMessage } from '../../../../shared/infrastructure/api-e
     MatButtonModule,
     TranslateModule,
     ReactiveFormsModule,
-    NgIf
+    NgIf,
+    TranslateModule
   ]
 })
 export class LoginFormComponent extends BaseFormComponent {

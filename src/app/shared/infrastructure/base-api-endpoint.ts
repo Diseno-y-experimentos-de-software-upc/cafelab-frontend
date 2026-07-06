@@ -1,6 +1,9 @@
 import { HttpClient, HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { TranslateService } from '@ngx-translate/core';
 import { catchError, map, Observable, throwError } from 'rxjs';
 import { API_ERROR_UNAUTHORIZED } from './api-error-message';
+import { BACKEND_MSG, BACKEND_MSG_PREFIX } from './backend-errors.map';
 import type { BaseEntity } from './base-entity';
 import type { BaseResource, BaseResponse } from './base-resource';
 import type { BaseAssembler } from './base-assembler';
@@ -23,6 +26,40 @@ export abstract class BaseApiEndpoint<
       Accept: 'application/json',
     }),
   };
+
+  /** Inyectado vía inject() para no cambiar la firma del constructor de las subclases. */
+  private readonly i18n = inject(TranslateService);
+
+  /**
+   * Traduce un mensaje que envía el backend en español a la clave i18n correspondiente
+   * (BACKEND_ERRORS.*). Si no hay coincidencia, devuelve el texto original sin tocar.
+   */
+  protected translateBackendMessage(text: string): string {
+    if (!text) {
+      return text;
+    }
+    const trimmed = text.trim();
+    const tryKey = (key: string): string | null => {
+      const full = `BACKEND_ERRORS.${key}`;
+      const t = this.i18n.instant(full);
+      return t && t !== full ? t : null;
+    };
+
+    
+    const exact = BACKEND_MSG[trimmed];
+    if (exact) {
+      const t = tryKey(exact);
+      if (t) return t;
+    }
+    
+    for (const [prefix, key] of BACKEND_MSG_PREFIX) {
+      if (trimmed.startsWith(prefix)) {
+        const t = tryKey(key);
+        if (t) return t;
+      }
+    }
+    return text;
+  }
 
   constructor(
     protected readonly http: HttpClient,
@@ -125,7 +162,10 @@ export abstract class BaseApiEndpoint<
       } else if (Array.isArray((error.error as { errors?: unknown })?.errors)) {
         const errs = (error.error as { errors: Array<{ defaultMessage?: string; message?: string }> })
           .errors;
-        const parts = errs.map((x) => x.defaultMessage || x.message).filter(Boolean);
+        const parts = errs
+          .map((x) => x.defaultMessage || x.message)
+          .filter(Boolean)
+          .map((p) => this.translateBackendMessage(String(p)));
         if (parts.length) {
           errorMessage = parts.join('. ');
         }
@@ -150,6 +190,8 @@ export abstract class BaseApiEndpoint<
       } else if (error.message) {
         errorMessage = error.message;
       }
+
+      errorMessage = this.translateBackendMessage(errorMessage);
 
       const err = new Error(errorMessage) as ApiError;
       if (Object.keys(fieldErrors).length > 0) {

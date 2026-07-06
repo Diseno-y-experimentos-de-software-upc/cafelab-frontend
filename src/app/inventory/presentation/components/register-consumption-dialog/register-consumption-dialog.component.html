@@ -31,7 +31,7 @@
           <mat-label>{{ 'INVENTORY.CONSUMPTION_DIALOG.LOT' | translate }}</mat-label>
           <mat-select formControlName="lotId" required>
             <mat-option *ngFor="let lot of availableLots" [value]="lot.id || 0" [disabled]="!lot.id">
-              {{ lot.lot_name }} ({{ lot.coffee_type }})
+              {{ lot.lot_name }} ({{ coffeeTypeLabelKey(lot.coffee_type) | translate }})
             </mat-option>
           </mat-select>
         </mat-form-field>
@@ -40,7 +40,7 @@
           <mat-label>{{ 'INVENTORY.CONSUMPTION_DIALOG.FINAL_PRODUCT' | translate }}</mat-label>
           <input matInput formControlName="finalProduct" required>
           <mat-error *ngIf="form.get('finalProduct')?.hasError('pattern')">
-            Solo se permiten letras, números, espacios y guiones.
+            {{ 'INVENTORY.CONSUMPTION_DIALOG.FINAL_PRODUCT_PATTERN_ERROR' | translate }}
           </mat-error>
         </mat-form-field>
 
@@ -103,7 +103,7 @@
     <div class="confirmation-warning">
     <mat-checkbox type="checkbox" formControlName="noEdit" class="confirmation-checkbox">
       <span class="warning-text">
-      ATENCIÓN: Una vez registrado el consumo, no podrá editarse ni modificarse posteriormente.
+      {{  'INVENTORY.CONSUMPTION_DIALOG.CONFIRMATION_WARNING' | translate }}
         </span>
     </mat-checkbox>
     </div>

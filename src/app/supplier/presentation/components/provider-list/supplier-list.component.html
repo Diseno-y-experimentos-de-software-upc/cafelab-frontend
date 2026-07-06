@@ -67,7 +67,7 @@
             class="action-button"
             (click)="supplier.id ? deleteSupplier(supplier.id) : null"
             [disabled]="!supplier.id"
-            title="Eliminar proveedor"
+            title="{{ 'supply.suppliers.delete_supplier' | translate }}"
           >
             <i class="material-icons">delete</i>
           </button>
