@@ -65,7 +65,7 @@
         <td class="action-cell">
           <button
             class="action-button"
-            (click)="supplier.id ? deleteSupplier(supplier.id) : null"
+            (click)="openDeleteModal(supplier)"
             [disabled]="!supplier.id"
             title="{{ 'supply.suppliers.delete_supplier' | translate }}"
           >
@@ -213,7 +213,7 @@
           <div *ngIf="registerFieldErrors['webLink']" class="field-error">{{ registerFieldErrors['webLink'] }}</div>
         </div>
         <div class="form-group">
-          <label>{{ 'supply.suppliers.columns.specialties' | translate }} ({{ 'supply.suppliers.specialties_hint' | translate }} - máx. 4):</label>
+          <label>{{ 'supply.suppliers.columns.specialties' | translate }} ({{ 'supply.suppliers.specialties_hint' | translate }} — {{ 'supply.suppliers.specialties_max' | translate }}):</label>
           <div *ngIf="registerFieldErrors['specialties']" class="field-error">{{ registerFieldErrors['specialties'] }}</div>
           <div class="specialties-list">
     <span *ngFor="let specialty of newSpecialties; let i = index" class="specialty-tag">
@@ -324,7 +324,7 @@
           <div *ngIf="editFieldErrors['webLink']" class="field-error">{{ editFieldErrors['webLink'] }}</div>
         </div>
         <div class="form-group">
-          <label>{{ 'supply.suppliers.columns.specialties' | translate }} (máx. 4):</label>
+          <label>{{ 'supply.suppliers.columns.specialties' | translate }} ({{ 'supply.suppliers.specialties_max' | translate }}):</label>
           <div *ngIf="editFieldErrors['specialties']" class="field-error">{{ editFieldErrors['specialties'] }}</div>
           <div class="specialties-list">
     <span *ngFor="let specialty of editingSpecialties; let i = index" class="specialty-tag">
@@ -340,6 +340,29 @@
           <button type="submit" class="submit-button">{{ 'supply.suppliers.save_button' | translate }}</button>
         </div>
       </form>
+    </div>
+  </div>
+
+  <div *ngIf="showDeleteModal" class="modal-overlay">
+    <div class="modal-content delete-confirmation-modal">
+      <h2>{{ 'SUPPLIER_BC.DELETE.TITLE' | translate }}</h2>
+      <p>
+        {{ 'SUPPLIER_BC.DELETE.MESSAGE' | translate }}
+        <strong>"{{ supplierToDelete?.name }}"</strong>?
+      </p>
+
+      <div *ngIf="error" class="error-message">
+        {{ error }}
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="cancel-button" (click)="cancelDelete()">
+          {{ 'SUPPLIER_BC.DELETE.CANCEL' | translate }}
+        </button>
+        <button type="button" class="delete-button" [disabled]="loading" (click)="confirmDelete()">
+          {{ 'SUPPLIER_BC.DELETE.CONFIRM' | translate }}
+        </button>
+      </div>
     </div>
   </div>
 </div>

@@ -97,7 +97,7 @@
       </div>
       <div class="readonly-row" *ngIf="isAnnulled(selectedForView)">
         <span class="readonly-label">{{ 'COST_MANAGEMENT.RECORDS.ANNUL_REASON_LABEL' | translate }}</span>
-        <span class="readonly-value">{{ selectedForView.reason }}</span>
+        <span class="readonly-value">{{ getAnnulReasonDisplay(selectedForView.reason) }}</span>
       </div>
       <div class="readonly-row">
         <span class="readonly-label">{{ 'COST_MANAGEMENT.LOT_LABEL' | translate }}</span>
@@ -207,7 +207,9 @@
           <option value="" disabled>
             {{ 'COST_MANAGEMENT.RECORDS.ANNUL.REASON_PLACEHOLDER' | translate }}
           </option>
-          <option *ngFor="let r of predefinedReasons" [value]="r">{{ r }}</option>
+          <option *ngFor="let reasonKey of predefinedReasonKeys" [value]="reasonKey">
+            {{ annulReasonLabel(reasonKey) }}
+          </option>
           <option [value]="otherReasonKey">
             {{ 'COST_MANAGEMENT.RECORDS.ANNUL.REASON_OTHER' | translate }}
           </option>

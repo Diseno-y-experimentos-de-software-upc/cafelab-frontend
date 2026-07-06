@@ -85,7 +85,7 @@ export class RegisterConsumptionDialogComponent implements OnInit {
   error: string | null = null;
 
   minDate = new Date();
-  maxDate = new Date(new Date().setFullYear(new Date().getFullYear() + 5));
+  maxDate = new Date();
 
   constructor(
     private fb: FormBuilder,
@@ -100,6 +100,9 @@ export class RegisterConsumptionDialogComponent implements OnInit {
     private coffeeLotApi: CoffeeLotApi,
     private translate: TranslateService,
   ) {
+    this.minDate.setHours(0, 0, 0, 0);
+    this.maxDate.setHours(0, 0, 0, 0);
+
     this.form = this.fb.group({
       date: [new Date(),
         [
@@ -132,17 +135,13 @@ export class RegisterConsumptionDialogComponent implements OnInit {
   loadAvailableLots(): void {
     const fromParent = this.data.availableLots;
     if (fromParent?.length) {
-      this.availableLots = fromParent.filter(
-        (lot) =>
-          lot.status === this.data.coffeeStatus &&
-          (!this.data.coffeeType || lot.coffee_type === this.data.coffeeType),
-      );
+      this.availableLots = fromParent.filter((lot) => this.matchesLotFilters(lot));
       return;
     }
 
     this.loading = true;
     this.coffeeLotApi
-      .getAll()
+      .getSelectable()
       .pipe(
         catchError((err) => {
           console.error('Error loading lots:', err);
@@ -150,13 +149,37 @@ export class RegisterConsumptionDialogComponent implements OnInit {
         }),
       )
       .subscribe((lots) => {
-        this.availableLots = lots.filter(
-          (lot) =>
-            lot.status === this.data.coffeeStatus &&
-            (!this.data.coffeeType || lot.coffee_type === this.data.coffeeType),
-        );
+        this.availableLots = lots.filter((lot) => this.matchesLotFilters(lot));
         this.loading = false;
       });
+  }
+
+  private matchesLotFilters(lot: CoffeeLot): boolean {
+    if (lot.record_status === 'anulado') {
+      return false;
+    }
+    if (this.normalizeLotStatus(lot.status) !== this.data.coffeeStatus) {
+      return false;
+    }
+    if (this.data.coffeeType && this.normalizeCoffeeType(lot.coffee_type) !== this.data.coffeeType) {
+      return false;
+    }
+    return true;
+  }
+
+  private normalizeLotStatus(raw: string | undefined | null): string {
+    const s = (raw ?? '').trim().toLowerCase();
+    return s === 'green' || s === 'roasted' ? s : '';
+  }
+
+  private normalizeCoffeeType(raw: string | undefined | null): string {
+    const t = (raw ?? '').trim();
+    if (!t) return '';
+    const folded = t.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase();
+    if (folded === 'arabica') return 'Arábica';
+    if (folded === 'robusta') return 'Robusta';
+    if (folded === 'mezcla' || folded === 'blend') return 'Mezcla';
+    return t;
   }
 
   updateSummary(): void {
@@ -231,7 +254,7 @@ export class RegisterConsumptionDialogComponent implements OnInit {
         userId: 0,
         coffeeLotId,
         quantityUsed: qty,
-        dateUsed: (formValue.date as Date).toISOString(),
+        dateUsed: this.toLocalDateTimeString(formValue.date as Date),
         finalProduct: String(formValue.finalProduct).trim(),
       };
 
@@ -274,20 +297,24 @@ export class RegisterConsumptionDialogComponent implements OnInit {
     if (!value) return null;
 
     const selectedDate = new Date(value);
-    const today = new Date();
-
-    today.setHours(0, 0, 0, 0);
-
-    const maxDate = new Date(today);
-    maxDate.setFullYear(today.getFullYear() + 5);
-
     selectedDate.setHours(0, 0, 0, 0);
 
-    if (selectedDate < today || selectedDate > maxDate) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    if (selectedDate.getTime() !== today.getTime()) {
       return { invalidDateRange: true };
     }
 
     return null;
+  }
+
+  private toLocalDateTimeString(dateValue: Date): string {
+    const localDate = new Date(dateValue);
+    const year = localDate.getFullYear();
+    const month = String(localDate.getMonth() + 1).padStart(2, '0');
+    const day = String(localDate.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}T12:00:00`;
   }
 
 }

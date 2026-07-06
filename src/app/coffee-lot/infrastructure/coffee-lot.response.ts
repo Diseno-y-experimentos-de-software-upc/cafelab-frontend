@@ -9,11 +9,19 @@ export interface CoffeeLotListResponse extends BaseResponse {}
 export interface CoffeeLotResource extends BaseResource {
   userId: number;
   supplierId: number;
+  supplierName: string;
+  lotLineageId: number;
+  versionNumber: number;
+  isCurrent: boolean;
+  supersedesId: number | null;
+  recordStatus: string;
+  annulmentReason: string;
   lotName: string;
   coffeeType: string;
   processingMethod: string;
   altitude: number;
   weight: number;
+  originalWeight: number;
   origin: string;
   status: string;
   certifications: string[] | null;
@@ -36,8 +44,11 @@ export interface UpdateCoffeeLotResourceBody {
   coffee_type: string;
   processing_method: string;
   altitude: number;
-  weight: number;
   origin: string;
   status: string;
   certifications: string[];
+}
+
+export interface AnnullCoffeeLotResourceBody {
+  reason: string;
 }

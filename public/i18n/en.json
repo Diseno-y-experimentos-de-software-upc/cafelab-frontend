@@ -20,7 +20,11 @@
     "LOADING": "Loading...",
     "DELETING": "Deleting...",
     "NOT_AVAILABLE": "N/A",
-    "KG": "kg"
+    "CLOSE": "Close",
+    "KG": "kg",
+    "UNIT_METERS": "m",
+    "UNIT_MINUTES": "min",
+    "UNIT_CELSIUS": "°C"
   },
   "NAVIGATION": {
     "HOME": "Home",
@@ -417,6 +421,7 @@
       },
       "no_specialties": "N/A",
       "specialties_hint": "comma separated",
+      "specialties_max": "max. 4",
       "optional": "optional",
       "not_provided": "Not provided",
       "contact_person_placeholder": "e.g. Maria Lopez",
@@ -431,7 +436,7 @@
         "web_link": "Web link",
         "user_id": "User ID"
       },
-      "add_specialty_placeholder": "Add Especialty",
+      "add_specialty_placeholder": "Add specialty",
       "delete_supplier": "Delete supplier"
     }
   },
@@ -456,8 +461,10 @@
   "TABLE": {
     "HEADER": {
       "NAME": "Name",
+      "VERSION": "Version",
       "COFFEE_TYPE": "Coffee Type",
       "ALTITUDE": "Altitude (masl)",
+      "REMAINING_WEIGHT": "Remaining kg",
       "SUPPLIER": "Supplier",
       "ACTIONS": "Actions"
     },
@@ -470,6 +477,8 @@
       "ALTITUDE": "Altitude (masl)",
       "ORIGIN": "Origin(specify in the location)",
       "WEIGHT": "Weight (kg)",
+      "BASE_WEIGHT": "Base kg",
+      "CURRENT_WEIGHT": "Current kg",
       "PROCESS": "Processing Method",
       "SUPPLIER": "Supplier",
       "CERTIFICATIONS": "Certifications",
@@ -516,6 +525,18 @@
       "CONFIRM": "Delete",
       "CANCEL": "Cancel"
     },
+    "REGISTER_CONFIRMATION": {
+      "TITLE": "Confirm lot registration",
+      "MESSAGE": "After registering a lot, you will not be able to modify the base kg. Entered kg: <strong>{{weight}}</strong> or the linked supplier: <strong>{{supplierName}}</strong>.",
+      "CONFIRM": "Register",
+      "CANCEL": "Cancel"
+    },
+    "VERSION_CONFIRMATION": {
+      "TITLE": "Confirm new version",
+      "MESSAGE": "Your changes will create version <strong>v{{nextVersion}}</strong> of this lot. Base kg and supplier stay the same; current stock is carried over to the new version.",
+      "CONFIRM": "Create version",
+      "CANCEL": "Cancel"
+    },
     "SUCCESS_MODAL": {
       "TITLE": "Submission Successful!",
       "MESSAGE": "Your message has been sent successfully.",
@@ -533,7 +554,7 @@
       "type": "Type of Coffee",
       "selectType": "Select type",
       "duration": "Total Roasting Time (min)",
-      "durationPlaceholder": "Ej: 12",
+      "durationPlaceholder": "e.g. 12",
       "tempStart": "Initial Grain Temperature (°C)",
       "tempEnd": "Desired Final Temperature (°C)",
       "lot": "Linked Lot",
@@ -564,7 +585,7 @@
     "detailTempEnd": "Final Temperature",
     "delete": {
       "title": "Delete profile",
-      "message": "Do you want to drop this profile: ",
+      "message": "Are you sure you want to delete the profile: ",
       "cancel": "Cancel",
       "confirm": "Confirm"
     }
@@ -1013,7 +1034,17 @@
         "ERROR_REQUIRED": "You must provide an annulment reason.",
         "DISABLED_HINT": "This record is already annulled",
         "CANCEL": "Cancel",
-        "CONFIRM": "Confirm annulment"
+        "CONFIRM": "Confirm annulment",
+        "REASONS": {
+          "WRONG_DATA": "Incorrect data",
+          "WRONG_LOT": "Wrong lot",
+          "DUPLICATE_RECORD": "Duplicate record",
+          "INCOMPLETE_COSTS": "Incomplete costs",
+          "OPERATIONAL_CANCELLATION": "Operational cancellation",
+          "SUPPLIER_UNAVAILABLE": "Supplier unavailable",
+          "CALCULATION_ERROR": "Calculation error",
+          "TRANSPORT_ERROR": "Transport error"
+        }
       },
       "ERRORS": {
         "LOAD": "Records could not be loaded.",
@@ -1324,6 +1355,12 @@
       "WEB_LINK_INVALID": "The web link must be a valid http or https URL."
     },
     "CONFIRM_DELETE": "Are you sure you want to delete this supplier?",
+    "DELETE": {
+      "TITLE": "Delete supplier",
+      "MESSAGE": "Are you sure you want to delete the supplier",
+      "CANCEL": "Cancel",
+      "CONFIRM": "Delete"
+    },
     "ERRORS": {
       "LOAD": "Suppliers could not be loaded.",
       "SEARCH": "Supplier search could not be completed.",
@@ -1340,7 +1377,8 @@
   "COFFEE_LOT_BC": {
     "HINT": {
       "NEED_SUPPLIER": "Register at least one supplier before creating a lot.",
-      "SUPPLIER_FIXED_ON_EDIT": "This screen does not change the lot's supplier."
+      "SUPPLIER_FIXED_ON_EDIT": "The supplier is set when the lot is registered and cannot change in later versions.",
+      "WEIGHT_FIXED_ON_EDIT": "The lot base kg cannot be changed from this screen."
     },
     "VALIDATION": {
       "SUMMARY": "Please fix the fields highlighted below.",
@@ -1371,7 +1409,43 @@
       "UNAUTHORIZED": "Your session expired or you lack permission. Please sign in again.",
       "NOT_FOUND": "This lot does not exist or was already removed.",
       "GENERIC": "Something went wrong. Please try again.",
-      "NOT_AUTHENTICATED_CREATE": "Sign in to register a lot."
+      "NOT_AUTHENTICATED_CREATE": "Sign in to register a lot.",
+      "LOAD_VERSIONS": "Version history could not be loaded.",
+      "ANNULL": "The lot could not be annulled."
+    },
+    "STATUS": {
+      "ANNULLED": "Annulled lot"
+    },
+    "ANNUL_REASON_LABEL": "Annulment reason",
+    "ANNUL": {
+      "ACTION": "Annul lot",
+      "TITLE": "Annul lot",
+      "QUESTION": "Are you sure you want to annul this lot? It will not be deleted: it stays flagged as annulled for auditing and can no longer be used in inventory or cost registration.",
+      "REASON_LABEL": "Reason",
+      "REASON_PLACEHOLDER": "Select a reason",
+      "REASON_OTHER": "Other",
+      "REASON_CUSTOM_LABEL": "Reason detail (max. 25 characters)",
+      "REASON_CUSTOM_PLACEHOLDER": "Describe the reason (max. 25)",
+      "ERROR_REQUIRED": "You must provide an annulment reason.",
+      "DISABLED_HINT": "This lot is already annulled",
+      "CANCEL": "Cancel",
+      "CONFIRM": "Confirm annulment",
+      "REASONS": {
+        "DUPLICATE_RECORD": "Duplicate record",
+        "WRONG_LOT": "Wrong lot",
+        "INCORRECT_DATA": "Incorrect data",
+        "OPERATIONAL_CANCELLATION": "Operational cancellation",
+        "WEIGHT_ERROR": "Weight error",
+        "NO_REAL_STOCK": "No real stock",
+        "OPERATIONAL_CHANGE": "Operational change",
+        "INTERNAL_AUDIT": "Internal audit"
+      }
+    },
+    "VERSION_HISTORY": {
+      "TITLE": "Version history",
+      "EMPTY": "No previous versions.",
+      "CURRENT": "Current",
+      "HISTORICAL": "Historical"
     },
     "OPTIONS": {
       "COFFEE_TYPE": {
@@ -1403,7 +1477,11 @@
     "DUPLICATE_NAME_PATTERN": "Copy of {{name}}",
     "DUPLICATE_NAME_DEFAULT": "profile",
     "HINT": {
-      "NEED_LOT": "Register at least one of your coffee lots before creating a roast profile."
+      "NEED_LOT": "Register at least one of your coffee lots before creating a roast profile.",
+      "NEED_ACTIVE_LOT": "Register at least one active (non-annulled) lot before creating a roast profile.",
+      "EDIT_BLOCKED_ANNULLED_LOT": "A profile linked to an annulled lot cannot be edited.",
+      "DUPLICATE_BLOCKED_ANNULLED_LOT": "A profile linked to an annulled lot cannot be duplicated.",
+      "FAVORITE_BLOCKED_ANNULLED_LOT": "Favorite cannot be changed on a profile with an annulled lot."
     },
     "FIELD": {
       "NAME": "Profile name",
@@ -1432,7 +1510,9 @@
       "TEMP_RANGE": "Each temperature must be between 1 and 240 °C.",
       "TEMP_ORDER": "Starting temperature cannot be greater than or equal to the final temperature.",
       "LOT": "Select a linked coffee lot.",
-      "NO_LOTS": "You need at least one registered coffee lot."
+      "NO_LOTS": "You need at least one registered coffee lot.",
+      "NO_ACTIVE_LOTS": "You need at least one active (non-annulled) lot.",
+      "ANNULLED_LOT": "You cannot link a profile to an annulled lot."
     },
     "ERRORS": {
       "LOAD": "Roast profiles could not be loaded.",
@@ -1499,11 +1579,18 @@
     "EL_PRODUCTO_FINAL_NO_PUEDE_TENER_MAS": "The final product cannot exceed 100 characters",
     "EL_PRODUCTO_FINAL_SOLO_PUEDE_CONTENER_LETRAS": "The final product can only contain letters, numbers and spaces",
     "EL_REGISTRO_YA_ESTA_ANULADO": "The record is already voided",
+    "EL_LOTE_YA_ESTA_ANULADO": "The lot is already annulled",
+    "NO_SE_PUEDE_MODIFICAR_UN_LOTE_ANULADO": "An annulled lot cannot be modified",
+    "NO_SE_PUEDE_OPERAR_SOBRE_UN_LOTE_ANULADO": "Operations on an annulled lot are not allowed",
+    "NO_SE_PUEDE_REGISTRAR_COSTO_SOBRE_LOTE_ANULADO": "Cost cannot be registered for an annulled lot",
+    "NO_SE_PUEDE_AJUSTAR_STOCK_LOTE_ANULADO": "Stock cannot be adjusted for an annulled lot",
+    "NO_SE_PUEDE_VINCULAR_PERFIL_TUESTE_LOTE_ANULADO": "A roast profile cannot be linked to an annulled lot",
     "EL_TIPO_DE_CAFE_NO_PUEDE_SER": "The coffee type cannot be null or empty",
     "EL_TIPO_DE_CAFE_NO_PUEDE_TENER": "The coffee type cannot exceed 50 characters",
     "EL_TIPO_DE_DEFECTO_NO_PUEDE_SER": "The defect type cannot be null or empty",
     "EL_TIPO_DE_TUESTE_NO_PUEDE_SER": "The roast type cannot be null or empty",
     "ERROR_INTERNO_DEL_SERVIDOR": "Internal server error",
+    "LA_CANTIDAD_SUPERA_EL_STOCK_DISPONIBLE_DEL_LOTE": "The quantity exceeds the available batch stock",
     "LA_CAUSA_PROBABLE_NO_PUEDE_SER_NULA": "The probable cause cannot be null or empty",
     "LA_DURACION_DEBE_SER_UN_VALOR_POSITIVO": "The duration must be a positive value",
     "LA_DURACION_NO_PUEDE_EXCEDER_1440_MINUTOS": "The duration cannot exceed 1440 minutes (24 hours)",
@@ -1569,7 +1656,8 @@
     "NO_SE_PUEDEN_TENER_MAS_DE_4": "You cannot have more than 4 specialties",
     "PHONE_DEBE_TENER_ENTRE_7_Y_15": "Phone must be between 7 and 15 digits",
     "PROVEEDOR_ELIMINADO_EXITOSAMENTE": "Supplier deleted successfully",
-    "SESION_NO_VALIDA": "Invalid session",
+    "SOLO_SE_PUEDE_AJUSTAR_STOCK_VERSION_ACTUAL": "Stock can only be adjusted on the current batch version",
+    "SOLO_SE_PUEDE_REGISTRAR_CONSUMO_DIA_HOY": "Consumption can only be registered for today",
     "TIPO_DE_TUESTE_NO_VALIDO_DEBE_SER": "Invalid roast type. It must be: Light, Medium, Medium-Dark, Dark",
     "USUARIO_NO_AUTENTICADO_O_PERFIL_NO_ENCONTRADO": "User not authenticated or profile not found",
     "YA_EXISTE_UN_CAFE_CON_ESE_NOMBRE": "A coffee with that name already exists",

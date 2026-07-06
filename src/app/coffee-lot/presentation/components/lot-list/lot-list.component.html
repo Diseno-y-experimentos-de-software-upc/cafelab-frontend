@@ -31,8 +31,10 @@
       <thead>
       <tr>
         <th>{{ 'TABLE.HEADER.NAME' | translate }}</th>
+        <th>{{ 'TABLE.HEADER.VERSION' | translate }}</th>
         <th>{{ 'TABLE.HEADER.COFFEE_TYPE' | translate }}</th>
         <th>{{ 'TABLE.HEADER.ALTITUDE' | translate }}</th>
+        <th>{{ 'TABLE.HEADER.REMAINING_WEIGHT' | translate }}</th>
         <th>{{ 'TABLE.HEADER.SUPPLIER' | translate }}</th>
         <th>{{ 'FORM.LABEL.STATUS' | translate }}</th>
         <th colspan="3">{{ 'TABLE.HEADER.ACTIONS' | translate }}</th>
@@ -40,13 +42,20 @@
       </thead>
       <tbody>
       <tr *ngIf="lots.length === 0">
-        <td colspan="8">{{ 'TABLE.NO_LOTS' | translate }}</td>
+        <td colspan="10">{{ 'TABLE.NO_LOTS' | translate }}</td>
       </tr>
-      <tr *ngFor="let lot of lots">
+      <tr *ngFor="let lot of lots" [class.row-annulled]="isAnnulled(lot)">
         <td>{{ lot.lot_name }}</td>
+        <td>
+          <span *ngIf="isAnnulled(lot)" class="version-badge annulled-badge">
+            {{ 'COFFEE_LOT_BC.STATUS.ANNULLED' | translate }}
+          </span>
+          <span *ngIf="!isAnnulled(lot)" class="version-badge">{{ getVersionLabel(lot) }}</span>
+        </td>
         <td>{{ coffeeTypeLabelKey(lot.coffee_type) | translate }}</td>
         <td>{{ lot.altitude }}</td>
-        <td>{{ getSupplierName(lot.supplier_id) }}</td>
+        <td>{{ getCurrentWeight(lot) | number:'1.0-2' }} {{ 'COMMON.KG' | translate }}</td>
+        <td>{{ getSupplierDisplayName(lot) }}</td>
         <td>{{ getStatusText(lot.status) }}</td>
         <td class="action-cell">
           <button class="action-button" (click)="viewLotDetails(lot)" [title]="'BUTTON.VIEW' | translate">
@@ -54,12 +63,17 @@
           </button>
         </td>
         <td class="action-cell">
-          <button class="action-button" (click)="editLot(lot)" [title]="'BUTTON.EDIT' | translate">
+          <button class="action-button" (click)="editLot(lot)" [title]="'BUTTON.EDIT' | translate" [disabled]="isAnnulled(lot)">
             <i class="material-icons">edit</i>
           </button>
         </td>
         <td class="action-cell">
-          <button class="action-button delete-button" (click)="deleteLot(lot)" [title]="'BUTTON.DELETE' | translate">
+          <button
+            class="action-button delete-button"
+            (click)="annulLot(lot)"
+            [title]="(isAnnulled(lot) ? 'COFFEE_LOT_BC.ANNUL.DISABLED_HINT' : 'COFFEE_LOT_BC.ANNUL.ACTION') | translate"
+            [disabled]="isAnnulled(lot)"
+          >
             <i class="material-icons">delete</i>
           </button>
         </td>
@@ -83,7 +97,7 @@
   <div *ngIf="showRegisterModal" class="modal-overlay">
     <div class="modal-content">
       <h2>{{ 'MODAL.NEW_COFFEE_LOT' | translate }}</h2>
-      <form (ngSubmit)="registerLot()" #lotForm="ngForm">
+      <form (ngSubmit)="requestRegisterLot()" #lotForm="ngForm">
         <div class="form-row">
           <div class="form-group">
             <label>{{ 'FORM.LABEL.NAME' | translate }}</label>
@@ -188,6 +202,25 @@
 
     <div class="detail-row">
       <div class="detail-group">
+        <label>{{ 'TABLE.HEADER.VERSION' | translate }}:</label>
+        <p>
+          <span *ngIf="isAnnulled(selectedLot)" class="version-badge annulled-badge">
+            {{ 'COFFEE_LOT_BC.STATUS.ANNULLED' | translate }}
+          </span>
+          <span *ngIf="!isAnnulled(selectedLot)" class="version-badge">{{ getVersionLabel(selectedLot) }}</span>
+        </p>
+      </div>
+    </div>
+
+    <div class="detail-row" *ngIf="isAnnulled(selectedLot)">
+      <div class="detail-group">
+        <label>{{ 'COFFEE_LOT_BC.ANNUL_REASON_LABEL' | translate }}:</label>
+        <p>{{ getAnnulReasonDisplay(selectedLot?.annulment_reason) }}</p>
+      </div>
+    </div>
+
+    <div class="detail-row">
+      <div class="detail-group">
         <label>{{ 'FORM.LABEL.NAME' | translate }}:</label>
         <p>{{ selectedLot?.lot_name }}</p>
       </div>
@@ -198,13 +231,18 @@
       </div>
 
       <div class="detail-group">
-        <label>{{ 'FORM.LABEL.WEIGHT' | translate }}:</label>
-        <p>{{ selectedLot?.weight }} kg</p>
+        <label>{{ 'FORM.LABEL.BASE_WEIGHT' | translate }}:</label>
+        <p>{{ getBaseWeight(selectedLot) | number:'1.0-2' }} {{ 'COMMON.KG' | translate }}</p>
+      </div>
+
+      <div class="detail-group">
+        <label>{{ 'FORM.LABEL.CURRENT_WEIGHT' | translate }}:</label>
+        <p>{{ getCurrentWeight(selectedLot) | number:'1.0-2' }} {{ 'COMMON.KG' | translate }}</p>
       </div>
 
       <div class="detail-group">
         <label>{{ 'FORM.LABEL.ALTITUDE' | translate }}:</label>
-        <p>{{ selectedLot?.altitude }} m</p>
+        <p>{{ selectedLot?.altitude }} {{ 'COMMON.UNIT_METERS' | translate }}</p>
       </div>
     </div>
 
@@ -216,12 +254,12 @@
 
       <div class="detail-group">
         <label>{{ 'FORM.LABEL.PROCESS' | translate }}:</label>
-        <p>{{ selectedLot?.processing_method }}</p>
+        <p>{{ processLabelKey(selectedLot?.processing_method ?? '') | translate }}</p>
       </div>
 
       <div class="detail-group">
         <label>{{ 'FORM.LABEL.SUPPLIER' | translate }}:</label>
-        <p>{{ getSupplierName(selectedLot?.supplier_id) || ('FORM.LABEL.NOT_ASSIGNED' | translate) }}</p>
+        <p>{{ getSupplierDisplayName(selectedLot) || ('FORM.LABEL.NOT_ASSIGNED' | translate) }}</p>
       </div>
       <div class="detail-group">
         <label>{{ 'FORM.LABEL.STATUS' | translate }}:</label>
@@ -236,6 +274,29 @@
           {{ certificationLabelKey(cert) | translate }}
         </li>
         <li *ngIf="!selectedLot?.certifications?.length">{{ 'FORM.LABEL.NO_CERTIFICATIONS' | translate }}</li>
+      </ul>
+    </div>
+
+    <div class="version-history-section">
+      <h3>{{ 'COFFEE_LOT_BC.VERSION_HISTORY.TITLE' | translate }}</h3>
+      <div *ngIf="loadingVersions" class="loading-indicator">
+        <div class="spinner"></div>
+        <p>{{ 'COMMON.LOADING' | translate }}</p>
+      </div>
+      <ul class="version-history-list" *ngIf="!loadingVersions">
+        <li *ngFor="let version of versionHistory" class="version-history-item">
+          <span class="version-badge">{{ getVersionLabel(version) }}</span>
+          <span class="version-name">{{ version.lot_name }}</span>
+          <span class="version-status" [class.current]="version.is_current">
+            {{ version.is_current
+              ? ('COFFEE_LOT_BC.VERSION_HISTORY.CURRENT' | translate)
+              : ('COFFEE_LOT_BC.VERSION_HISTORY.HISTORICAL' | translate) }}
+          </span>
+          <span class="version-weight">{{ getCurrentWeight(version) | number:'1.0-2' }} {{ 'COMMON.KG' | translate }}</span>
+        </li>
+        <li *ngIf="versionHistory.length === 0" class="version-history-empty">
+          {{ 'COFFEE_LOT_BC.VERSION_HISTORY.EMPTY' | translate }}
+        </li>
       </ul>
     </div>
   </div>
@@ -282,10 +343,10 @@
 
         <div class="form-row">
           <div class="form-group">
-            <label>{{ 'FORM.LABEL.WEIGHT' | translate }}</label>
-            <input type="number" [(ngModel)]="editingLot.weight" name="weight_kg" min="0.01" step="0.01" required />
-            <div *ngIf="editFieldErrors['weight']" class="field-error">{{ editFieldErrors['weight'] }}</div>
-            <i class="material-icons">edit</i>
+            <label>{{ 'FORM.LABEL.BASE_WEIGHT' | translate }}</label>
+            <p class="readonly-field" [title]="'COFFEE_LOT_BC.HINT.WEIGHT_FIXED_ON_EDIT' | translate">
+              {{ getBaseWeight(editingLot) | number:'1.0-2' }} {{ 'COMMON.KG' | translate }}
+            </p>
           </div>
 
           <div class="form-group">
@@ -304,7 +365,7 @@
           <div class="form-group">
             <label>{{ 'FORM.LABEL.SUPPLIER' | translate }}</label>
             <p class="readonly-field" [title]="'COFFEE_LOT_BC.HINT.SUPPLIER_FIXED_ON_EDIT' | translate">
-              {{ getSupplierName(editingLot.supplier_id) || ('FORM.LABEL.NOT_ASSIGNED' | translate) }}
+              {{ getSupplierDisplayName(editingLot) || ('FORM.LABEL.NOT_ASSIGNED' | translate) }}
             </p>
             <i class="material-icons">edit</i>
           </div>
@@ -343,22 +404,104 @@
     </div>
   </div>
 
-  <div *ngIf="showDeleteModal" class="modal-overlay">
+  <div *ngIf="showEditConfirmModal" class="modal-overlay">
     <div class="modal-content delete-confirmation-modal">
-      <h2>{{ 'MODAL.DELETE_CONFIRMATION.TITLE' | translate }}</h2>
-      <p [innerHTML]="'MODAL.DELETE_CONFIRMATION.MESSAGE' | translate: {lotName: lotToDelete?.lot_name}"></p>
-      
+      <h2>{{ 'MODAL.VERSION_CONFIRMATION.TITLE' | translate }}</h2>
+      <p [innerHTML]="'MODAL.VERSION_CONFIRMATION.MESSAGE' | translate: {
+        nextVersion: getNextVersionNumber()
+      }"></p>
+
       <div *ngIf="loading" class="loading-indicator">
         <div class="spinner"></div>
-        <p>{{ 'COMMON.DELETING' | translate }}</p>
+        <p>{{ 'COMMON.LOADING' | translate }}</p>
       </div>
-      
+
       <div class="form-actions" *ngIf="!loading">
-        <button class="delete-button" (click)="confirmDelete()">
-          {{ 'MODAL.DELETE_CONFIRMATION.CONFIRM' | translate }}
+        <button class="submit-button" type="button" (click)="confirmSaveLotChanges()">
+          {{ 'MODAL.VERSION_CONFIRMATION.CONFIRM' | translate }}
         </button>
-        <button class="cancel-button" (click)="cancelDelete()">
-          {{ 'MODAL.DELETE_CONFIRMATION.CANCEL' | translate }}
+        <button class="cancel-button" type="button" (click)="cancelEditConfirm()">
+          {{ 'MODAL.VERSION_CONFIRMATION.CANCEL' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="showRegisterConfirmModal" class="modal-overlay">
+    <div class="modal-content delete-confirmation-modal">
+      <h2>{{ 'MODAL.REGISTER_CONFIRMATION.TITLE' | translate }}</h2>
+      <p [innerHTML]="'MODAL.REGISTER_CONFIRMATION.MESSAGE' | translate: {
+        weight: newLot.weight,
+        supplierName: getSupplierName(newLot.supplier_id)
+      }"></p>
+
+      <div *ngIf="loading" class="loading-indicator">
+        <div class="spinner"></div>
+        <p>{{ 'COMMON.LOADING' | translate }}</p>
+      </div>
+
+      <div class="form-actions" *ngIf="!loading">
+        <button class="submit-button" type="button" (click)="confirmRegisterLot()">
+          {{ 'MODAL.REGISTER_CONFIRMATION.CONFIRM' | translate }}
+        </button>
+        <button class="cancel-button" type="button" (click)="cancelRegisterConfirm()">
+          {{ 'MODAL.REGISTER_CONFIRMATION.CANCEL' | translate }}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="showAnnulModal" class="modal-overlay" (click)="cancelAnnul()">
+    <div class="modal-content annul-modal" (click)="$event.stopPropagation()">
+      <h2>{{ 'COFFEE_LOT_BC.ANNUL.TITLE' | translate }}</h2>
+      <p class="annul-question">{{ 'COFFEE_LOT_BC.ANNUL.QUESTION' | translate }}</p>
+      <p class="annul-target">
+        <strong>{{ lotToAnnul?.lot_name }}</strong>
+      </p>
+
+      <div class="form-group">
+        <label for="lot-annul-reason">{{ 'COFFEE_LOT_BC.ANNUL.REASON_LABEL' | translate }}</label>
+        <select
+          id="lot-annul-reason"
+          [(ngModel)]="annulReasonSelection"
+          name="annulReasonSelection"
+          [disabled]="loading"
+        >
+          <option value="">{{ 'COFFEE_LOT_BC.ANNUL.REASON_PLACEHOLDER' | translate }}</option>
+          <option *ngFor="let reasonKey of predefinedAnnulReasonKeys" [value]="reasonKey">
+            {{ annulReasonLabel(reasonKey) }}
+          </option>
+          <option [value]="otherReasonKey">{{ 'COFFEE_LOT_BC.ANNUL.REASON_OTHER' | translate }}</option>
+        </select>
+      </div>
+
+      <div class="form-group" *ngIf="annulReasonSelection === otherReasonKey">
+        <label for="lot-annul-reason-custom">{{ 'COFFEE_LOT_BC.ANNUL.REASON_CUSTOM_LABEL' | translate }}</label>
+        <input
+          id="lot-annul-reason-custom"
+          type="text"
+          [(ngModel)]="annulReasonCustom"
+          name="annulReasonCustom"
+          [maxlength]="reasonMaxLength"
+          [disabled]="loading"
+          [placeholder]="'COFFEE_LOT_BC.ANNUL.REASON_CUSTOM_PLACEHOLDER' | translate"
+        />
+        <small>{{ annulReasonCustom.length }}/{{ reasonMaxLength }}</small>
+      </div>
+
+      <div *ngIf="annulFormError" class="error-message">{{ annulFormError }}</div>
+
+      <div *ngIf="loading" class="loading-indicator">
+        <div class="spinner"></div>
+        <p>{{ 'COMMON.LOADING' | translate }}</p>
+      </div>
+
+      <div class="form-actions" *ngIf="!loading">
+        <button class="annul-confirm-button" type="button" (click)="confirmAnnul()">
+          {{ 'COFFEE_LOT_BC.ANNUL.CONFIRM' | translate }}
+        </button>
+        <button class="cancel-button" type="button" (click)="cancelAnnul()">
+          {{ 'COFFEE_LOT_BC.ANNUL.CANCEL' | translate }}
         </button>
       </div>
     </div>

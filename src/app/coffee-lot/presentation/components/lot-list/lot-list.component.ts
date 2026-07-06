@@ -14,6 +14,20 @@ import type { ApiError } from '../../../../shared/infrastructure/base-api-endpoi
 import { getUserFacingApiMessage } from '../../../../shared/infrastructure/api-error-message';
 import { MatSnackBar, MatSnackBarModule } from '@angular/material/snack-bar';
 
+const PREDEFINED_ANNUL_REASON_KEYS = [
+  'DUPLICATE_RECORD',
+  'WRONG_LOT',
+  'INCORRECT_DATA',
+  'OPERATIONAL_CANCELLATION',
+  'WEIGHT_ERROR',
+  'NO_REAL_STOCK',
+  'OPERATIONAL_CHANGE',
+  'INTERNAL_AUDIT',
+] as const;
+
+const OTHER_REASON_KEY = '__OTHER__';
+const REASON_MAX_LENGTH = 25;
+
 @Component({
   selector: 'app-lot-list',
   standalone: true,
@@ -29,12 +43,21 @@ export class LotListComponent implements OnInit {
   suppliers: Supplier[] = [];
   searchQuery = '';
   showRegisterModal = false;
+  showRegisterConfirmModal = false;
+  showEditConfirmModal = false;
   showEditModal = false;
   showLotDetails = false;
-  showDeleteModal = false;
+  showAnnulModal = false;
   loading = false;
   error: string | null = null;
   newCertification = '';
+
+  readonly predefinedAnnulReasonKeys = PREDEFINED_ANNUL_REASON_KEYS;
+  readonly otherReasonKey = OTHER_REASON_KEY;
+  readonly reasonMaxLength = REASON_MAX_LENGTH;
+  annulReasonSelection = '';
+  annulReasonCustom = '';
+  annulFormError: string | null = null;
 
   /** Errores por campo (registro) — claves alineadas con el API (p. ej. {@code lot_name}). */
   fieldErrors: Record<string, string> = {};
@@ -85,7 +108,9 @@ export class LotListComponent implements OnInit {
   newLot: CoffeeLot = this.getEmptyLot();
   editingLot: CoffeeLot = this.getEmptyLot();
   selectedLot: CoffeeLot | null = null;
-  lotToDelete: CoffeeLot | null = null;
+  lotToAnnul: CoffeeLot | null = null;
+  versionHistory: CoffeeLot[] = [];
+  loadingVersions = false;
 
   constructor(
     private readonly coffeeLotApi: CoffeeLotApi,
@@ -108,12 +133,36 @@ export class LotListComponent implements OnInit {
       processing_method: '',
       altitude: 0,
       weight: 0,
+      original_weight: 0,
       origin: '',
       certifications: [],
       supplier_id: 0,
+      supplier_name: '',
       userId: 0,
       status: '',
+      version_number: 1,
+      is_current: true,
+      record_status: 'activo',
+      annulment_reason: '',
     };
+  }
+
+  isAnnulled(lot: CoffeeLot | null | undefined): boolean {
+    return lot?.record_status === 'anulado';
+  }
+
+  getVersionLabel(lot: CoffeeLot | null | undefined): string {
+    const version = lot?.version_number ?? 1;
+    return `v${version}`;
+  }
+
+  getNextVersionNumber(): number {
+    return (this.editingLot.version_number ?? 1) + 1;
+  }
+
+  getLineageId(lot: CoffeeLot | null | undefined): number | null {
+    if (!lot) return null;
+    return lot.lot_lineage_id ?? lot.id ?? null;
   }
 
   openRegisterModal(): void {
@@ -183,17 +232,45 @@ export class LotListComponent implements OnInit {
 
   viewLotDetails(lot: CoffeeLot): void {
     this.selectedLot = { ...lot };
+    this.versionHistory = [];
     this.showLotDetails = true;
     this.error = null;
+    this.loadVersionHistory(lot);
+  }
+
+  private loadVersionHistory(lot: CoffeeLot): void {
+    const lineageId = this.getLineageId(lot);
+    if (!lineageId) {
+      return;
+    }
+
+    this.loadingVersions = true;
+    this.coffeeLotApi
+      .getVersionsByLineage(lineageId)
+      .pipe(
+        catchError((err) => {
+          console.error('Error loading version history', err);
+          this.error = this.lotErrorMessage(err, 'COFFEE_LOT_BC.ERRORS.LOAD_VERSIONS');
+          return of([]);
+        }),
+        finalize(() => (this.loadingVersions = false)),
+      )
+      .subscribe((versions) => {
+        this.versionHistory = versions;
+      });
   }
 
   closeLotDetails(): void {
     this.showLotDetails = false;
     this.selectedLot = null;
+    this.versionHistory = [];
     this.error = null;
   }
 
   editLot(lot: CoffeeLot): void {
+    if (this.isAnnulled(lot)) {
+      return;
+    }
     this.editFieldErrors = {};
     this.editingLot = { ...lot };
     this.showEditModal = true;
@@ -282,16 +359,6 @@ export class LotListComponent implements OnInit {
     } else if (alt > 2500) {
       e['altitude'] = t('COFFEE_LOT_BC.VALIDATION.ALTITUDE_MAX');
     }
-    const w = Number(this.editingLot.weight);
-    const weightStr = String(this.editingLot.weight ?? '');
-    const decimalPlaces = weightStr.includes('.') ? weightStr.split('.')[1].length : 0;
-    if (!Number.isFinite(w) || w < 1) {
-      e['weight'] = t('COFFEE_LOT_BC.VALIDATION.WEIGHT');
-    } else if (w > 70) {
-      e['weight'] = t('COFFEE_LOT_BC.VALIDATION.WEIGHT_MAX');
-    } else if (decimalPlaces > 2) {
-      e['weight'] = t('COFFEE_LOT_BC.VALIDATION.WEIGHT_DECIMALS');
-    }
     if (!this.editingLot.origin?.trim()) {
       e['origin'] = t('COFFEE_LOT_BC.VALIDATION.ORIGIN');
     }
@@ -301,7 +368,7 @@ export class LotListComponent implements OnInit {
     return e;
   }
 
-  registerLot(): void {
+  requestRegisterLot(): void {
     this.fieldErrors = {};
     const client = this.collectRegisterFieldErrors();
     if (Object.keys(client).length > 0) {
@@ -314,12 +381,18 @@ export class LotListComponent implements OnInit {
       return;
     }
 
+    this.error = null;
+    this.showRegisterConfirmModal = true;
+  }
+
+  confirmRegisterLot(): void {
     this.loading = true;
     this.error = null;
 
     this.newLot.userId = Number(this.authService.getCurrentUserId());
     this.newLot.altitude = Number(this.newLot.altitude);
     this.newLot.weight = Number(this.newLot.weight);
+    this.newLot.original_weight = Number(this.newLot.weight);
 
     this.coffeeLotApi
       .create(this.newLot)
@@ -332,8 +405,9 @@ export class LotListComponent implements OnInit {
           }
           const msg = this.lotErrorMessage(err, 'COFFEE_LOT_BC.ERRORS.REGISTER');
           this.error = msg;
+          this.showRegisterConfirmModal = false;
           if (msg) {
-            this.snackBar.open(msg, 'Cerrar', { duration: 6000, panelClass: ['snack-error'] });
+            this.snackBar.open(msg, this.translateService.instant('COMMON.CLOSE'), { duration: 6000, panelClass: ['snack-error'] });
           }
           return of(null);
         }),
@@ -341,11 +415,16 @@ export class LotListComponent implements OnInit {
       )
       .subscribe((result) => {
         if (result !== null) {
+          this.showRegisterConfirmModal = false;
           this.showRegisterModal = false;
           this.resetForm();
           this.loadLots();
         }
       });
+  }
+
+  cancelRegisterConfirm(): void {
+    this.showRegisterConfirmModal = false;
   }
 
   cancelRegister(): void {
@@ -371,17 +450,25 @@ export class LotListComponent implements OnInit {
       return;
     }
 
+    this.error = null;
+    this.showEditConfirmModal = true;
+  }
+
+  confirmSaveLotChanges(): void {
+    if (!this.editingLot.id) {
+      this.error = this.translateService.instant('COFFEE_LOT_BC.ERRORS.MISSING_ID');
+      return;
+    }
+
     this.loading = true;
     this.error = null;
-
     this.editingLot.altitude = Number(this.editingLot.altitude);
-    this.editingLot.weight = Number(this.editingLot.weight);
 
     this.coffeeLotApi
-      .update(this.editingLot.id, this.editingLot)
+      .createVersion(this.editingLot.id, this.editingLot)
       .pipe(
         catchError((err) => {
-          console.error('Error updating lot', err);
+          console.error('Error creating lot version', err);
           const api = err as ApiError;
           if (api.fieldErrors && Object.keys(api.fieldErrors).length > 0) {
             this.editFieldErrors = { ...api.fieldErrors };
@@ -389,7 +476,7 @@ export class LotListComponent implements OnInit {
           const msg = this.lotErrorMessage(err, 'COFFEE_LOT_BC.ERRORS.UPDATE');
           this.error = msg;
           if (msg) {
-            this.snackBar.open(msg, 'Cerrar', { duration: 6000, panelClass: ['snack-error'] });
+            this.snackBar.open(msg, this.translateService.instant('COMMON.CLOSE'), { duration: 6000, panelClass: ['snack-error'] });
           }
           return of(null);
         }),
@@ -397,11 +484,16 @@ export class LotListComponent implements OnInit {
       )
       .subscribe((result) => {
         if (result !== null) {
+          this.showEditConfirmModal = false;
           this.showEditModal = false;
           this.editFieldErrors = {};
           this.loadLots();
         }
       });
+  }
+
+  cancelEditConfirm(): void {
+    this.showEditConfirmModal = false;
   }
 
   onSupplierChange(event: Event): void {
@@ -436,6 +528,23 @@ export class LotListComponent implements OnInit {
     return supplier ? supplier.name : '';
   }
 
+  getSupplierDisplayName(lot: CoffeeLot | null | undefined): string {
+    if (!lot) return '';
+    if (lot.supplier_name?.trim()) {
+      return lot.supplier_name.trim();
+    }
+    return this.getSupplierName(lot.supplier_id);
+  }
+
+  getBaseWeight(lot: CoffeeLot | null | undefined): number {
+    if (!lot) return 0;
+    return lot.original_weight ?? lot.weight ?? 0;
+  }
+
+  getCurrentWeight(lot: CoffeeLot | null | undefined): number {
+    return lot?.weight ?? 0;
+  }
+
   getStatusText(status: string | undefined): string {
     if (!status) return '';
     return status === 'green'
@@ -443,49 +552,107 @@ export class LotListComponent implements OnInit {
       : this.translateService.instant('FORM.STATUS_OPTIONS.ROASTED');
   }
 
-  deleteLot(lot: CoffeeLot): void {
+  annulLot(lot: CoffeeLot): void {
     if (!lot.id) {
       this.error = this.translateService.instant('COFFEE_LOT_BC.ERRORS.MISSING_ID');
       return;
     }
+    if (this.isAnnulled(lot)) {
+      return;
+    }
 
-    this.lotToDelete = lot;
-    this.showDeleteModal = true;
+    this.lotToAnnul = lot;
+    this.annulReasonSelection = '';
+    this.annulReasonCustom = '';
+    this.annulFormError = null;
+    this.showAnnulModal = true;
   }
 
-  confirmDelete(): void {
-    if (!this.lotToDelete?.id) {
+  cancelAnnul(): void {
+    this.showAnnulModal = false;
+    this.lotToAnnul = null;
+    this.annulReasonSelection = '';
+    this.annulReasonCustom = '';
+    this.annulFormError = null;
+  }
+
+  private resolveAnnulReason(): string | null {
+    const selection = this.annulReasonSelection;
+    if (!selection) {
+      return null;
+    }
+    if (selection !== OTHER_REASON_KEY) {
+      return this.annulReasonLabel(selection);
+    }
+    const custom = (this.annulReasonCustom || '').trim();
+    return custom || null;
+  }
+
+  annulReasonLabel(key: string): string {
+    return this.translateService.instant(`COFFEE_LOT_BC.ANNUL.REASONS.${key}`);
+  }
+
+  getAnnulReasonDisplay(reason: string | undefined | null): string {
+    const text = (reason ?? '').trim();
+    if (!text) {
+      return '';
+    }
+    const key = PREDEFINED_ANNUL_REASON_KEYS.find(
+      (k) => this.annulReasonLabel(k) === text || k === text,
+    );
+    if (key) {
+      return this.annulReasonLabel(key);
+    }
+    const legacyKey = this.legacyAnnulReasonKeyBySpanishLabel[text];
+    if (legacyKey) {
+      return this.annulReasonLabel(legacyKey);
+    }
+    return text;
+  }
+
+  private readonly legacyAnnulReasonKeyBySpanishLabel: Record<string, string> = {
+    'Registro duplicado': 'DUPLICATE_RECORD',
+    'Lote erróneo': 'WRONG_LOT',
+    'Datos incorrectos': 'INCORRECT_DATA',
+    'Cancelación operativa': 'OPERATIONAL_CANCELLATION',
+    'Error de peso': 'WEIGHT_ERROR',
+    'Sin stock real': 'NO_REAL_STOCK',
+    'Cambio operativo': 'OPERATIONAL_CHANGE',
+    'Auditoría interna': 'INTERNAL_AUDIT',
+  };
+
+  confirmAnnul(): void {
+    if (!this.lotToAnnul?.id) {
       this.error = this.translateService.instant('COFFEE_LOT_BC.ERRORS.MISSING_ID');
+      return;
+    }
+
+    const reason = this.resolveAnnulReason();
+    if (!reason) {
+      this.annulFormError = this.translateService.instant('COFFEE_LOT_BC.ANNUL.ERROR_REQUIRED');
       return;
     }
 
     this.loading = true;
     this.error = null;
+    this.annulFormError = null;
 
     this.coffeeLotApi
-      .delete(this.lotToDelete.id)
+      .annull(this.lotToAnnul.id, reason)
       .pipe(
         catchError((err) => {
-          console.error('Error deleting lot', err);
-          this.error = this.lotErrorMessage(err, 'COFFEE_LOT_BC.ERRORS.DELETE');
+          console.error('Error annulling lot', err);
+          this.annulFormError = this.lotErrorMessage(err, 'COFFEE_LOT_BC.ERRORS.ANNULL');
           return of(null);
         }),
-        finalize(() => {
-          this.loading = false;
-          this.showDeleteModal = false;
-          this.lotToDelete = null;
-        }),
+        finalize(() => (this.loading = false)),
       )
       .subscribe((result) => {
         if (result !== null) {
+          this.cancelAnnul();
           this.loadLots();
         }
       });
-  }
-
-  cancelDelete(): void {
-    this.showDeleteModal = false;
-    this.lotToDelete = null;
   }
 
   resetForm(): void {

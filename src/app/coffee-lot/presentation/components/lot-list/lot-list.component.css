@@ -583,3 +583,98 @@
   justify-content: center;
   margin-top: 25px;
 }
+
+.version-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 12px;
+  background-color: #4A5A54;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.version-history-section {
+  margin-top: 24px;
+  padding-top: 16px;
+  border-top: 1px solid #ddd;
+}
+
+.version-history-list {
+  list-style: none;
+  padding: 0;
+  margin: 12px 0 0;
+}
+
+.version-history-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 0;
+  border-bottom: 1px solid #eee;
+}
+
+.version-name {
+  flex: 1;
+  font-weight: 500;
+}
+
+.version-status {
+  font-size: 12px;
+  color: #888;
+}
+
+.version-status.current {
+  color: #2e7d32;
+  font-weight: 600;
+}
+
+.version-weight {
+  font-size: 13px;
+  color: #555;
+}
+
+.version-history-empty {
+  color: #888;
+  font-style: italic;
+}
+
+.row-annulled td {
+  opacity: 0.75;
+  background-color: #faf5f5;
+}
+
+.annulled-badge {
+  background-color: #8b3a3a;
+}
+
+.annul-modal {
+  max-width: 520px;
+}
+
+.annul-question {
+  margin-bottom: 12px;
+  line-height: 1.5;
+}
+
+.annul-target {
+  margin-bottom: 16px;
+}
+
+.annul-confirm-button {
+  background-color: #8b3a3a;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 10px 16px;
+  cursor: pointer;
+}
+
+.annul-confirm-button:hover:not([disabled]) {
+  background-color: #6f2f2f;
+}
+
+.annul-confirm-button[disabled] {
+  opacity: 0.6;
+  cursor: not-allowed;
+}

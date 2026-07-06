@@ -20,7 +20,11 @@
     "LOADING": "Cargando...",
     "DELETING": "Eliminando...",
     "NOT_AVAILABLE": "N/D",
-    "KG": "kg"
+    "CLOSE": "Cerrar",
+    "KG": "kg",
+    "UNIT_METERS": "m",
+    "UNIT_MINUTES": "min",
+    "UNIT_CELSIUS": "°C"
   },
   "NAVIGATION": {
     "HOME": "Inicio",
@@ -417,6 +421,7 @@
       },
       "no_specialties": "N/A",
       "specialties_hint": "separadas por coma",
+      "specialties_max": "máx. 4",
       "optional": "opcional",
       "not_provided": "No especificado",
       "contact_person_placeholder": "Ej: María López",
@@ -458,8 +463,10 @@
   "TABLE": {
     "HEADER": {
       "NAME": "Nombre",
+      "VERSION": "Versión",
       "COFFEE_TYPE": "Tipo de Café",
       "ALTITUDE": "Altitud (msnm)",
+      "REMAINING_WEIGHT": "Kg restantes",
       "SUPPLIER": "Proveedor",
       "ACTIONS": "Acciones"
     },
@@ -472,6 +479,8 @@
       "ALTITUDE": "Altitud (msnm)",
       "ORIGIN": "Origen(Especificar en la ubicacion)",
       "WEIGHT": "Peso (kg)",
+      "BASE_WEIGHT": "Kg base",
+      "CURRENT_WEIGHT": "Kg actuales",
       "PROCESS": "Proceso",
       "SUPPLIER": "Proveedor",
       "CERTIFICATIONS": "Certificaciones",
@@ -516,6 +525,18 @@
       "TITLE": "Confirmar Eliminación",
       "MESSAGE": "¿Está seguro de que desea eliminar el lote '{{lotName}}'? Esta acción no se puede deshacer.",
       "CONFIRM": "Eliminar",
+      "CANCEL": "Cancelar"
+    },
+    "REGISTER_CONFIRMATION": {
+      "TITLE": "Confirmar registro de lote",
+      "MESSAGE": "Luego de registrar un lote, no podrás modificar el Kg base. Kg ingresado: <strong>{{weight}}</strong> ni el proveedor vinculado: <strong>{{supplierName}}</strong>.",
+      "CONFIRM": "Registrar",
+      "CANCEL": "Cancelar"
+    },
+    "VERSION_CONFIRMATION": {
+      "TITLE": "Confirmar nueva versión",
+      "MESSAGE": "Los cambios crearán la versión <strong>v{{nextVersion}}</strong> del lote. El kg base y el proveedor se mantienen; el stock actual se conserva en la nueva versión.",
+      "CONFIRM": "Crear versión",
       "CANCEL": "Cancelar"
     },
     "SUCCESS_MODAL": {
@@ -1015,7 +1036,17 @@
         "ERROR_REQUIRED": "Debe indicar un motivo de anulación.",
         "DISABLED_HINT": "Este registro ya está anulado",
         "CANCEL": "Cancelar",
-        "CONFIRM": "Confirmar anulación"
+        "CONFIRM": "Confirmar anulación",
+        "REASONS": {
+          "WRONG_DATA": "Datos erróneos",
+          "WRONG_LOT": "Lote equivocado",
+          "DUPLICATE_RECORD": "Registro duplicado",
+          "INCOMPLETE_COSTS": "Costos incompletos",
+          "OPERATIONAL_CANCELLATION": "Cancelación operativa",
+          "SUPPLIER_UNAVAILABLE": "Proveedor no disponible",
+          "CALCULATION_ERROR": "Error de cálculo",
+          "TRANSPORT_ERROR": "Error de transporte"
+        }
       },
       "ERRORS": {
         "LOAD": "No se pudieron cargar los registros.",
@@ -1326,6 +1357,12 @@
       "WEB_LINK_INVALID": "El enlace web debe ser una URL http o https válida."
     },
     "CONFIRM_DELETE": "¿Está seguro de que desea eliminar este proveedor?",
+    "DELETE": {
+      "TITLE": "Eliminar proveedor",
+      "MESSAGE": "¿Está seguro de que desea eliminar el proveedor",
+      "CANCEL": "Cancelar",
+      "CONFIRM": "Eliminar"
+    },
     "ERRORS": {
       "LOAD": "No se pudieron cargar los proveedores.",
       "SEARCH": "No se pudo completar la búsqueda de proveedores.",
@@ -1342,7 +1379,8 @@
   "COFFEE_LOT_BC": {
     "HINT": {
       "NEED_SUPPLIER": "Registre al menos un proveedor antes de crear un lote.",
-      "SUPPLIER_FIXED_ON_EDIT": "El proveedor del lote no se modifica desde esta pantalla."
+      "SUPPLIER_FIXED_ON_EDIT": "El proveedor queda fijado al registrar el lote y no se modifica en versiones posteriores.",
+      "WEIGHT_FIXED_ON_EDIT": "El kg base del lote no se modifica desde esta pantalla."
     },
     "VALIDATION": {
       "SUMMARY": "Revise los campos marcados abajo.",
@@ -1373,7 +1411,43 @@
       "UNAUTHORIZED": "Sesión caducada o sin permiso. Vuelve a iniciar sesión.",
       "NOT_FOUND": "El lote no existe o ya fue eliminado.",
       "GENERIC": "Ocurrió un error inesperado. Inténtalo de nuevo.",
-      "NOT_AUTHENTICATED_CREATE": "Inicie sesión para registrar un lote."
+      "NOT_AUTHENTICATED_CREATE": "Inicie sesión para registrar un lote.",
+      "LOAD_VERSIONS": "No se pudo cargar el historial de versiones.",
+      "ANNULL": "No se pudo anular el lote."
+    },
+    "STATUS": {
+      "ANNULLED": "Lote anulado"
+    },
+    "ANNUL_REASON_LABEL": "Motivo de anulación",
+    "ANNUL": {
+      "ACTION": "Anular lote",
+      "TITLE": "Anular lote",
+      "QUESTION": "¿Está seguro de anular este lote? El lote no se eliminará: quedará marcado como anulado para auditoría y ya no podrá usarse en inventario ni costos.",
+      "REASON_LABEL": "Indicar motivo",
+      "REASON_PLACEHOLDER": "Seleccione un motivo",
+      "REASON_OTHER": "Otro",
+      "REASON_CUSTOM_LABEL": "Detalle del motivo (máx. 25 caracteres)",
+      "REASON_CUSTOM_PLACEHOLDER": "Describa el motivo (máx. 25)",
+      "ERROR_REQUIRED": "Debe indicar un motivo de anulación.",
+      "DISABLED_HINT": "Este lote ya está anulado",
+      "CANCEL": "Cancelar",
+      "CONFIRM": "Confirmar anulación",
+      "REASONS": {
+        "DUPLICATE_RECORD": "Registro duplicado",
+        "WRONG_LOT": "Lote erróneo",
+        "INCORRECT_DATA": "Datos incorrectos",
+        "OPERATIONAL_CANCELLATION": "Cancelación operativa",
+        "WEIGHT_ERROR": "Error de peso",
+        "NO_REAL_STOCK": "Sin stock real",
+        "OPERATIONAL_CHANGE": "Cambio operativo",
+        "INTERNAL_AUDIT": "Auditoría interna"
+      }
+    },
+    "VERSION_HISTORY": {
+      "TITLE": "Historial de versiones",
+      "EMPTY": "Sin versiones anteriores.",
+      "CURRENT": "Actual",
+      "HISTORICAL": "Histórica"
     },
     "OPTIONS": {
       "COFFEE_TYPE": {
@@ -1405,7 +1479,11 @@
     "DUPLICATE_NAME_PATTERN": "Copia de {{name}}",
     "DUPLICATE_NAME_DEFAULT": "perfil",
     "HINT": {
-      "NEED_LOT": "Registre al menos un lote de café suyo antes de crear un perfil de tueste."
+      "NEED_LOT": "Registre al menos un lote de café suyo antes de crear un perfil de tueste.",
+      "NEED_ACTIVE_LOT": "Registre al menos un lote activo (no anulado) antes de crear un perfil de tueste.",
+      "EDIT_BLOCKED_ANNULLED_LOT": "No se puede editar un perfil vinculado a un lote anulado.",
+      "DUPLICATE_BLOCKED_ANNULLED_LOT": "No se puede duplicar un perfil vinculado a un lote anulado.",
+      "FAVORITE_BLOCKED_ANNULLED_LOT": "No se puede cambiar favorito en un perfil con lote anulado."
     },
     "FIELD": {
       "NAME": "Nombre del perfil",
@@ -1434,7 +1512,9 @@
       "TEMP_RANGE": "Cada temperatura debe estar entre 1 y 240 °C.",
       "TEMP_ORDER": "La temperatura inicial no puede ser mayor o igual que la temperatura final.",
       "LOT": "Seleccione un lote de café vinculado.",
-      "NO_LOTS": "Debe tener al menos un lote de café registrado."
+      "NO_LOTS": "Debe tener al menos un lote de café registrado.",
+      "NO_ACTIVE_LOTS": "Debe tener al menos un lote activo (no anulado).",
+      "ANNULLED_LOT": "No puede vincular un perfil a un lote anulado."
     },
     "ERRORS": {
       "LOAD": "No se pudieron cargar los perfiles de tueste.",
@@ -1501,11 +1581,18 @@
     "EL_PRODUCTO_FINAL_NO_PUEDE_TENER_MAS": "El producto final no puede tener más de 100 caracteres",
     "EL_PRODUCTO_FINAL_SOLO_PUEDE_CONTENER_LETRAS": "El producto final solo puede contener letras, números y espacios",
     "EL_REGISTRO_YA_ESTA_ANULADO": "El registro ya está anulado",
+    "EL_LOTE_YA_ESTA_ANULADO": "El lote ya está anulado",
+    "NO_SE_PUEDE_MODIFICAR_UN_LOTE_ANULADO": "No se puede modificar un lote anulado",
+    "NO_SE_PUEDE_OPERAR_SOBRE_UN_LOTE_ANULADO": "No se puede operar sobre un lote anulado",
+    "NO_SE_PUEDE_REGISTRAR_COSTO_SOBRE_LOTE_ANULADO": "No se puede registrar costo sobre un lote anulado",
+    "NO_SE_PUEDE_AJUSTAR_STOCK_LOTE_ANULADO": "No se puede ajustar stock de un lote anulado",
+    "NO_SE_PUEDE_VINCULAR_PERFIL_TUESTE_LOTE_ANULADO": "No se puede vincular un perfil de tueste a un lote anulado",
     "EL_TIPO_DE_CAFE_NO_PUEDE_SER": "El tipo de café no puede ser nulo o vacío",
     "EL_TIPO_DE_CAFE_NO_PUEDE_TENER": "El tipo de café no puede tener más de 50 caracteres",
     "EL_TIPO_DE_DEFECTO_NO_PUEDE_SER": "El tipo de defecto no puede ser nulo o vacío",
     "EL_TIPO_DE_TUESTE_NO_PUEDE_SER": "El tipo de tueste no puede ser nulo o vacío",
     "ERROR_INTERNO_DEL_SERVIDOR": "Error interno del servidor",
+    "LA_CANTIDAD_SUPERA_EL_STOCK_DISPONIBLE_DEL_LOTE": "La cantidad supera el stock disponible del lote",
     "LA_CAUSA_PROBABLE_NO_PUEDE_SER_NULA": "La causa probable no puede ser nula o vacía",
     "LA_DURACION_DEBE_SER_UN_VALOR_POSITIVO": "La duración debe ser un valor positivo",
     "LA_DURACION_NO_PUEDE_EXCEDER_1440_MINUTOS": "La duración no puede exceder 1440 minutos (24 horas)",
@@ -1571,7 +1658,8 @@
     "NO_SE_PUEDEN_TENER_MAS_DE_4": "No se pueden tener más de 4 especialidades",
     "PHONE_DEBE_TENER_ENTRE_7_Y_15": "Phone debe tener entre 7 y 15 dígitos",
     "PROVEEDOR_ELIMINADO_EXITOSAMENTE": "Proveedor eliminado exitosamente",
-    "SESION_NO_VALIDA": "Sesión no válida",
+    "SOLO_SE_PUEDE_AJUSTAR_STOCK_VERSION_ACTUAL": "Solo se puede ajustar stock en la versión actual del lote",
+    "SOLO_SE_PUEDE_REGISTRAR_CONSUMO_DIA_HOY": "Solo se puede registrar consumo del día de hoy",
     "TIPO_DE_TUESTE_NO_VALIDO_DEBE_SER": "Tipo de tueste no válido. Debe ser: Ligero, Medio, Medio-Oscuro, Oscuro",
     "USUARIO_NO_AUTENTICADO_O_PERFIL_NO_ENCONTRADO": "Usuario no autenticado o perfil no encontrado",
     "YA_EXISTE_UN_CAFE_CON_ESE_NOMBRE": "Ya existe un café con ese nombre",

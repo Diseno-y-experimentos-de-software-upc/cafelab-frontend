@@ -64,13 +64,40 @@ export class CoffeeLotApiEndpoint extends BaseApiEndpoint<
       );
   }
 
-  override update(entity: CoffeeLot, id: number): Observable<CoffeeLot> {
+  createVersion(id: number, entity: CoffeeLot): Observable<CoffeeLot> {
     const body = this.coffeeLotAssembler.toUpdateResource(entity);
     return this.http
-      .put<CoffeeLotResource>(`${this.endpointUrl}/${id}`, body, this.httpOptions)
+      .post<CoffeeLotResource>(`${this.endpointUrl}/${id}/versions`, body, this.httpOptions)
       .pipe(
         map((r) => this.assembler.toEntityFromResource(r)),
         catchError(this.handleError(this.translate.instant('COFFEE_LOT_BC.ERRORS.UPDATE'))),
+      );
+  }
+
+  getVersionsByLineage(lineageId: number): Observable<CoffeeLot[]> {
+    return this.http
+      .get<CoffeeLotResource[]>(`${this.endpointUrl}/lineage/${lineageId}/versions`, this.httpOptions)
+      .pipe(
+        map((arr) => arr.map((r) => this.assembler.toEntityFromResource(r))),
+        catchError(this.handleError(this.translate.instant('COFFEE_LOT_BC.ERRORS.LOAD_VERSIONS'))),
+      );
+  }
+
+  getSelectable(): Observable<CoffeeLot[]> {
+    return this.http
+      .get<CoffeeLotResource[]>(`${this.endpointUrl}/selectable`, this.httpOptions)
+      .pipe(
+        map((arr) => arr.map((r) => this.assembler.toEntityFromResource(r))),
+        catchError(this.handleError(this.translate.instant('COFFEE_LOT_BC.ERRORS.LOAD'))),
+      );
+  }
+
+  annull(id: number, reason: string): Observable<CoffeeLot> {
+    return this.http
+      .post<CoffeeLotResource>(`${this.endpointUrl}/${id}/annulment`, { reason }, this.httpOptions)
+      .pipe(
+        map((r) => this.assembler.toEntityFromResource(r)),
+        catchError(this.handleError(this.translate.instant('COFFEE_LOT_BC.ERRORS.ANNULL'))),
       );
   }
 }

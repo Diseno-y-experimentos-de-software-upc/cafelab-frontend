@@ -167,7 +167,7 @@ export class InventaryComponent implements OnInit {
   
   getTotalKgForStatus(status: 'green' | 'roasted'): number {
     return this.lots
-      .filter((lot) => this.normalizeLotStatus(lot.status) === status)
+      .filter((lot) => this.isActiveLot(lot) && this.normalizeLotStatus(lot.status) === status)
       .reduce((sum, lot) => sum + this.lotWeightKg(lot), 0);
   }
 
@@ -178,7 +178,7 @@ export class InventaryComponent implements OnInit {
   calculateStatusMetrics(status: string, data: CoffeeStatusData): void {
     const statusKey = status as 'green' | 'roasted';
     const statusLots = this.lots.filter(
-      (lot) => this.normalizeLotStatus(lot.status) === statusKey,
+      (lot) => this.isActiveLot(lot) && this.normalizeLotStatus(lot.status) === statusKey,
     );
     const statusTotalKg = statusLots.reduce((sum, lot) => sum + this.lotWeightKg(lot), 0);
     const threshold = statusTotalKg * 0.3;
@@ -213,6 +213,10 @@ export class InventaryComponent implements OnInit {
   private lotWeightKg(lot: CoffeeLot): number {
     const w = Number(lot.weight);
     return Number.isFinite(w) ? w : 0;
+  }
+
+  private isActiveLot(lot: CoffeeLot): boolean {
+    return lot.record_status !== 'anulado';
   }
 
   private normalizeLotStatus(raw: string | undefined | null): 'green' | 'roasted' | '' {
@@ -255,9 +259,29 @@ export class InventaryComponent implements OnInit {
   }
 
   openRegisterConsumptionDialog(status: string): void {
+    const userId = Number(this.authService.getCurrentUserId());
+    if (!userId || isNaN(userId)) {
+      this.error = this.translate.instant('INVENTORY.ERRORS.AUTH_USER');
+      return;
+    }
+
+    this.coffeeLotApi.getAll().subscribe({
+      next: (lots) => {
+        this.lots = lots;
+        this.calculateMetrics();
+        this.openRegisterConsumptionDialogWithLots(status);
+      },
+      error: (err) => {
+        console.error('Error refreshing lots before consumption dialog:', err);
+        this.openRegisterConsumptionDialogWithLots(status);
+      },
+    });
+  }
+
+  private openRegisterConsumptionDialogWithLots(status: string): void {
     const st = status as 'green' | 'roasted';
     const availableLots = this.lots.filter(
-      (lot) => this.normalizeLotStatus(lot.status) === st,
+      (lot) => this.isActiveLot(lot) && this.normalizeLotStatus(lot.status) === st,
     );
     
     if (availableLots.length === 0) {
@@ -298,9 +322,10 @@ export class InventaryComponent implements OnInit {
             this.error = null;
             this.loadData();
           },
-          error: (err) => {
+          error: (err: Error) => {
             console.error('Error al registrar consumo:', err);
-            this.error = this.translate.instant('INVENTORY.ERRORS.REGISTER_CONSUMPTION');
+            const fallback = this.translate.instant('INVENTORY.ERRORS.REGISTER_CONSUMPTION');
+            this.error = err?.message?.trim() && err.message !== fallback ? err.message : fallback;
           }
         });
       }
@@ -308,14 +333,10 @@ export class InventaryComponent implements OnInit {
   }
   
   private isValidInventoryEntry(entry: InventoryEntry): boolean {
-    const lotExists = this.lots.some(
-      (lot) => Number(lot.id) === Number(entry.coffeeLotId),
-    );
     return (
       entry.coffeeLotId > 0 &&
       entry.quantityUsed > 0 &&
-      (entry.finalProduct?.trim().length ?? 0) > 0 &&
-      lotExists
+      (entry.finalProduct?.trim().length ?? 0) > 0
     );
   }
 

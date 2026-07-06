@@ -41,10 +41,22 @@ export class CoffeeLotApi {
   }
 
   update(id: number, entity: CoffeeLot): Observable<CoffeeLot> {
-    return this.coffeeLotApiEndpoint.update(entity, id);
+    return this.coffeeLotApiEndpoint.createVersion(id, entity);
   }
 
-  delete(id: number): Observable<void> {
-    return this.coffeeLotApiEndpoint.delete(id);
+  createVersion(id: number, entity: CoffeeLot): Observable<CoffeeLot> {
+    return this.coffeeLotApiEndpoint.createVersion(id, entity);
+  }
+
+  getVersionsByLineage(lineageId: number): Observable<CoffeeLot[]> {
+    return this.coffeeLotApiEndpoint.getVersionsByLineage(lineageId);
+  }
+
+  getSelectable(): Observable<CoffeeLot[]> {
+    return this.coffeeLotApiEndpoint.getSelectable();
+  }
+
+  annull(id: number, reason: string): Observable<CoffeeLot> {
+    return this.coffeeLotApiEndpoint.annull(id, reason);
   }
 }

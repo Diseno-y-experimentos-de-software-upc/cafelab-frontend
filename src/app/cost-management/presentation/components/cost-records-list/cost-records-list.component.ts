@@ -15,16 +15,16 @@ import type {
 } from '../../../domain/model/production-cost.entity';
 import { getUserFacingApiMessage } from '../../../../shared/infrastructure/api-error-message';
 
-/** Opciones predefinidas del selector de motivos de anulación. */
-const PREDEFINED_REASONS = [
-  'Datos erróneos',
-  'Lote equivocado',
-  'Registro duplicado',
-  'Costos incompletos',
-  'Cancelación operativa',
-  'Proveedor no disponible',
-  'Error de cálculo',
-  'Error de transporte',
+/** Claves i18n de motivos predefinidos de anulación. */
+const PREDEFINED_REASON_KEYS = [
+  'WRONG_DATA',
+  'WRONG_LOT',
+  'DUPLICATE_RECORD',
+  'INCOMPLETE_COSTS',
+  'OPERATIONAL_CANCELLATION',
+  'SUPPLIER_UNAVAILABLE',
+  'CALCULATION_ERROR',
+  'TRANSPORT_ERROR',
 ] as const;
 
 const OTHER_REASON_KEY = '__OTHER__';
@@ -40,7 +40,7 @@ const REASON_MAX_LENGTH = 25;
 export class CostRecordsListComponent implements OnInit {
   @Output() newCalculation = new EventEmitter<void>();
 
-  readonly predefinedReasons = PREDEFINED_REASONS;
+  readonly predefinedReasonKeys = PREDEFINED_REASON_KEYS;
   readonly otherReasonKey = OTHER_REASON_KEY;
   readonly reasonMaxLength = REASON_MAX_LENGTH;
 
@@ -158,7 +158,7 @@ export class CostRecordsListComponent implements OnInit {
       return null;
     }
     if (selection !== OTHER_REASON_KEY) {
-      return selection;
+      return this.annulReasonLabel(selection);
     }
     const custom = (this.annulReasonCustom || '').trim();
     if (!custom) {
@@ -166,6 +166,39 @@ export class CostRecordsListComponent implements OnInit {
     }
     return custom.slice(0, REASON_MAX_LENGTH);
   }
+
+  annulReasonLabel(key: string): string {
+    return this.translate.instant(`COST_MANAGEMENT.RECORDS.ANNUL.REASONS.${key}`);
+  }
+
+  getAnnulReasonDisplay(reason: string | undefined | null): string {
+    const text = (reason ?? '').trim();
+    if (!text) {
+      return '';
+    }
+    const key = PREDEFINED_REASON_KEYS.find(
+      (k) => this.annulReasonLabel(k) === text || k === text,
+    );
+    if (key) {
+      return this.annulReasonLabel(key);
+    }
+    const legacyKey = this.legacyAnnulReasonKeyBySpanishLabel[text];
+    if (legacyKey) {
+      return this.annulReasonLabel(legacyKey);
+    }
+    return text;
+  }
+
+  private readonly legacyAnnulReasonKeyBySpanishLabel: Record<string, string> = {
+    'Datos erróneos': 'WRONG_DATA',
+    'Lote equivocado': 'WRONG_LOT',
+    'Registro duplicado': 'DUPLICATE_RECORD',
+    'Costos incompletos': 'INCOMPLETE_COSTS',
+    'Cancelación operativa': 'OPERATIONAL_CANCELLATION',
+    'Proveedor no disponible': 'SUPPLIER_UNAVAILABLE',
+    'Error de cálculo': 'CALCULATION_ERROR',
+    'Error de transporte': 'TRANSPORT_ERROR',
+  };
 
   confirmAnnul(): void {
     if (!this.selectedForAnnul) {

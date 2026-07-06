@@ -45,13 +45,29 @@ export class InventoryEntryAssembler
   }
 
   toCreateResource(entity: InventoryEntry): CreateInventoryEntryBody {
-    const iso = new Date(entity.dateUsed).toISOString();
     return {
       coffeeLotId: Number(entity.coffeeLotId),
       quantityUsed: Number(entity.quantityUsed),
-      dateUsed: iso.slice(0, 19),
+      dateUsed: this.toApiLocalDateTime(entity.dateUsed),
       finalProduct: entity.finalProduct.trim(),
     };
+  }
+
+  /** Envía la fecha local sin pasar por UTC (evita cambiar de día en el backend). */
+  private toApiLocalDateTime(raw: string): string {
+    const text = String(raw ?? '').trim();
+    const localMatch = /^(\d{4}-\d{2}-\d{2})T(\d{2}:\d{2}:\d{2})$/.exec(text);
+    if (localMatch) {
+      return text;
+    }
+    const parsed = new Date(text);
+    if (!Number.isFinite(parsed.getTime())) {
+      return text;
+    }
+    const year = parsed.getFullYear();
+    const month = String(parsed.getMonth() + 1).padStart(2, '0');
+    const day = String(parsed.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}T12:00:00`;
   }
 
   toUpdateResource(entity: InventoryEntry): UpdateInventoryEntryBody {

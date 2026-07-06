@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule, NgForm } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { Router, RouterModule } from '@angular/router';
-import { catchError, finalize, of } from 'rxjs';
+import { catchError, finalize, forkJoin, of } from 'rxjs';
 import { TranslateModule, TranslateService } from '@ngx-translate/core';
 import { RoastProfileApi } from '../../../application/roast-profile.api';
 import { RoastProfile } from '../../../domain/model/roast-profile.entity';
@@ -25,7 +25,10 @@ export class RoastProfileListComponent implements OnInit {
   @ViewChild('editForm') editForm!: NgForm;
   @ViewChild('roastCurveCanvas') roastCurveCanvas: unknown;
 
+  /** Lotes activos para selectores de registro/edición. */
   coffeeLots: CoffeeLot[] = [];
+  /** Catálogo completo (incluye anulados) para mostrar nombres en tabla/detalle. */
+  lotCatalog: CoffeeLot[] = [];
   profiles: RoastProfile[] = [];
   searchQuery = '';
   showProfileDetails = false;
@@ -158,7 +161,7 @@ export class RoastProfileListComponent implements OnInit {
     this.error = null;
     this.fieldErrors = {};
     if (this.coffeeLots.length === 0) {
-      this.error = this.translate.instant('ROAST_PROFILE_BC.HINT.NEED_LOT');
+      this.error = this.translate.instant('ROAST_PROFILE_BC.HINT.NEED_ACTIVE_LOT');
       return;
     }
     this.showRegisterModal = true;
@@ -234,6 +237,9 @@ export class RoastProfileListComponent implements OnInit {
   toggleFavorite(profile: RoastProfile, event: Event): void {
     event.stopPropagation();
     if (!profile.id || profile.id <= 0) return;
+    if (this.isProfileLinkedToAnnulledLot(profile)) {
+      return;
+    }
 
     this.roastProfileApi
       .toggleFavorite(profile.id)
@@ -270,6 +276,10 @@ export class RoastProfileListComponent implements OnInit {
   }
 
   editProfile(profile: RoastProfile): void {
+    if (this.isProfileLinkedToAnnulledLot(profile)) {
+      this.error = this.translate.instant('ROAST_PROFILE_BC.HINT.EDIT_BLOCKED_ANNULLED_LOT');
+      return;
+    }
     this.editFieldErrors = {};
     this.editingProfile = { ...profile };
     this.showEditModal = true;
@@ -328,9 +338,11 @@ export class RoastProfileListComponent implements OnInit {
     const lot = Number(this.newProfile.lot);
     if (!lot || lot <= 0) {
       e['lot'] = t('ROAST_PROFILE_BC.VALIDATION.LOT');
+    } else if (!this.isSelectableLotId(lot)) {
+      e['lot'] = t('ROAST_PROFILE_BC.VALIDATION.ANNULLED_LOT');
     }
     if (this.coffeeLots.length === 0) {
-      e['lot'] = t('ROAST_PROFILE_BC.VALIDATION.NO_LOTS');
+      e['lot'] = t('ROAST_PROFILE_BC.VALIDATION.NO_ACTIVE_LOTS');
     }
     return e;
   }
@@ -379,6 +391,8 @@ export class RoastProfileListComponent implements OnInit {
     const lot = Number(p.lot);
     if (!lot || lot <= 0) {
       e['lot'] = t('ROAST_PROFILE_BC.VALIDATION.LOT');
+    } else if (!this.isSelectableLotId(lot)) {
+      e['lot'] = t('ROAST_PROFILE_BC.VALIDATION.ANNULLED_LOT');
     }
     return e;
   }
@@ -428,6 +442,10 @@ export class RoastProfileListComponent implements OnInit {
   duplicateProfile(profile: RoastProfile, event: Event): void {
     event.stopPropagation();
     if (!profile.id || profile.id <= 0) return;
+    if (this.isProfileLinkedToAnnulledLot(profile)) {
+      this.error = this.translate.instant('ROAST_PROFILE_BC.HINT.DUPLICATE_BLOCKED_ANNULLED_LOT');
+      return;
+    }
 
     this.loading = true;
     this.error = null;
@@ -560,24 +578,48 @@ export class RoastProfileListComponent implements OnInit {
   }
 
   loadCoffeeLots(): void {
-    this.coffeeLotApi
-      .getAll()
-      .pipe(
+    forkJoin({
+      catalog: this.coffeeLotApi.getAll().pipe(
         catchError((err) => {
-          console.error('Error loading coffee lots', err);
+          console.error('Error loading coffee lot catalog', err);
           this.error = this.roastErrorMessage(err, 'ROAST_PROFILE_BC.ERRORS.LOAD_LOTS');
           return of([]);
         }),
-      )
-      .subscribe((lots: CoffeeLot[]) => {
-        this.coffeeLots = lots;
-      });
+      ),
+      selectable: this.coffeeLotApi.getSelectable().pipe(
+        catchError((err) => {
+          console.error('Error loading selectable coffee lots', err);
+          return of([]);
+        }),
+      ),
+    }).subscribe(({ catalog, selectable }) => {
+      this.lotCatalog = catalog;
+      this.coffeeLots = selectable;
+    });
+  }
+
+  isLotAnnulled(lotId: number | undefined): boolean {
+    if (!lotId) return false;
+    const lot = this.lotCatalog.find((l) => l.id === lotId);
+    return lot?.record_status === 'anulado';
+  }
+
+  isProfileLinkedToAnnulledLot(profile: RoastProfile | null | undefined): boolean {
+    return this.isLotAnnulled(profile?.lot);
+  }
+
+  private isSelectableLotId(lotId: number): boolean {
+    return this.coffeeLots.some((l) => Number(l.id) === lotId);
   }
 
   getLotName(lotId: number | undefined): string {
     if (!lotId) return '';
-    const lot = this.coffeeLots.find((l) => l.id === lotId);
-    return lot ? lot.lot_name : '';
+    const lot = this.lotCatalog.find((l) => l.id === lotId);
+    if (!lot) return '';
+    if (lot.record_status === 'anulado') {
+      return `${lot.lot_name} (${this.translate.instant('COFFEE_LOT_BC.STATUS.ANNULLED')})`;
+    }
+    return lot.lot_name;
   }
 
   drawRoastCurve(): void {

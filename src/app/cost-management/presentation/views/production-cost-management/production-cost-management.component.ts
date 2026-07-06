@@ -216,7 +216,7 @@ export class ProductionCostPageComponent implements OnInit {
       return;
     }
 
-    this.coffeeLotApi.getAll().subscribe({
+    this.coffeeLotApi.getSelectable().subscribe({
       next: (list: CoffeeLot[]) => {
         this.lots = list;
         this.loading = false;

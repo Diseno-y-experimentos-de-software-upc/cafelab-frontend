@@ -72,7 +72,12 @@
           <td>{{ profile.duration }}</td>
           <td>{{ getLotName(profile.lot) }}</td>
           <td class="action-cell">
-            <button class="action-button" (click)="toggleFavorite(profile, $event)">
+            <button
+              class="action-button"
+              (click)="toggleFavorite(profile, $event)"
+              [disabled]="isProfileLinkedToAnnulledLot(profile)"
+              [title]="isProfileLinkedToAnnulledLot(profile) ? ('ROAST_PROFILE_BC.HINT.FAVORITE_BLOCKED_ANNULLED_LOT' | translate) : ''"
+            >
               <i class="material-icons">{{ profile.isFavorite ? 'star' : 'star_border' }}</i>
             </button>
           </td>
@@ -82,12 +87,22 @@
             </button>
           </td>
           <td class="action-cell">
-            <button class="action-button" (click)="editProfile(profile)">
+            <button
+              class="action-button"
+              (click)="editProfile(profile)"
+              [disabled]="isProfileLinkedToAnnulledLot(profile)"
+              [title]="isProfileLinkedToAnnulledLot(profile) ? ('ROAST_PROFILE_BC.HINT.EDIT_BLOCKED_ANNULLED_LOT' | translate) : ('BUTTON.EDIT' | translate)"
+            >
               <i class="material-icons">edit</i>
             </button>
           </td>
           <td class="action-cell">
-            <button class="action-button" (click)="duplicateProfile(profile, $event)">
+            <button
+              class="action-button"
+              (click)="duplicateProfile(profile, $event)"
+              [disabled]="isProfileLinkedToAnnulledLot(profile)"
+              [title]="isProfileLinkedToAnnulledLot(profile) ? ('ROAST_PROFILE_BC.HINT.DUPLICATE_BLOCKED_ANNULLED_LOT' | translate) : ''"
+            >
               <i class="material-icons">content_copy</i>
             </button>
           </td>
@@ -124,18 +139,23 @@
         <h3>{{ 'profile.informationTitle' | translate }}</h3>
 
         <div class="detail-group">
+          <label>{{ 'profile.columns.type' | translate }}</label>
+          <p>{{ roastTypeLabel(selectedProfile?.type ?? '') }}</p>
+        </div>
+
+        <div class="detail-group">
           <label>{{ 'profile.detailDuration' | translate }}</label>
-          <p>{{ selectedProfile?.duration }} min</p>
+          <p>{{ selectedProfile?.duration }} {{ 'COMMON.UNIT_MINUTES' | translate }}</p>
         </div>
 
         <div class="detail-group">
           <label>{{ 'profile.detailTempStart' | translate }}</label>
-          <p>{{ selectedProfile?.tempStart }} °C</p>
+          <p>{{ selectedProfile?.tempStart }} {{ 'COMMON.UNIT_CELSIUS' | translate }}</p>
         </div>
 
         <div class="detail-group">
           <label>{{ 'profile.detailTempEnd' | translate }}</label>
-          <p>{{ selectedProfile?.tempEnd }} °C</p>
+          <p>{{ selectedProfile?.tempEnd }} {{ 'COMMON.UNIT_CELSIUS' | translate }}</p>
         </div>
 
         <div class="detail-group">
@@ -340,7 +360,7 @@
       class="register-button"
       (click)="openRegisterModal()"
       [disabled]="coffeeLots.length === 0"
-      [title]="coffeeLots.length === 0 ? ('ROAST_PROFILE_BC.HINT.NEED_LOT' | translate) : ''"
+      [title]="coffeeLots.length === 0 ? ('ROAST_PROFILE_BC.HINT.NEED_ACTIVE_LOT' | translate) : ''"
     >
       {{ 'profile.registerbutton' | translate }}
     </button>

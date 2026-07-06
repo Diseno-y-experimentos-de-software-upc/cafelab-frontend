@@ -26,6 +26,7 @@ export class SupplierListComponent implements OnInit {
   showRegisterModal: boolean = false;
   showEditModal: boolean = false;
   showSupplierDetails: boolean = false;
+  showDeleteModal: boolean = false;
 
   newSpecialties: string[] = [];
   editingSpecialties: string[] = [];
@@ -55,6 +56,7 @@ export class SupplierListComponent implements OnInit {
   };
 
   selectedSupplier: Supplier | null = null;
+  supplierToDelete: Supplier | null = null;
   loading: boolean = false;
   error: string | null = null;
 
@@ -191,7 +193,7 @@ export class SupplierListComponent implements OnInit {
           const msg = this.supplierErrorMessage(err, 'SUPPLIER_BC.ERRORS.UPDATE');
           this.error = msg;
           if (msg) {
-            this.snackBar.open(msg, 'Cerrar', { duration: 6000, panelClass: ['snack-error'] });
+            this.snackBar.open(msg, this.translateService.instant('COMMON.CLOSE'), { duration: 6000, panelClass: ['snack-error'] });
           }
           return of(null);
         }),
@@ -204,11 +206,28 @@ export class SupplierListComponent implements OnInit {
         }
       });
   }
-  deleteSupplier(id: number): void {
-    if (!confirm(this.translateService.instant('SUPPLIER_BC.CONFIRM_DELETE'))) {
+  openDeleteModal(supplier: Supplier): void {
+    if (!supplier.id || supplier.id <= 0) {
+      return;
+    }
+    this.supplierToDelete = supplier;
+    this.showDeleteModal = true;
+    this.error = null;
+  }
+
+  cancelDelete(): void {
+    this.showDeleteModal = false;
+    this.supplierToDelete = null;
+    this.error = null;
+  }
+
+  confirmDelete(): void {
+    if (!this.supplierToDelete?.id || this.supplierToDelete.id <= 0) {
+      this.error = this.translateService.instant('SUPPLIER_BC.ERRORS.NOT_FOUND');
       return;
     }
 
+    const id = this.supplierToDelete.id;
     this.loading = true;
     this.error = null;
 
@@ -219,9 +238,13 @@ export class SupplierListComponent implements OnInit {
           this.error = this.supplierErrorMessage(err, 'SUPPLIER_BC.ERRORS.DELETE');
           return of(null);
         }),
-        finalize(() => this.loading = false)
+        finalize(() => {
+          this.loading = false;
+          this.showDeleteModal = false;
+          this.supplierToDelete = null;
+        })
       )
-      .subscribe((result: any) => {
+      .subscribe((result: unknown) => {
         if (result !== null) {
           this.loadSuppliers();
         }
@@ -260,7 +283,7 @@ export class SupplierListComponent implements OnInit {
           const msg = this.supplierErrorMessage(err, 'SUPPLIER_BC.ERRORS.REGISTER');
           this.error = msg;
           if (msg) {
-            this.snackBar.open(msg, 'Cerrar', { duration: 6000, panelClass: ['snack-error'] });
+            this.snackBar.open(msg, this.translateService.instant('COMMON.CLOSE'), { duration: 6000, panelClass: ['snack-error'] });
           }
           return of(null);
         }),
