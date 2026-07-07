@@ -21,8 +21,15 @@ export class App implements OnInit {
 
   constructor(private translate: TranslateService, private router: Router) {
     this.translate.addLangs(['en', 'es']);
-    this.translate.setDefaultLang('en');
-    this.translate.use('en');
+    this.translate.setDefaultLang('es');
+    this.translate.use('es');
+
+    // Mantener el atributo lang del <html> sincronizado con el idioma activo (WCAG 3.1.1).
+    // Cubre cualquiera de los selectores de idioma, sin importar cuál se use.
+    document.documentElement.lang = 'es';
+    this.translate.onLangChange.subscribe((event) => {
+      document.documentElement.lang = event.lang;
+    });
 
     // 3. Lógica de Google Analytics para Single Page Application
       this.router.events
